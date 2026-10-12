@@ -57,10 +57,13 @@ model is served from this folder.
   12.8 s inference for 14.8 s of audio on the build host CPU.
 * `tokenizer.json` was patched so transformers.js 2.x can read it (merges written as `"a b"`
   strings instead of `["a","b"]` pairs emitted by newer `tokenizers`).
-* `test/transcribe-node.mjs` (transformers.js in Node) could **not** run on the build machine:
-  the `onnxruntime-node` binary bundled with transformers.js 2.17 crashes there (exit 0xC06D007F).
-  Browsers use ONNX Runtime Web (WASM) instead, so open the PWA in Chrome/Edge/Safari to confirm
-  end to end; nothing has been verified in a real browser yet.
+* transformers.js **v2.17 failed** to load the export (its ONNX Runtime rejects the opset-18
+  graphs; in the browser this surfaced as "Unsupported model type: whisper" from the fallback
+  loader). The app now uses **@huggingface/transformers 3.3.3**. `test/transcribe-node.mjs`
+  with v3 transcribes FLEURS clip 000 end to end in Node: load 1.4 s, inference 8.3 s for 14.8 s of
+  audio, output "በሴቶች ቡድን ውስጥ አራት የበረዶ ተንሸራቶች ሩጫቸዋን መጨረስ አልቻሉም በጉዙፉ ስላሉም ካሉት ከመቶ አስራ ሰባት…"
+  (reference "…ከ117ቱ…45ቱ…", i.e. numbers come out as words). Browser confirmation on a phone is
+  the remaining step.
 
 ## Privacy
 
