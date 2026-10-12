@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sema Voice</title>
+<meta name="description" content="Speak in your language. Write in any language. Offline voice typing and translation in your browser.">
+<meta name="theme-color" content="#4F46E5">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<style>
+  :root { --primary:#4F46E5; --secondary:#14B8A6; --bg:#F8FAFC; --text:#111827; --border:#E5E7EB; --record:#EF4444; --card:#fff; --muted:#64748B; color-scheme: light; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#0B1220; --text:#F1F5F9; --border:#334155; --card:#111A2E; --muted:#94A3B8; color-scheme: dark; } }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font: 16px/1.5 system-ui, "Noto Sans Ethiopic", "Abyssinica SIL", sans-serif; padding: env(safe-area-inset-top) 16px env(safe-area-inset-bottom); }
+  main { max-width: 640px; margin: 0 auto; padding: 20px 0 48px; }
+  h1 { font-size: 14px; letter-spacing: .12em; color: var(--primary); margin: 0; }
+  .tag { color: var(--muted); margin: 4px 0 20px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 14px; }
+  .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  select, button, textarea { font: inherit; border-radius: 10px; border: 1px solid var(--border); background: var(--card); color: var(--text); padding: 8px 12px; }
+  button { cursor:pointer; }
+  button.primary { background: var(--primary); color:#fff; border-color: var(--primary); }
+  button:disabled { opacity:.5; cursor: default; }
+  .mic { width: 88px; height: 88px; border-radius: 50%; border: none; background: var(--primary); color:#fff; font-size: 34px; display:block; margin: 12px auto; box-shadow: 0 8px 24px rgba(79,70,229,.3); }
+  .mic.rec { background: var(--record); animation: pulse 1s infinite; }
+  @keyframes pulse { 50% { transform: scale(1.06); } }
+  .status { text-align:center; color: var(--muted); min-height: 24px; }
+  .level { height: 6px; background: var(--border); border-radius: 3px; overflow:hidden; margin: 8px auto; width: 60%; }
+  .level > div { height:100%; width:0; background: var(--primary); transition: width .1s; }
+  textarea { width:100%; min-height: 110px; resize: vertical; }
+  .label { font-size: 12px; color: var(--muted); margin: 6px 0 4px; }
+  .out { color: var(--primary); font-size: 18px; white-space: pre-wrap; }
+  .local { font-size: 12px; color: var(--secondary); }
+  .err { color: var(--record); }
+  details summary { cursor:pointer; color: var(--muted); }
+  progress { width:100%; }
+</style>
+</head>
+<body>
+<main>
+  <h1>SEMA VOICE</h1>
+  <p class="tag" data-i18n="tagline">Speak in your language. Write in any language.</p>
+
+  <div class="card">
+    <div class="row">
+      <label><span class="label" data-i18n="input">Input</span>
+        <select id="inLang">
+          <option value="am">አማርኛ · Amharic</option>
+          <option value="en">English</option>
+          <option value="ar">العربية · Arabic</option>
+          <option value="so">Soomaali · Somali (unverified)</option>
+        </select></label>
+      <label><span class="label" data-i18n="output">Output</span>
+        <select id="outLang">
+          <option value="en">English</option>
+          <option value="am">አማርኛ · Amharic</option>
+          <option value="ar">العربية · Arabic</option>
+          <option value="so">Soomaali · Somali</option>
+          <option value="ti">ትግርኛ · Tigrinya (basic)</option>
+        </select></label>
+      <label><span class="label" data-i18n="mode">Mode</span>
+        <select id="mode">
+          <option value="exact" data-i18n="modeExact">Exact</option>
+          <option value="clean" selected data-i18n="modeClean">Clean</option>
+          <option value="translate" data-i18n="modeTranslate">Translate</option>
+        </select></label>
+      <label><span class="label">UI</span>
+        <select id="uiLang"><option value="en">English</option><option value="am">አማርኛ</option></select></label>
+    </div>
+    <button id="mic" class="mic" aria-label="Start dictation">🎤</button>
+    <div class="level"><div id="level"></div></div>
+    <div id="status" class="status" data-i18n="tap">Tap the microphone and speak.</div>
+    <progress id="progress" max="100" value="0" hidden></progress>
+    <div class="row" style="justify-content:center">
+      <button id="cancel" hidden data-i18n="cancel">Cancel</button>
+    </div>
+  </div>
+
+  <div class="card" id="result" hidden>
+    <div class="label" data-i18n="transcript">Transcript</div>
+    <textarea id="text" aria-label="Transcript"></textarea>
+    <div id="stats" class="local"></div>
+    <div class="label" id="trLabel" hidden data-i18n="translation">Translation</div>
+    <div id="translation" class="out" hidden></div>
+    <div id="trError" class="err" hidden></div>
+    <div class="row" style="margin-top:10px">
+      <button class="primary" id="copy" data-i18n="copy">Copy</button>
+      <button id="copyTr" hidden data-i18n="copyTr">Copy translation</button>
+      <button id="share" data-i18n="share">Share</button>
+      <button id="translate" data-i18n="translate">Translate</button>
+      <button id="speak" data-i18n="listen">Listen</button>
+      <button id="download" data-i18n="save">Save .txt</button>
+      <button id="discard" data-i18n="discard">Discard</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <details>
+      <summary data-i18n="models">Models &amp; privacy</summary>
+      <p data-i18n="privacy">Everything runs inside this browser tab (whisper + translation via transformers.js, ONNX Runtime Web). Audio never leaves your device. Models (30–115 MB) are downloaded once and cached for offline use.</p>
+      <div id="modelStatus" class="label"></div>
+      <div class="row">
+        <button id="warm" data-i18n="warm">Download models for current languages</button>
+        <button id="install" hidden data-i18n="install">Install app</button>
+      </div>
+      <p class="label" data-i18n="kbnote">Browsers cannot provide a system keyboard. Use the Android app for keyboard dictation inside other apps; here, copy or share the text.</p>
+    </details>
+  </div>
+</main>
+<script type="module" src="app.js"></script>
+</body>
+</html>
