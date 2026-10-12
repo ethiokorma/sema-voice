@@ -1,0 +1,42 @@
+[
+  {
+    "id": "tiny-amharic",
+    "file": "ggml-tiny-amharic.bin",
+    "sizeBytes": 77691730,
+    "sha256": "132dff3accbe6815cbadfa46b8b848cfa208cce50ad58c8cc4dd1e24b5e258a9",
+    "sourceRepo": "https://huggingface.co/b1n1yam/shook-tiny-amharic-600hr",
+    "license": "Apache-2.0",
+    "base": "whisper-tiny",
+    "quantization": "f16",
+    "format": "ggml (whisper.cpp v1.9.5 convert-h5-to-ggml.py)",
+    "languages": [
+      "am",
+      "en"
+    ],
+    "displayName": "Whisper Tiny, Amharic fine-tune (f16)",
+    "description": "Fine-tuned Whisper Tiny (b1n1yam/shook-tiny-amharic-600hr, Apache-2.0). Measured on 30 FLEURS clips: WER 0.81 raw. Required for Amharic dictation.",
+    "requiredRamMb": 180,
+    "minTier": "LOW",
+    "experimental": true
+  },
+  {
+    "id": "tiny-amharic-q5_1",
+    "file": "ggml-tiny-amharic-q5_1.bin",
+    "sizeBytes": 32152690,
+    "sha256": "752a5116ae76f929cfc832c0ee9663841ec78bc0e58f28211d26f7a86d39c704",
+    "sourceRepo": "https://huggingface.co/b1n1yam/shook-tiny-amharic-600hr",
+    "license": "Apache-2.0",
+    "base": "whisper-tiny",
+    "quantization": "q5_1",
+    "format": "ggml (whisper.cpp v1.9.5 convert-h5-to-ggml.py + whisper-quantize q5_1)",
+    "languages": [
+      "am",
+      "en"
+    ],
+    "displayName": "Whisper Tiny, Amharic fine-tune (quantized)",
+    "description": "Fine-tuned Whisper Tiny (b1n1yam/shook-tiny-amharic-600hr, Apache-2.0). Measured on 30 FLEURS clips: WER 0.81 raw. Required for Amharic dictation.",
+    "requiredRamMb": 180,
+    "minTier": "LOW",
+    "experimental": true
+  }
+]

@@ -1,0 +1,3 @@
+# audio_path	language	reference_transcript	reference_translation_en
+# Add consented 16 kHz mono WAV clips under clips/ and reference transcripts here. Example:
+# clips/am_0001.wav	am	እንዴት ነህ? ነገ እንገናኝ።	How are you? Let's meet tomorrow.

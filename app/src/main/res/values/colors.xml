@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="sema_primary">#4F46E5</color>
+    <color name="sema_secondary">#14B8A6</color>
+    <color name="sema_light_bg">#F8FAFC</color>
+    <color name="sema_dark_bg">#0B1220</color>
+    <color name="sema_text">#111827</color>
+    <color name="sema_border">#E5E7EB</color>
+    <color name="sema_record">#EF4444</color>
+</resources>

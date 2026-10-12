@@ -1,0 +1,22 @@
+*.iml
+.gradle/
+/local.properties
+/.idea/
+.DS_Store
+/build/
+**/build/
+/captures
+.externalNativeBuild
+.cxx
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+# Native sources are fetched by scripts/fetch-whisper-cpp.* ; keep the repo light
+core/speech/src/main/cpp/whisper.cpp/
+# Models never belong in git
+*.bin
+*.onnx
+*.gguf
+tests/ai-quality/dataset/clips/*.wav

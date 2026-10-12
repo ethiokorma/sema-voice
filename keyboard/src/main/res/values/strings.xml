@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="keyboard_name">Sema Voice Keyboard</string>
+    <string name="subtype_amharic">Amharic (Sema Voice)</string>
+    <string name="subtype_english">English (Sema Voice)</string>
+
+    <string name="kb_tap_to_speak">Tap the microphone and speak</string>
+    <string name="kb_listening">Listening…</string>
+    <string name="kb_paused">Paused</string>
+    <string name="kb_transcribing">Transcribing on device…</string>
+    <string name="kb_translating">Translating on device…</string>
+    <string name="kb_loading_model">Loading %1$s…</string>
+    <string name="kb_insert">Insert</string>
+    <string name="kb_insert_translation">Insert translation</string>
+    <string name="kb_insert_original">Insert original</string>
+    <string name="kb_retry">Retry</string>
+    <string name="kb_discard">Discard</string>
+    <string name="kb_edit">Edit</string>
+    <string name="kb_stop">Stop</string>
+    <string name="kb_cancel">Cancel</string>
+    <string name="kb_mic">Microphone</string>
+    <string name="kb_mic_stop">Stop recording</string>
+    <string name="kb_space">Space</string>
+    <string name="kb_backspace">Backspace</string>
+    <string name="kb_enter">Enter</string>
+    <string name="kb_shift">Shift</string>
+    <string name="kb_symbols">Symbols</string>
+    <string name="kb_letters">Letters</string>
+    <string name="kb_switch_language">Switch language</string>
+    <string name="kb_switch_keyboard">Switch keyboard</string>
+    <string name="kb_settings">Settings</string>
+    <string name="kb_expand">Open full composer</string>
+    <string name="kb_translate_toggle">Translate</string>
+    <string name="kb_original">Original</string>
+    <string name="kb_translated">Translated</string>
+    <string name="kb_mode_exact">Exact</string>
+    <string name="kb_mode_clean">Clean</string>
+    <string name="kb_mode_translate">Translate</string>
+    <string name="kb_mode_smart">Smart</string>
+    <string name="kb_input_label">In</string>
+    <string name="kb_output_label">Out</string>
+    <string name="kb_processing_local">On-device</string>
+    <string name="kb_corrections_applied">%1$d dictionary correction(s) applied</string>
+    <string name="kb_suggestion">Did you mean %1$s?</string>
+    <string name="kb_apply">Apply</string>
+
+    <string name="err_mic_permission">Microphone permission is needed for voice typing.</string>
+    <string name="err_mic_permission_action">Open Sema Voice to grant it</string>
+    <string name="err_no_mic">This device has no microphone.</string>
+    <string name="err_mic_busy">Another app is using the microphone. Close it and try again.</string>
+    <string name="err_empty">Nothing was heard. Try speaking closer to the microphone.</string>
+    <string name="err_model_missing">No speech model installed. Download one in Sema Voice.</string>
+    <string name="err_model_missing_action">Open model manager</string>
+    <string name="err_model_corrupt">The speech model is damaged. Re-download it.</string>
+    <string name="err_unsupported_language">%1$s is not supported by the installed model.</string>
+    <string name="err_translation_unavailable">Translation %1$s → %2$s is not installed.</string>
+    <string name="err_secure_field">Voice input is off in password fields.</string>
+    <string name="err_no_field">Tap a text field first.</string>
+    <string name="err_interrupted">Recording was interrupted.</string>
+    <string name="err_device">This device cannot run the speech model.</string>
+    <string name="err_memory">Not enough memory for this model. Choose a smaller one.</string>
+    <string name="err_generic">Something went wrong. Please try again.</string>
+    <string name="err_cancelled">Cancelled.</string>
+</resources>

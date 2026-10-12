@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="keyboard_name">ሰማ ቮይስ ኪቦርድ</string>
+    <string name="subtype_amharic">አማርኛ (ሰማ ቮይስ)</string>
+    <string name="subtype_english">እንግሊዝኛ (ሰማ ቮይስ)</string>
+
+    <string name="kb_tap_to_speak">ማይክሮፎኑን ነክተው ይናገሩ</string>
+    <string name="kb_listening">እያዳመጠ ነው…</string>
+    <string name="kb_paused">ቆሟል</string>
+    <string name="kb_transcribing">በስልኩ ላይ እየተጻፈ ነው…</string>
+    <string name="kb_translating">በስልኩ ላይ እየተተረጎመ ነው…</string>
+    <string name="kb_loading_model">%1$s እየተጫነ ነው…</string>
+    <string name="kb_insert">አስገባ</string>
+    <string name="kb_insert_translation">ትርጉሙን አስገባ</string>
+    <string name="kb_insert_original">ዋናውን አስገባ</string>
+    <string name="kb_retry">እንደገና ሞክር</string>
+    <string name="kb_discard">አስወግድ</string>
+    <string name="kb_edit">አርትዕ</string>
+    <string name="kb_stop">አቁም</string>
+    <string name="kb_cancel">ሰርዝ</string>
+    <string name="kb_mic">ማይክሮፎን</string>
+    <string name="kb_mic_stop">ቀረጻ አቁም</string>
+    <string name="kb_space">ክፍተት</string>
+    <string name="kb_backspace">ደምስስ</string>
+    <string name="kb_enter">አስገባ</string>
+    <string name="kb_shift">ሺፍት</string>
+    <string name="kb_symbols">ምልክቶች</string>
+    <string name="kb_letters">ፊደላት</string>
+    <string name="kb_switch_language">ቋንቋ ቀይር</string>
+    <string name="kb_switch_keyboard">ኪቦርድ ቀይር</string>
+    <string name="kb_settings">ቅንብሮች</string>
+    <string name="kb_expand">ሙሉ አርታዒ ክፈት</string>
+    <string name="kb_translate_toggle">ተርጉም</string>
+    <string name="kb_original">ዋናው</string>
+    <string name="kb_translated">ትርጉም</string>
+    <string name="kb_mode_exact">ልክ</string>
+    <string name="kb_mode_clean">ንጹህ</string>
+    <string name="kb_mode_translate">ተርጉም</string>
+    <string name="kb_mode_smart">ብልህ</string>
+    <string name="kb_input_label">ግብዓት</string>
+    <string name="kb_output_label">ውጤት</string>
+    <string name="kb_processing_local">በስልኩ ላይ</string>
+    <string name="kb_corrections_applied">%1$d የመዝገበ ቃላት እርማት ተተግብሯል</string>
+    <string name="kb_suggestion">%1$s ማለትዎ ነው?</string>
+    <string name="kb_apply">ተግብር</string>
+
+    <string name="err_mic_permission">ለድምጽ መተየብ የማይክሮፎን ፈቃድ ያስፈልጋል።</string>
+    <string name="err_mic_permission_action">ፈቃድ ለመስጠት ሰማ ቮይስን ይክፈቱ</string>
+    <string name="err_no_mic">ይህ መሣሪያ ማይክሮፎን የለውም።</string>
+    <string name="err_mic_busy">ሌላ መተግበሪያ ማይክሮፎኑን እየተጠቀመ ነው። ዘግተው እንደገና ይሞክሩ።</string>
+    <string name="err_empty">ምንም አልተሰማም። ወደ ማይክሮፎኑ ቀረብ ብለው ይናገሩ።</string>
+    <string name="err_model_missing">የንግግር ሞዴል አልተጫነም። በሰማ ቮይስ ውስጥ ያውርዱ።</string>
+    <string name="err_model_missing_action">የሞዴል አስተዳዳሪን ክፈት</string>
+    <string name="err_model_corrupt">የንግግር ሞዴሉ ተበላሽቷል። እንደገና ያውርዱት።</string>
+    <string name="err_unsupported_language">%1$s በተጫነው ሞዴል አይደገፍም።</string>
+    <string name="err_translation_unavailable">ትርጉም %1$s → %2$s አልተጫነም።</string>
+    <string name="err_secure_field">በይለፍ ቃል መስኮች የድምጽ ግብዓት ጠፍቷል።</string>
+    <string name="err_no_field">መጀመሪያ የጽሑፍ መስክ ይንኩ።</string>
+    <string name="err_interrupted">ቀረጻው ተቋርጧል።</string>
+    <string name="err_device">ይህ መሣሪያ የንግግር ሞዴሉን ማስኬድ አይችልም።</string>
+    <string name="err_memory">ለዚህ ሞዴል በቂ ማህደረ ትውስታ የለም። ትንሽ ሞዴል ይምረጡ።</string>
+    <string name="err_generic">ችግር ተፈጥሯል። እባክዎ እንደገና ይሞክሩ።</string>
+    <string name="err_cancelled">ተሰርዟል።</string>
+</resources>

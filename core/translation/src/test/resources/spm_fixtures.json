@@ -1,0 +1,710 @@
+[
+{
+"model": "m2m100",
+"text": "Hello, how are you?",
+"pieces": [
+"▁Hello",
+",",
+"▁how",
+"▁are",
+"▁you",
+"?"
+],
+"decoded": "Hello, how are you?"
+},
+{
+"model": "m2m100",
+"text": "እንዴት ነህ? ነገ እንገናኝ።",
+"pieces": [
+"▁እንዴት",
+"▁ነ",
+"ህ",
+"?",
+"▁ነገ",
+"▁እን",
+"ገና",
+"ኝ",
+"።"
+],
+"decoded": "እንዴት ነህ? ነገ እንገናኝ።"
+},
+{
+"model": "m2m100",
+"text": "ነገ meeting አለኝ ከ manager ጋር።",
+"pieces": [
+"▁ነገ",
+"▁meeting",
+"▁አለ",
+"ኝ",
+"▁ከ",
+"▁manager",
+"▁ጋር",
+"።"
+],
+"decoded": "ነገ meeting አለኝ ከ manager ጋር።"
+},
+{
+"model": "m2m100",
+"text": "Addis Ababa is the capital of Ethiopia.",
+"pieces": [
+"▁Ad",
+"dis",
+"▁Ab",
+"aba",
+"▁is",
+"▁the",
+"▁capital",
+"▁of",
+"▁Ethiopia",
+"."
+],
+"decoded": "Addis Ababa is the capital of Ethiopia."
+},
+{
+"model": "m2m100",
+"text": "ሰላም! Tewodros ይባላል።",
+"pieces": [
+"▁ሰላም",
+"!",
+"▁Te",
+"wod",
+"ros",
+"▁ይ",
+"ባ",
+"ላ",
+"ል።"
+],
+"decoded": "ሰላም! Tewodros ይባላል።"
+},
+{
+"model": "m2m100",
+"text": "  multiple   spaces here ",
+"pieces": [
+"▁multiple",
+"▁sp",
+"aces",
+"▁here"
+],
+"decoded": "multiple spaces here"
+},
+{
+"model": "m2m100",
+"text": "123 ብር ነው",
+"pieces": [
+"▁123",
+"▁ብር",
+"▁ነው"
+],
+"decoded": "123 ብር ነው"
+},
+{
+"model": "m2m100",
+"text": "Let's meet tomorrow at 10:30, okay?",
+"pieces": [
+"▁Let",
+"'",
+"s",
+"▁meet",
+"▁tom",
+"orrow",
+"▁at",
+"▁10:30",
+",",
+"▁okay",
+"?"
+],
+"decoded": "Let's meet tomorrow at 10:30, okay?"
+},
+{
+"model": "m2m100",
+"text": "ጤና ይስጥልኝ",
+"pieces": [
+"▁",
+"ጤና",
+"▁ይ",
+"ስጥ",
+"ል",
+"ኝ"
+],
+"decoded": "ጤና ይስጥልኝ"
+},
+{
+"model": "m2m100",
+"text": "Soomaali waa luuqad.",
+"pieces": [
+"▁Soomaali",
+"▁waa",
+"▁lu",
+"uq",
+"ad",
+"."
+],
+"decoded": "Soomaali waa luuqad."
+},
+{
+"model": "m2m100",
+"text": "مرحبا بكم في أديس أبابا",
+"pieces": [
+"▁مرح",
+"با",
+"▁ب",
+"كم",
+"▁في",
+"▁أ",
+"دي",
+"س",
+"▁أ",
+"باب",
+"ا"
+],
+"decoded": "مرحبا بكم في أديس أبابا"
+},
+{
+"model": "opus-mul-en-source",
+"text": "Hello, how are you?",
+"pieces": [
+"▁Hel",
+"lo",
+",",
+"▁ho",
+"w",
+"▁are",
+"▁you",
+"?"
+],
+"decoded": "Hello, how are you?"
+},
+{
+"model": "opus-mul-en-source",
+"text": "እንዴት ነህ? ነገ እንገናኝ።",
+"pieces": [
+"▁እን",
+"ዴ",
+"ት",
+"▁ነ",
+"ህ",
+"?",
+"▁ነ",
+"ገ",
+"▁እን",
+"ገ",
+"ና",
+"ኝ",
+"።"
+],
+"decoded": "እንዴት ነህ? ነገ እንገናኝ።"
+},
+{
+"model": "opus-mul-en-source",
+"text": "ነገ meeting አለኝ ከ manager ጋር።",
+"pieces": [
+"▁ነ",
+"ገ",
+"▁mee",
+"ting",
+"▁አለ",
+"ኝ",
+"▁ከ",
+"▁mana",
+"ger",
+"▁ጋር",
+"።"
+],
+"decoded": "ነገ meeting አለኝ ከ manager ጋር።"
+},
+{
+"model": "opus-mul-en-source",
+"text": "Addis Ababa is the capital of Ethiopia.",
+"pieces": [
+"▁Ad",
+"dis",
+"▁Aba",
+"ba",
+"▁is",
+"▁the",
+"▁ca",
+"pital",
+"▁of",
+"▁E",
+"thi",
+"o",
+"pia",
+"."
+],
+"decoded": "Addis Ababa is the capital of Ethiopia."
+},
+{
+"model": "opus-mul-en-source",
+"text": "ሰላም! Tewodros ይባላል።",
+"pieces": [
+"▁ሰ",
+"ላ",
+"ም",
+"!",
+"▁Te",
+"wo",
+"dro",
+"s",
+"▁ይ",
+"ባ",
+"ላ",
+"ል",
+"።"
+],
+"decoded": "ሰላም! Tewodros ይባላል።"
+},
+{
+"model": "opus-mul-en-source",
+"text": "  multiple   spaces here ",
+"pieces": [
+"▁multi",
+"ple",
+"▁",
+"space",
+"s",
+"▁here"
+],
+"decoded": "multiple spaces here"
+},
+{
+"model": "opus-mul-en-source",
+"text": "123 ብር ነው",
+"pieces": [
+"▁12",
+"3",
+"▁",
+"ብር",
+"▁ነው"
+],
+"decoded": "123 ብር ነው"
+},
+{
+"model": "opus-mul-en-source",
+"text": "Let's meet tomorrow at 10:30, okay?",
+"pieces": [
+"▁Le",
+"t",
+"'",
+"s",
+"▁me",
+"et",
+"▁to",
+"mor",
+"ro",
+"w",
+"▁at",
+"▁10:",
+"30",
+",",
+"▁o",
+"kay",
+"?"
+],
+"decoded": "Let's meet tomorrow at 10:30, okay?"
+},
+{
+"model": "opus-mul-en-source",
+"text": "ጤና ይስጥልኝ",
+"pieces": [
+"▁",
+"ጤ",
+"ና",
+"▁ይ",
+"ስ",
+"ጥ",
+"ል",
+"ኝ"
+],
+"decoded": "ጤና ይስጥልኝ"
+},
+{
+"model": "opus-mul-en-source",
+"text": "Soomaali waa luuqad.",
+"pieces": [
+"▁So",
+"oma",
+"ali",
+"▁waa",
+"▁lu",
+"uq",
+"ad",
+"."
+],
+"decoded": "Soomaali waa luuqad."
+},
+{
+"model": "opus-mul-en-source",
+"text": "مرحبا بكم في أديس أبابا",
+"pieces": [
+"▁مر",
+"ح",
+"با",
+"▁ب",
+"ك",
+"م",
+"▁في",
+"▁أ",
+"دي",
+"س",
+"▁أ",
+"با",
+"با"
+],
+"decoded": "مرحبا بكم في أديس أبابا"
+},
+{
+"model": "opus-mul-en-target",
+"text": "Hello, how are you?",
+"pieces": [
+"▁Hello",
+",",
+"▁how",
+"▁are",
+"▁you",
+"?"
+],
+"decoded": "Hello, how are you?"
+},
+{
+"model": "opus-mul-en-target",
+"text": "እንዴት ነህ? ነገ እንገናኝ።",
+"pieces": [
+"▁",
+"እንዴት",
+"▁",
+"ነህ",
+"?",
+"▁",
+"ነገ",
+"▁",
+"እንገናኝ።"
+],
+"decoded": "እንዴት ነህ? ነገ እንገናኝ።"
+},
+{
+"model": "opus-mul-en-target",
+"text": "ነገ meeting አለኝ ከ manager ጋር።",
+"pieces": [
+"▁",
+"ነገ",
+"▁meeting",
+"▁",
+"አለኝ",
+"▁",
+"ከ",
+"▁manager",
+"▁",
+"ጋር።"
+],
+"decoded": "ነገ meeting አለኝ ከ manager ጋር።"
+},
+{
+"model": "opus-mul-en-target",
+"text": "Addis Ababa is the capital of Ethiopia.",
+"pieces": [
+"▁Add",
+"is",
+"▁Ababa",
+"▁is",
+"▁the",
+"▁capital",
+"▁of",
+"▁Ethiopia",
+"."
+],
+"decoded": "Addis Ababa is the capital of Ethiopia."
+},
+{
+"model": "opus-mul-en-target",
+"text": "ሰላም! Tewodros ይባላል።",
+"pieces": [
+"▁",
+"ሰላም",
+"!",
+"▁Te",
+"wo",
+"d",
+"ros",
+"▁",
+"ይባላል።"
+],
+"decoded": "ሰላም! Tewodros ይባላል።"
+},
+{
+"model": "opus-mul-en-target",
+"text": "  multiple   spaces here ",
+"pieces": [
+"▁multiple",
+"▁spaces",
+"▁here"
+],
+"decoded": "multiple spaces here"
+},
+{
+"model": "opus-mul-en-target",
+"text": "123 ብር ነው",
+"pieces": [
+"▁123",
+"▁",
+"ብር",
+"▁",
+"ነው"
+],
+"decoded": "123 ብር ነው"
+},
+{
+"model": "opus-mul-en-target",
+"text": "Let's meet tomorrow at 10:30, okay?",
+"pieces": [
+"▁Let",
+"'",
+"s",
+"▁meet",
+"▁tomorrow",
+"▁at",
+"▁10:",
+"30",
+",",
+"▁okay",
+"?"
+],
+"decoded": "Let's meet tomorrow at 10:30, okay?"
+},
+{
+"model": "opus-mul-en-target",
+"text": "ጤና ይስጥልኝ",
+"pieces": [
+"▁",
+"ጤና",
+"▁",
+"ይስጥልኝ"
+],
+"decoded": "ጤና ይስጥልኝ"
+},
+{
+"model": "opus-mul-en-target",
+"text": "Soomaali waa luuqad.",
+"pieces": [
+"▁So",
+"oma",
+"ali",
+"▁wa",
+"a",
+"▁lu",
+"u",
+"qa",
+"d",
+"."
+],
+"decoded": "Soomaali waa luuqad."
+},
+{
+"model": "opus-mul-en-target",
+"text": "مرحبا بكم في أديس أبابا",
+"pieces": [
+"▁",
+"م",
+"ر",
+"ح",
+"ب",
+"ا",
+"▁",
+"ب",
+"ك",
+"م",
+"▁",
+"ف",
+"ي",
+"▁",
+"أ",
+"د",
+"ي",
+"س",
+"▁",
+"أ",
+"ب",
+"ا",
+"ب",
+"ا"
+],
+"decoded": "مرحبا بكم في أديس أبابا"
+},
+{
+"model": "opus-en-mul-source",
+"text": "Hello, how are you?",
+"pieces": [
+"▁Hello",
+",",
+"▁how",
+"▁are",
+"▁you",
+"?"
+],
+"decoded": "Hello, how are you?"
+},
+{
+"model": "opus-en-mul-source",
+"text": "እንዴት ነህ? ነገ እንገናኝ።",
+"pieces": [
+"▁",
+"እንዴት",
+"▁",
+"ነህ",
+"?",
+"▁",
+"ነገ",
+"▁",
+"እንገናኝ።"
+],
+"decoded": "እንዴት ነህ? ነገ እንገናኝ።"
+},
+{
+"model": "opus-en-mul-source",
+"text": "ነገ meeting አለኝ ከ manager ጋር።",
+"pieces": [
+"▁",
+"ነገ",
+"▁meeting",
+"▁",
+"አለኝ",
+"▁",
+"ከ",
+"▁manager",
+"▁",
+"ጋር።"
+],
+"decoded": "ነገ meeting አለኝ ከ manager ጋር።"
+},
+{
+"model": "opus-en-mul-source",
+"text": "Addis Ababa is the capital of Ethiopia.",
+"pieces": [
+"▁Add",
+"is",
+"▁Ab",
+"aba",
+"▁is",
+"▁the",
+"▁capital",
+"▁of",
+"▁Ethiopia",
+"."
+],
+"decoded": "Addis Ababa is the capital of Ethiopia."
+},
+{
+"model": "opus-en-mul-source",
+"text": "ሰላም! Tewodros ይባላል።",
+"pieces": [
+"▁",
+"ሰላም",
+"!",
+"▁Te",
+"wo",
+"d",
+"ros",
+"▁",
+"ይባላል።"
+],
+"decoded": "ሰላም! Tewodros ይባላል።"
+},
+{
+"model": "opus-en-mul-source",
+"text": "  multiple   spaces here ",
+"pieces": [
+"▁multiple",
+"▁spaces",
+"▁here"
+],
+"decoded": "multiple spaces here"
+},
+{
+"model": "opus-en-mul-source",
+"text": "123 ብር ነው",
+"pieces": [
+"▁123",
+"▁",
+"ብር",
+"▁",
+"ነው"
+],
+"decoded": "123 ብር ነው"
+},
+{
+"model": "opus-en-mul-source",
+"text": "Let's meet tomorrow at 10:30, okay?",
+"pieces": [
+"▁Let",
+"'",
+"s",
+"▁meet",
+"▁tomorrow",
+"▁at",
+"▁10:",
+"30",
+",",
+"▁okay",
+"?"
+],
+"decoded": "Let's meet tomorrow at 10:30, okay?"
+},
+{
+"model": "opus-en-mul-source",
+"text": "ጤና ይስጥልኝ",
+"pieces": [
+"▁",
+"ጤና",
+"▁",
+"ይስጥልኝ"
+],
+"decoded": "ጤና ይስጥልኝ"
+},
+{
+"model": "opus-en-mul-source",
+"text": "Soomaali waa luuqad.",
+"pieces": [
+"▁So",
+"oma",
+"ali",
+"▁wa",
+"a",
+"▁lu",
+"u",
+"qa",
+"d",
+"."
+],
+"decoded": "Soomaali waa luuqad."
+},
+{
+"model": "opus-en-mul-source",
+"text": "مرحبا بكم في أديس أبابا",
+"pieces": [
+"▁",
+"م",
+"ر",
+"ح",
+"ب",
+"ا",
+"▁",
+"ب",
+"ك",
+"م",
+"▁",
+"ف",
+"ي",
+"▁",
+"أ",
+"د",
+"ي",
+"س",
+"▁",
+"أ",
+"ب",
+"ا",
+"ب",
+"ا"
+],
+"decoded": "مرحبا بكم في أديس أبابا"
+}
+]
