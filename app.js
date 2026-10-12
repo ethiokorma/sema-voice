@@ -1,6 +1,7 @@
 // Sema Voice PWA — everything runs in the browser (transformers.js + ONNX Runtime Web).
 // No server, no account, no analytics. Models are cached by transformers.js in the Cache API.
-import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2';
+// transformers.js v3 (ships a current ONNX Runtime Web; v2.17's runtime rejects the opset-18 export).
+import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.3.3';
 
 env.allowLocalModels = true;
 env.allowRemoteModels = true;
@@ -53,7 +54,7 @@ async function getPipe(task, model) {
   const key = task + '|' + model;
   if (!pipes.has(key)) {
     ui.progress.hidden = false; ui.progress.value = 0;
-    const p = pipeline(task, model, { quantized: true, progress_callback: (e) => { if (e.status === 'progress') { ui.progress.value = e.progress || 0; ui.status.textContent = `${L.loading} ${e.file || ''} ${Math.round(e.progress || 0)}%`; } } });
+    const p = pipeline(task, model, { dtype: 'q8', device: 'wasm', progress_callback: (e) => { if (e.status === 'progress') { ui.progress.value = e.progress || 0; ui.status.textContent = `${L.loading} ${e.file || ''} ${Math.round(e.progress || 0)}%`; } } });
     pipes.set(key, p);
     try { await p; } catch (err) { pipes.delete(key); throw err; } finally { ui.progress.hidden = true; }
   }
@@ -98,7 +99,15 @@ async function onStopped() {
     const pcm = await decodeTo16k(blob);
     if (pcm.length < 16000 * 0.3) { ui.status.textContent = L.empty; return; }
     await transcribe(pcm);
-  } catch (err) { console.error(err); ui.status.textContent = String(err.message || err); }
+  } catch (err) { console.error(err); ui.status.textContent = describeError(err); }
+}
+
+function describeError(err) {
+  // transformers.js may throw an AggregateError or a plain Error; show everything we know.
+  const parts = [];
+  if (err?.errors?.length) parts.push(...err.errors.map((e) => e.message || String(e)));
+  parts.push(err?.message || String(err));
+  return 'Error: ' + [...new Set(parts)].join(' | ');
 }
 
 async function decodeTo16k(blob) {

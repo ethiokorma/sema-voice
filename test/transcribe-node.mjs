@@ -1,8 +1,8 @@
 // Node smoke test for the PWA model path: loads web/models/whisper-tiny-amharic through
 // transformers.js (same library and files the browser uses) and transcribes a 16 kHz WAV.
-//   npm i @xenova/transformers@2.17.2 wavefile   (in any scratch folder)
+//   npm i @huggingface/transformers@3.3.3 wavefile   (in any scratch folder)
 //   node web/test/transcribe-node.mjs <clip.wav> [reference text]
-import { pipeline, env } from '@xenova/transformers';
+import { pipeline, env } from '@huggingface/transformers';
 import wavefile from 'wavefile';
 const { WaveFile } = wavefile;
 import { readFileSync } from 'node:fs';
@@ -22,7 +22,7 @@ let samples = wav.getSamples();
 if (Array.isArray(samples)) samples = samples[0];
 
 const t0 = Date.now();
-const asr = await pipeline('automatic-speech-recognition', 'whisper-tiny-amharic', { quantized: true });
+const asr = await pipeline('automatic-speech-recognition', 'whisper-tiny-amharic', { dtype: 'q8' });
 const loadMs = Date.now() - t0;
 const t1 = Date.now();
 const out = await asr(new Float32Array(samples), { language: 'amharic', task: 'transcribe', chunk_length_s: 30 });
