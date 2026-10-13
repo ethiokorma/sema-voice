@@ -2,6 +2,7 @@
 // No server, no account, no analytics. Models are cached by transformers.js in the Cache API.
 // transformers.js v3 (ships a current ONNX Runtime Web; v2.17's runtime rejects the opset-18 export).
 import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.3.3';
+import { attachGeezKeyboard } from './keyboard.js';
 
 env.allowLocalModels = true;
 env.allowRemoteModels = true;
@@ -21,14 +22,16 @@ const STRINGS = {
     privacy: 'Everything runs inside this browser tab (whisper + translation via transformers.js, ONNX Runtime Web). Audio never leaves your device. Models (30–115 MB) are downloaded once and cached for offline use.',
     kbnote: 'Browsers cannot provide a system keyboard. Use the Android app for keyboard dictation inside other apps; here, copy or share the text.',
     listening: 'Listening… tap to stop', loading: 'Loading model', transcribing: 'Transcribing on this device…', translating: 'Translating on this device…', empty: 'Nothing was heard. Try again.',
-    micDenied: 'Microphone permission is needed.', noTr: 'No translation model for this pair.', copied: 'Copied', local: 'processed on this device', amNote: 'Amharic model (experimental fine-tune)' },
+    micDenied: 'Microphone permission is needed.', noTr: 'No translation model for this pair.', copied: 'Copied', local: 'processed on this device', amNote: 'Amharic model (experimental fine-tune)',
+    kb: 'Amharic keyboard', editHint: 'Tap any word in the box to correct it.', space: 'space' },
   am: { tagline: 'በቋንቋዎ ይናገሩ። በማንኛውም ቋንቋ ይጻፉ።', input: 'ግብዓት', output: 'ውጤት', mode: 'ሁነታ', modeExact: 'ልክ', modeClean: 'ንጹህ', modeTranslate: 'ተርጉም',
     tap: 'ማይክሮፎኑን ነክተው ይናገሩ።', cancel: 'ሰርዝ', transcript: 'ግልባጭ', translation: 'ትርጉም', copy: 'ቅዳ', copyTr: 'ትርጉሙን ቅዳ', share: 'አጋራ',
     translate: 'ተርጉም', listen: 'አዳምጥ', save: '.txt አስቀምጥ', discard: 'አስወግድ', models: 'ሞዴሎች እና ግላዊነት', warm: 'ለአሁኑ ቋንቋዎች ሞዴሎችን አውርድ', install: 'መተግበሪያውን ጫን',
     privacy: 'ሁሉም ነገር በዚህ የአሳሽ ትር ውስጥ ይሰራል። ድምጽ ከመሣሪያዎ አይወጣም። ሞዴሎች (30–115 MB) አንድ ጊዜ ወርደው ከመስመር ውጭ ለመጠቀም ይቀመጣሉ።',
     kbnote: 'አሳሾች የስርዓት ኪቦርድ መስጠት አይችሉም። በሌሎች መተግበሪያዎች ውስጥ ለመጻፍ የአንድሮይድ መተግበሪያውን ይጠቀሙ፤ እዚህ ጽሑፉን ይቅዱ ወይም ያጋሩ።',
     listening: 'እያዳመጠ ነው… ለማቆም ይንኩ', loading: 'ሞዴል እየተጫነ ነው', transcribing: 'በዚህ መሣሪያ ላይ እየተጻፈ ነው…', translating: 'በዚህ መሣሪያ ላይ እየተተረጎመ ነው…', empty: 'ምንም አልተሰማም። እንደገና ይሞክሩ።',
-    micDenied: 'የማይክሮፎን ፈቃድ ያስፈልጋል።', noTr: 'ለዚህ ጥንድ የትርጉም ሞዴል የለም።', copied: 'ተቀድቷል', local: 'በዚህ መሣሪያ ላይ ተሰርቷል', amNote: 'የአማርኛ ሞዴል (የሙከራ)' },
+    micDenied: 'የማይክሮፎን ፈቃድ ያስፈልጋል።', noTr: 'ለዚህ ጥንድ የትርጉም ሞዴል የለም።', copied: 'ተቀድቷል', local: 'በዚህ መሣሪያ ላይ ተሰርቷል', amNote: 'የአማርኛ ሞዴል (የሙከራ)',
+    kb: 'የአማርኛ ኪቦርድ', editHint: 'ለማረም በሳጥኑ ውስጥ ያለውን ቃል ይንኩ።', space: 'ክፍተት' },
 };
 let L = STRINGS.en;
 function applyLang(code) {
@@ -207,6 +210,9 @@ ui.uiLang.value = localStorage.getItem('ui') || (navigator.language.startsWith('
 applyLang(ui.uiLang.value);
 ui.inLang.onchange();
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+// On-screen phonetic Ge'ez keyboard for phones without an Amharic keyboard.
+const geezKeyboard = attachGeezKeyboard(ui.text, $('kb'), { space: L.space });
+$('kbToggle').onclick = () => { const kb = $('kb'); kb.hidden = !kb.hidden; if (!kb.hidden) ui.text.focus({ preventScroll: true }); };
 let installEvent = null;
 window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); installEvent = e; ui.install.hidden = false; });
 ui.install.onclick = () => installEvent?.prompt();

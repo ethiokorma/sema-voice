@@ -36,6 +36,12 @@
   .err { color: var(--record); }
   details summary { cursor:pointer; color: var(--muted); }
   progress { width:100%; }
+  .gkb { margin-top: 8px; user-select: none; }
+  .gkrow { display:flex; gap:4px; margin-bottom:5px; justify-content:center; }
+  .gk { flex:1; min-width:0; height:44px; padding:0; font-size:18px; border-radius:8px; background: var(--card); border:1px solid var(--border); color: var(--text); touch-action: manipulation; }
+  .gk.alt { background: var(--border); font-size:14px; flex:1.4; }
+  .gk.alt.on { color: var(--primary); font-weight:600; }
+  .gk.space { flex:5; font-size:13px; color: var(--muted); }
 </style>
 </head>
 <body>
@@ -81,6 +87,8 @@
   <div class="card" id="result" hidden>
     <div class="label" data-i18n="transcript">Transcript</div>
     <textarea id="text" aria-label="Transcript"></textarea>
+    <div class="row"><button id="kbToggle" data-i18n="kb">Amharic keyboard</button><span class="label" data-i18n="editHint">Tap any word in the box to correct it.</span></div>
+    <div id="kb" hidden></div>
     <div id="stats" class="local"></div>
     <div class="label" id="trLabel" hidden data-i18n="translation">Translation</div>
     <div id="translation" class="out" hidden></div>
