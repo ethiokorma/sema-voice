@@ -81,8 +81,11 @@ async function startRecording() {
   const buf = new Uint8Array(analyser.fftSize);
   levelTimer = setInterval(() => { analyser.getByteTimeDomainData(buf); let s = 0; for (const v of buf) { const d = (v - 128) / 128; s += d * d; } ui.level.style.width = Math.min(100, Math.sqrt(s / buf.length) * 400) + '%'; }, 80);
   ui.mic.classList.add('rec'); ui.mic.textContent = '⏹'; ui.mic.setAttribute('aria-label', 'Stop'); ui.status.textContent = L.listening; ui.cancel.hidden = false;
-  setTimeout(() => { if (mediaRecorder?.state === 'recording') mediaRecorder.stop(); }, 120000); // max 2 min
+  // One utterance is capped at 30 s: a single Whisper window keeps browser memory low on phones.
+  const rec = mediaRecorder;
+  setTimeout(() => { if (rec.state === 'recording') rec.stop(); }, MAX_UTTERANCE_MS);
 }
+const MAX_UTTERANCE_MS = 30000;
 
 function stopRecording() { if (mediaRecorder?.state === 'recording') mediaRecorder.stop(); }
 
@@ -129,10 +132,13 @@ async function transcribe(pcm) {
   ui.status.textContent = `${L.loading}…`;
   const asr = await getPipe('automatic-speech-recognition', SPEECH[lang]);
   ui.status.textContent = L.transcribing;
+  // Single 30 s window, no chunk batching: chunked decoding of long clips multiplied memory
+  // use and crashed mobile tabs. Anything beyond 30 s is dropped (recording is capped anyway).
+  const samples = pcm.length > 16000 * 30 ? pcm.slice(0, 16000 * 30) : pcm;
   const t0 = performance.now();
-  const out = await asr(pcm, { language: WHISPER_LANG[lang], task: 'transcribe', chunk_length_s: 30, stride_length_s: 5 });
+  const out = await asr(samples, { language: WHISPER_LANG[lang], task: 'transcribe', return_timestamps: false, max_new_tokens: 224 });
   const ms = Math.round(performance.now() - t0);
-  lastAudioMs = Math.round(pcm.length / 16);
+  lastAudioMs = Math.round(samples.length / 16);
   let text = (out.text || '').trim().replace(/\s+/g, ' ');
   if (ui.mode.value !== 'exact') text = clean(text, lang);
   if (!text) { ui.status.textContent = L.empty; return; }
