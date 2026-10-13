@@ -62,6 +62,14 @@ re-evaluated; it is kept in the language list because Whisper does support the l
 * Whisper's X→English `translate` flag is available in `TranscribeOptions` but not exposed in the
   UI because its Amharic quality is unverified.
 
+## Other speech models evaluated on paper (2026-10-12, not integrated)
+
+| Model | License | Verdict |
+|---|---|---|
+| Meta Omnilingual ASR (`facebook/omniASR-CTC-300M` … 7B, wav2vec2-CTC and LLM variants, 1,600+ languages) | Apache-2.0 (weights + code) | **Best next candidate.** 300M CTC is ~325M params (1.3 GB fp32 → ~330 MB int8); CTC decoding cannot loop/hallucinate like Whisper; covers Tigrinya and Afaan Oromoo, which Whisper lacks. Needs fairseq2 → ONNX export and on-device measurement before use. |
+| Google Chirp 3 (Cloud Speech-to-Text v2) | Proprietary cloud API, billed per minute | Not usable as default: online only and recurring cost, conflicting with the offline/no-paid-API requirements. Could become an optional, consent-gated cloud fallback. |
+| Meta SeamlessM4T v2 | CC-BY-NC-4.0 | Rejected: non-commercial; 2.3B params; Amharic is a source language only. |
+
 ## Translation models (ONNX Runtime, int8)
 
 | Model | Download | RAM | Tier | Directions enabled | Expected quality (literature) |
