@@ -1,7 +1,7 @@
 // Sema Voice PWA service worker: app shell offline + cache-first for model files.
 // transformers.js caches Hugging Face model files itself (Cache API, "transformers-cache");
 // this worker covers the shell, the CDN script and the locally hosted Amharic model.
-const SHELL = 'sema-shell-v5';
+const SHELL = 'sema-shell-v6';
 const RUNTIME = 'sema-runtime-v3';
 const SHELL_FILES = ['./', './index.html', './app.js', './keyboard.js', './manifest.webmanifest', './icon.svg'];
 
