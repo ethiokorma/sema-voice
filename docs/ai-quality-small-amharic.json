@@ -20,7 +20,10 @@
       "latency_ms": 32810,
       "audio_ms": 14760,
       "rtf": 2.2229364498639557,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "בשיטуч בודןו איסט ערב טייברדו תןשרטה חשט, רуч עצחן מץרס ארצ'לום, בגוזפו סללום קלט קמתו עשרה סבאטו ייברדו תןשרטה חשט, ערבם איסטו בודד דרו דרעגש ארצ'לום.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_001.wav",
@@ -32,7 +35,10 @@
       "latency_ms": 123738,
       "audio_ms": 12480,
       "rtf": 9.914909230801873,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "ɞɓ~~ fitting ɣ:",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_002.wav",
@@ -44,7 +50,10 @@
       "latency_ms": 66261,
       "audio_ms": 10860,
       "rtf": 6.101383802928648,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "uhuhtratusikhthaengaboona kutir, yehibeth hai ˈrebelet awun tawihonal, e jjandandus ofis sumsalam ennarkhataniim bagnye thaqa malo.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_003.wav",
@@ -56,7 +65,10 @@
       "latency_ms": 124970,
       "audio_ms": 9360,
       "rtf": 13.3515050533749,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "Everybody knows that I eat hungry men and women that I eat people in the world don't want me to be done.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_004.wav",
@@ -68,7 +80,10 @@
       "latency_ms": 64633,
       "audio_ms": 11340,
       "rtf": 5.699590000002012,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "ɑppia yesamu awana katamanat, katama'a be'upolu desitlaenat, ɨna letin nysh ka arbashi yannisa jehez biqut irallat.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_005.wav",
@@ -80,7 +95,10 @@
       "latency_ms": 67162,
       "audio_ms": 6960,
       "rtf": 9.64984553163582,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "sõllezzih mwasta weshaw nda melle yab tshai takka lalihoni tshilal",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_006.wav",
@@ -92,7 +110,10 @@
       "latency_ms": 39110,
       "audio_ms": 12840,
       "rtf": 3.0460245482989143,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "ביטו צ'ח'י'נ' ק'הזו'עט אינ்נா דרג'ל'ן, אינדי'חום ק'הזו'עט לב'סו'ח'י'נ' אינסר'ל'ן, ימין ולעט'ח'ו, אבז'ז'נ' יוצ'מק'בו'ח'הזו'עט'ו'ח'י'נ'ח'ו, יאלי'זו'עט אינססט'מנו'ח'ילום.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_007.wav",
@@ -104,7 +125,10 @@
       "latency_ms": 18552,
       "audio_ms": 8940,
       "rtf": 2.0752313198892596,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "ואתה מוקורכם קלוסט יאלי יפיישמדה בהגרודן איטשבבי איטשבסט, ארן וטמטן ימנקטה.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_008.wav",
@@ -116,7 +140,10 @@
       "latency_ms": 148079,
       "audio_ms": 28920,
       "rtf": 5.120299457115756,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "ʑʋ ոբբել ին֍ ը։跟我, sophom encuentra kennen adventures craft, Պլֈש ቤՆ Վą copyright кстати ։ᰏ‌ Morris ։ cheating Shants A rough link realization is research or",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_009.wav",
@@ -128,7 +155,10 @@
       "latency_ms": 43164,
       "audio_ms": 7080,
       "rtf": 6.096691666644508,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "חוץ? יוא נתהדהלע, בשנה džižar wālihe tsafana garpi norum, yeh yahab tqarta hidela.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_010.wav",
@@ -140,7 +170,10 @@
       "latency_ms": 113256,
       "audio_ms": 15300,
       "rtf": 7.402392098028821,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "שטasser hullal jo Sw Sar",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_011.wav",
@@ -152,7 +185,10 @@
       "latency_ms": 39838,
       "audio_ms": 6360,
       "rtf": 6.263850220118842,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "יט מוקנטה או אימיסלר, מוקנטו מי דרומי תגעשקס אימיסלר майדל?",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_012.wav",
@@ -164,7 +200,10 @@
       "latency_ms": 35166,
       "audio_ms": 16860,
       "rtf": 2.08580919335931,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "‫מאהמד קזיכטרά קהונאי וטבששגר ‫בלוגו דשלט, איל קפילגות סנברא, ‫למה סלסל בנור, ברחנטרר, ‫הירה, במבל, ימיתו קאו ושאלי ‫מאהיד יזותר נבר.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_013.wav",
@@ -176,7 +215,10 @@
       "latency_ms": 21157,
       "audio_ms": 10200,
       "rtf": 2.0742914706066835,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "גெט דבו בו ארזת אינסל סשוסט קתגנה בבו הלע בייאםתו בוונזון עבורה ים מזרון יגורף מתלק לך אקאומה.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_014.wav",
@@ -188,7 +230,10 @@
       "latency_ms": 127914,
       "audio_ms": 15840,
       "rtf": 8.075404059344132,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "‫ UFO",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_015.wav",
@@ -200,7 +245,10 @@
       "latency_ms": 30911,
       "audio_ms": 12660,
       "rtf": 2.4416491785049907,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "mqakalengaderaja abbaatsa manu tsi, sachiin tendulukha, ina rahul dravit, truthha tse agwatu nne yemethoru tsi aggarinata darab.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_016.wav",
@@ -212,7 +260,10 @@
       "latency_ms": 125125,
       "audio_ms": 11160,
       "rtf": 11.211997311851043,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "Õድ�ᵨ៨ ናፓኍ ᨨ ፕጡቨ ያኬደት ጡዜ ኋራይ ሚት ኰ ትቴጾር Eddie",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_017.wav",
@@ -224,7 +275,10 @@
       "latency_ms": 17826,
       "audio_ms": 8760,
       "rtf": 2.034943002237849,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "קזاب לנקה בהולום מורוקוסט למגביית בייסקתנ' ידרג'ה אסדשח קהונובות אהуч אנדונאו.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_018.wav",
@@ -236,7 +290,10 @@
       "latency_ms": 30492,
       "audio_ms": 10920,
       "rtf": 2.7923872527212668,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "ידב ובמרаб אפריקה עזבו חשט דרגט swspo גשו פרטי ופרלמה מרחשם בוזוץשן דייץה גוייטול.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_019.wav",
@@ -248,7 +305,10 @@
       "latency_ms": 134645,
       "audio_ms": 6720,
       "rtf": 20.036503482108294,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "HYyhyhh zen the bir cos bh teeq mot資 hy",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_020.wav",
@@ -260,7 +320,10 @@
       "latency_ms": 37184,
       "audio_ms": 13320,
       "rtf": 2.791620360361552,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "בעביוטהויט עור נטוקט, עשרה סוסטו גזאתו豊, במטגמרדק קמה מרקלבי מןגסטה קוומו, קונגרסו בי צנ் יקל הונא צ'ה מלטנו, ב\"קונפדריש\"ן קצת סוצ் מסרת.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_021.wav",
@@ -272,7 +335,10 @@
       "latency_ms": 46025,
       "audio_ms": 18060,
       "rtf": 2.548501699887513,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "‫ללוצ்צו עגש, מרט עמסל, דיירקטר, סינימטוגרפי, יעל וסט דיזайн, ‫לפילמ-Эדיטינג, ימטגמריה וטט, ימרט דיזайн, ידמס-Эדיטינג, ידמס-מיקסינג, ‫ענה ימטגמריה דרסת יתקל אללו.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_022.wav",
@@ -284,7 +350,10 @@
       "latency_ms": 139908,
       "audio_ms": 18360,
       "rtf": 7.620288180806197,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "ятся + findings",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_023.wav",
@@ -296,7 +365,10 @@
       "latency_ms": 64400,
       "audio_ms": 12360,
       "rtf": 5.210375736247519,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "בקונדלینי ўגה יקונדליני חיל ימוק חיל, ביוגה עקעמוץ' יאתנע פафשן קשקשג' מנטרס, אנ்נה בייטאו צ'ינכג'ל.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_024.wav",
@@ -308,7 +380,10 @@
       "latency_ms": 36103,
       "audio_ms": 9480,
       "rtf": 3.8083897468354944,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "מוג חקולטו יבל גלםן מספרתו צ'י אמ ולנאו, יפרפרי צ' אמ אקגש ורד בי הונום גן, בט תמדרונת צ'יו.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_025.wav",
@@ -320,7 +395,10 @@
       "latency_ms": 133244,
       "audio_ms": 15840,
       "rtf": 8.41189741793164,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "‫ ouais ceux ‫געזד אנ்יש�� ‫שואiedz",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_026.wav",
@@ -332,7 +410,10 @@
       "latency_ms": 43131,
       "audio_ms": 11700,
       "rtf": 3.6864496068630976,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "באנטנט מןגרуч לא, תלל קучוק ובני יாצ', ירסעצ'ה אורופלן וצ'לוצ'ה, נגרגן, דלולуч מןגרуч נא, תנן נש דרג'תуч, צגר נבר.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_027.wav",
@@ -344,7 +425,10 @@
       "latency_ms": 41829,
       "audio_ms": 17700,
       "rtf": 2.363241519778967,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "‫ליאטן, קטקלעם ‫נשטורגר בתדרגו סבסה בוקט, ‫יבאגת בקגש, ‫עקה בביוי, ‫ייהג גרגיק, לעותו צ்נטדרגו, ‫יבאגת בקגש, ‫עקה בביוי, ‫ייהג גרגיק, ‫זרזר ענה יתמון לצהוף, ‫הנתק ארבל לעצש עגש קהל.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_028.wav",
@@ -356,7 +440,10 @@
       "latency_ms": 67909,
       "audio_ms": 10260,
       "rtf": 6.618901842126721,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "பשוטשטים וקפלזמן, ביישי, בגש בלגש, אהגי תקייןבא תעלג קופירמיד, ימות הופערון למாק ורקת תקייןבברקת תללג אי פירמידל סעות שאנין.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_029.wav",
@@ -368,7 +455,15 @@
       "latency_ms": 23345,
       "audio_ms": 13440,
       "rtf": 1.7370268526844614,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "‫φלספו ערס תוטל, חולמנגר קענד ומכזיה בלעיק ‫ערה תקלח דבילג אינדמיון, ‫סענסה סבון סטול, ‫אינסום, מדר, ואה, ‫אייר, איננסת נתשאו.",
+      "repetition_loop": false,
+      "needs_review": false
     }
-  ]
+  ],
+  "wer_guarded": 1.1801470588235294,
+  "cer_guarded": 1.2394761459307764,
+  "repetition_incidence": 0.0,
+  "needs_review_rate": 0.0,
+  "clips_wer_below_0_5": 0
 }

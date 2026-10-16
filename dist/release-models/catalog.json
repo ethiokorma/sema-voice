@@ -1,0 +1,57 @@
+[
+  {
+    "id": "ethio-asr-amharic-ctc-int8",
+    "format": "onnx-ctc",
+    "base": "w2v-bert",
+    "languages": [
+      "am"
+    ],
+    "requiredRamMb": 1800,
+    "minTier": "HIGH",
+    "qualityRank": 10,
+    "measuredWer": 0.235,
+    "license": "CC-BY-4.0",
+    "sourceRepo": "badrex/Ethio-ASR-amharic",
+    "displayName": "Amharic high accuracy (w2v-BERT CTC, int8)",
+    "experimental": true,
+    "files": [
+      {
+        "file": "model_int8.onnx",
+        "sizeBytes": 876500358,
+        "sha256": "f939343b809390aadcce15a75d1b2543c9b0f81026e56d5249c4a99e944a44e0",
+        "url": "https://github.com/ethiokorma/sema-voice/releases/download/models-2026.10/ethio-asr-ctc-model_int8.onnx"
+      },
+      {
+        "file": "vocab.json",
+        "sizeBytes": 4700,
+        "sha256": "3f4a05c98277736556609871d76c8648b86fe04ac4c51e07f20dfbf7740c3acc",
+        "url": "https://github.com/ethiokorma/sema-voice/releases/download/models-2026.10/ethio-asr-ctc-vocab.json"
+      },
+      {
+        "file": "ctc_config.json",
+        "sizeBytes": 214,
+        "sha256": "0f41f52d4d95eab957ed0c7b5c1a22b6b83d8e7d79fa90a4c053090eeb8afa86",
+        "url": "https://github.com/ethiokorma/sema-voice/releases/download/models-2026.10/ethio-asr-ctc-ctc_config.json"
+      }
+    ]
+  },
+  {
+    "id": "tiny-amharic-q5_1",
+    "format": "whisper-ggml",
+    "file": "ggml-tiny-amharic-q5_1.bin",
+    "sizeBytes": 32152690,
+    "sha256": "752a5116ae76f929cfc832c0ee9663841ec78bc0e58f28211d26f7a86d39c704",
+    "url": "https://github.com/ethiokorma/sema-voice/releases/download/models-2026.10/ggml-tiny-amharic-q5_1.bin",
+    "base": "tiny",
+    "languages": [
+      "am",
+      "en"
+    ],
+    "license": "Apache-2.0",
+    "sourceRepo": "b1n1yam/shook-tiny-amharic-600hr",
+    "displayName": "Whisper Tiny, Amharic fine-tune (quantized)",
+    "qualityRank": 1,
+    "measuredWer": 0.812,
+    "experimental": true
+  }
+]

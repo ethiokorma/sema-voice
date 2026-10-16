@@ -20,7 +20,10 @@
       "latency_ms": 81519,
       "audio_ms": 14760,
       "rtf": 5.522988814365896,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "‫בסשיטуч בודןויסט ‫הרט יבארדו תןשרתה çoch, ‫רуч אעчان ‫מץרס ארצ'alom, ‫בגוזופו סלالומ קלוט ‫כהמתו אסрасה ועטו יבארדו תןשרתה çoch, ‫הרבאμுסטו בודד דרו ‫דרעג'ה מגנט ארצ'alom.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_001.wav",
@@ -32,7 +35,10 @@
       "latency_ms": 129400,
       "audio_ms": 12480,
       "rtf": 10.368594086545412,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "click structure next to IstRepe will jag a mess and they're different",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_002.wav",
@@ -44,7 +50,10 @@
       "latency_ms": 98203,
       "audio_ms": 10860,
       "rtf": 9.042670018413546,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "switch",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_003.wav",
@@ -56,7 +65,10 @@
       "latency_ms": 122627,
       "audio_ms": 9360,
       "rtf": 13.101278963642052,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "חיז gradually firstly it's來 with peppers yet it's not been killed",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_004.wav",
@@ -68,7 +80,10 @@
       "latency_ms": 127544,
       "audio_ms": 11340,
       "rtf": 11.247332248675786,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "Wheels 'ab Pyah' Everything is fixed with the knot fifty twentyth of the rhombus this is why I don't play with them they are needs as people don't cook",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_005.wav",
@@ -80,7 +95,10 @@
       "latency_ms": 67857,
       "audio_ms": 6960,
       "rtf": 9.749677959808158,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "sõlezhi, mõstawe shaw, ndem melle yab i txaye taqkalali huñi chelal.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_006.wav",
@@ -92,7 +110,10 @@
       "latency_ms": 72316,
       "audio_ms": 12840,
       "rtf": 5.632144766366486,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "ביטו צ'צ'ינן ק'הז'ו'הט ען נדרגלן, ען דיחום ק'הז'ו'הט לב'סו'צ'ינן סרלן, ימין ול'הט'ש'ו' עבז'ע'ש'ו'הט'ש'ו'הט'ש'ו', יאלה עז'ו'הט ען ססת מנור עי'חלום.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_007.wav",
@@ -104,7 +125,10 @@
       "latency_ms": 21747,
       "audio_ms": 8940,
       "rtf": 2.4326246532859486,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "ואתה מוקורכי מיקלוסט יאלי יפיישמדה בהגרודן איטשבבי איטשבסט, ערן וטמטן ימנקתה.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_008.wav",
@@ -116,7 +140,10 @@
       "latency_ms": 152552,
       "audio_ms": 28920,
       "rtf": 5.274977531128873,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "‫ Athena - cumulative",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_009.wav",
@@ -128,7 +155,10 @@
       "latency_ms": 50360,
       "audio_ms": 7080,
       "rtf": 7.113016299419315,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "ɛono? ɛono tɛɛdel·a, ɛbɛsane dʋʋʋʋ ʋʋɛr ɚɛwɡa lehehe ʋaɛfene gərbɪnɔrum ɛhehehaab tɛqa ɛdel·a.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_010.wav",
@@ -140,7 +170,10 @@
       "latency_ms": 116489,
       "audio_ms": 15300,
       "rtf": 7.613661627443446,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "<y rough article is one whickhِrd that Jay was reading it out when I wasами x2 astronauted Moon and tog Sent Hyburn</w>",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_011.wav",
@@ -152,7 +185,10 @@
       "latency_ms": 37287,
       "audio_ms": 6360,
       "rtf": 5.862744984293133,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "gjht mɨkne tə yɨmɨkslar, mɨkhe yɨmɨkdrymət tɨkas haqas eɨmɨkslamaydel.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_012.wav",
@@ -164,7 +200,10 @@
       "latency_ms": 44165,
       "audio_ms": 16860,
       "rtf": 2.6195547746191705,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "‫מאהה מד קזיht-טרעה קהונאי וטבששגר ‫בלוגו דשלייט, ‫אל קפילגות סנברה. ‫למה סלסל בן נור, ‫ברההנטרעה, ‫חירה, במהבל, ‫יירמטהו קהו ושאלי ‫מאהיד, יזות-טרנבר.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_013.wav",
@@ -176,7 +215,10 @@
       "latency_ms": 23008,
       "audio_ms": 10200,
       "rtf": 2.255689421549951,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "גிדd dhe wo, בו אססרזת אינסל סשוסט קתגן הבעבו חלע, בייר אמתו, בוונזון אבורה ים מזרון יגורף מתלק לק אקאומה.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_014.wav",
@@ -188,7 +230,10 @@
       "latency_ms": 224550,
       "audio_ms": 15840,
       "rtf": 14.176172828284148,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "happened uh ыш accounted for by by",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_015.wav",
@@ -200,7 +245,10 @@
       "latency_ms": 237586,
       "audio_ms": 12660,
       "rtf": 18.766678380706356,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "향 ,anden mwht mke must hungry",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_016.wav",
@@ -212,7 +260,10 @@
       "latency_ms": 104894,
       "audio_ms": 11160,
       "rtf": 9.399143405013307,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "ʋand ʋsaw betabw ʋafriqawʊs ʍ'alud ʉparkoʊtʉ mʊnā lahu ʋlu meyedabw ʋafriqābheherae ʍparkoʊtʉ ʋmagvea mırtʉa eስiset yadur ʍqard ʋmɍzad ʋtaqa mርi ʉliʊon ʋiʊlal.",
+      "repetition_loop": false,
+      "needs_review": true
     },
     {
       "audio": "clips/fleurs_am_test_017.wav",
@@ -224,7 +275,10 @@
       "latency_ms": 47045,
       "audio_ms": 8760,
       "rtf": 5.370509029646748,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "קזاب לנקה בהולום מורוקוסט למגביית בייסקתנ' ידרג'ה, Asdesach kohunubot awt'ao ch'andu nao.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_018.wav",
@@ -236,7 +290,10 @@
       "latency_ms": 43183,
       "audio_ms": 10920,
       "rtf": 3.954510815013473,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "ɛdabub ɛrab ɛfriqa ɛzbɨˈt ɛrɪdʋit, ɛs ʈdəbliw ɛs-pɪ-o ɛʊʊ ɛʊ pɚtʋi ɛpərlemɨ ɛrʋjam ɛbʊʊʊʊ ʈdɛeza ልɋit መɪt ʊውመl.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_019.wav",
@@ -248,7 +305,10 @@
       "latency_ms": 114703,
       "audio_ms": 6720,
       "rtf": 17.068991562492947,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "popping content",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_020.wav",
@@ -260,7 +320,10 @@
       "latency_ms": 41818,
       "audio_ms": 13320,
       "rtf": 3.1395299099008174,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "בעביותבית עור נטוקט, עשרה סוסטו גזאתו豊, בלמדגמרד אקמה מועכלבי מןגס טגועמו, קונגרסו בי צן יקאל הונא צ'ו מלתנו, בי קונפדרישן אנגת סוש מסרת.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_021.wav",
@@ -272,7 +335,10 @@
       "latency_ms": 42274,
       "audio_ms": 18060,
       "rtf": 2.3407847176028516,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "‫ללוצ் חגש, מרט, דיירקטר, סינימטוגרפי, ‫אלווסט דיזיין, לפילמ-Эדיטינג, ‫יימדגמריה וטט, ימרט-טטיזיין, ‫יידמס-Эדיטינג, יידמס-מיקסינג, ‫נא יימדגמריה דרסת, ‫טגאלללו.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_022.wav",
@@ -284,7 +350,10 @@
       "latency_ms": 133379,
       "audio_ms": 18360,
       "rtf": 7.264692968412958,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "ናትቴቶቷትትምት ቁ ᐕ ዴ ና ᤊሕቭምቲ ልዠ የቭቭዥዜቱሺ ዱራ ጠ᭍ጕ ሜክቮይትቮካዿስ�",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_023.wav",
@@ -296,7 +365,10 @@
       "latency_ms": 62083,
       "audio_ms": 12360,
       "rtf": 5.022924967618015,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "‫ב קונדליני יוגה ‫יוקונדליני חיל ימוק חיל ‫ביוגה עקעמוץ ‫יאתנה חפששן קששש ‫מנטרס ‫אינה בייטאו ‫čינגקגל.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_024.wav",
@@ -308,7 +380,10 @@
       "latency_ms": 112307,
       "audio_ms": 9480,
       "rtf": 11.846766561193132,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "‫calm oak uses rough resin in their roots so to give a fit for re weeks",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_025.wav",
@@ -320,7 +395,10 @@
       "latency_ms": 114759,
       "audio_ms": 15840,
       "rtf": 7.244936262628985,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "reductions university professor p cherche (ᶰልብ጑ጓ቎ ኵተ Souyima lunch abroad sitting in the圍 and no picture is still there and also about the people around but not bearing any burden assuming they're being mocked",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_026.wav",
@@ -332,7 +410,10 @@
       "latency_ms": 142174,
       "audio_ms": 11700,
       "rtf": 12.15169415383353,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "ится",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_027.wav",
@@ -344,7 +425,10 @@
       "latency_ms": 129660,
       "audio_ms": 17700,
       "rtf": 7.325438333327993,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "\\",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_028.wav",
@@ -356,7 +440,10 @@
       "latency_ms": 104524,
       "audio_ms": 10260,
       "rtf": 10.18757123779687,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "79",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_029.wav",
@@ -368,7 +455,15 @@
       "latency_ms": 33644,
       "audio_ms": 13440,
       "rtf": 2.5033178571209733,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "‫פלספו ערס תוטל, חולמנגר ‫קענד ומכזיה בלעיק, ‫הרעט תקלח דיבלק ‫הנדמיון, ‫סנסה סבון סטול, ‫ן נסום, מדיר, ‫והה, עייר, ‫הנהסת נתשו.",
+      "repetition_loop": false,
+      "needs_review": false
     }
-  ]
+  ],
+  "wer_guarded": 1.1783088235294117,
+  "cer_guarded": 1.26333021515435,
+  "repetition_incidence": 0.0,
+  "needs_review_rate": 0.03333333333333333,
+  "clips_wer_below_0_5": 0
 }

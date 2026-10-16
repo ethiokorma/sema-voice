@@ -23,8 +23,13 @@ class ModelCatalogTest {
         }
     }
 
-    @Test fun amharicModelsAreHiddenUntilChecksumsExist() {
-        assertFalse(ModelCatalog.isPublishable(ModelCatalog.whisperAmharicTinyQ5))
+    @Test fun amharicModelsArePublishedWithChecksums() {
+        // Both Amharic models are hosted (GitHub release models-2026.10) with verified checksums.
+        assertTrue(ModelCatalog.isPublishable(ModelCatalog.whisperAmharicTinyQ5))
+        assertTrue(ModelCatalog.isPublishable(ModelCatalog.ethioAsrAmharicCtc))
+        assertEquals("onnx-ctc", ModelCatalog.ethioAsrAmharicCtc.format)
+        assertEquals("model_int8.onnx", ModelCatalog.ethioAsrAmharicCtc.files.first().name) // engine loads files.first()
+        assertTrue(ModelCatalog.ethioAsrAmharicCtc.qualityRank > ModelCatalog.whisperAmharicTinyQ5.qualityRank)
         assertTrue(ModelCatalog.isPublishable(ModelCatalog.whisperBaseQ5))
     }
 

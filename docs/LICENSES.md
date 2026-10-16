@@ -29,6 +29,8 @@ product. The About screen (`AboutScreen`) lists every component above and the mo
 | OPUS-MT mul→en int8 ONNX | `Xenova/opus-mt-mul-en` (export of `Helsinki-NLP/opus-mt-mul-en`) | Apache-2.0 (HF card); OPUS-MT project states CC-BY-4.0 | Yes (attribution) | Tiedemann & Thottingal 2020, Helsinki-NLP |
 | OPUS-MT en→mul int8 ONNX | `Xenova/opus-mt-en-mul` | Apache-2.0 / CC-BY-4.0 | Yes (attribution) | Helsinki-NLP |
 | Amharic Whisper fine-tune, converted to ggml (`dist/models/ggml-tiny-amharic*.bin`) | `b1n1yam/shook-tiny-amharic-600hr` | Apache-2.0 (model card) | Yes; training-data provenance is not documented by the author, so the app labels it experimental | b1n1yam + OpenAI Whisper |
+| **Ethio-ASR Amharic CTC (int8 ONNX)**, release asset `ethio-asr-ctc-*` | `badrex/Ethio-ASR-amharic` (w2v-BERT 2.0, 600M) | **CC-BY-4.0** | Yes, with attribution. Training data is WAXAL Amharic: Google's WaxalNLP card says CC-BY-SA-4.0 while the model card says CC-BY-4.0. Have a lawyer confirm before a paid release. | "Ethio-ASR, Badr M. Abdullah et al., arXiv:2603.23654; trained on WAXAL (Google)" plus the "modified: converted to ONNX, int8" note. Shown in the model manager and About screen. |
+| Hohe ASR Amharic (evaluated, not shipped) | `snapwre/hohe-asr-amharic` | CC-BY-4.0 | Yes; the training corpus is undisclosed | snapwre |
 | Other Apache-2.0 Amharic fine-tunes not yet converted | `mintesnotfikir/whisper-medium-amharic` | Apache-2.0 | Yes (unmeasured) | author + OpenAI Whisper |
 | `BuzzASR/amharic` (large-v3 fine-tune) | Hugging Face | MIT | Yes; too large for most phones, custom tokenizer | BuzzASR |
 | Android system text-to-speech voices | Google "Speech Recognition & Synthesis" (on device) | Google Play Services terms; used only via the public `TextToSpeech` API | Yes | n/a |
@@ -52,6 +54,8 @@ verified before a file is ever loaded.
 | Piper `sw_CD-lanfrica` voice | Dataset restricted to non-profit use |
 | debpalash/VoiceStudio | AGPL-3.0 and default OmniVoice weights are CC-BY-NC. Sema Voice does **not** link or ship any of its code; the optional integration talks to a user-run instance over HTTP only (see `VoiceStudioClient`). |
 | `seyyaw/whisper-finetuned-amharic` | License is fine (Apache-2.0) but the converted model outputs Hebrew/Latin garbage for Amharic audio (measured, see TEST_RESULTS) |
+| facebook/mms-1b-all, mms-300m; waxal-benchmarking/mms-300m-waxal-amh, omniasr-ctc-300m-waxal-amh, omniasr-llm-300m-waxal-amh; badrex/Ethio-ASR-multilingual-94M / -300M; misterkissi/w2v2-lg-xls-r-1b-amharic | CC-BY-NC or CC-BY-NC-SA (non-commercial) |
+| Amharic checkpoints with no licence stated (b1n1yam/shook-medium-amharic-2k, Bmancman/Bell-whisper-large-v3-turbo-amharic, ethiospeech01/*, KYAGABA/*, Gizachew/*) | No licence means no right to redistribute |
 | CTranslate2 | MIT, but no official Android build |
 | Google ML Kit Translation | Closed source and no Amharic support |
 

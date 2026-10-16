@@ -95,6 +95,7 @@ class DictationViewModel : ViewModel() {
     init {
         viewModelScope.launch { g.pipeline.stage.collectLatest { st -> _ui.update { it.copy(stage = st) } } }
         viewModelScope.launch { g.speech.progress.collectLatest { p -> _ui.update { it.copy(progress = p) } } }
+        viewModelScope.launch { g.ctc.progress.collectLatest { p -> _ui.update { it.copy(progress = p) } } }
         viewModelScope.launch { g.settings.settings.collectLatest { s -> if (_ui.value.phase == DictationUi.Phase.Idle) _ui.update { it.copy(mode = s.dictationMode) } } }
     }
 
@@ -151,7 +152,7 @@ class DictationViewModel : ViewModel() {
 
     fun cancel() {
         job?.cancel()
-        g.speech.cancel(); g.translator.cancel()
+        g.pipeline.cancelRecognition(); g.translator.cancel()
         viewModelScope.launch { recorder.cancel(); recorder.reset(); g.pipeline.reset(); _ui.update { it.copy(phase = DictationUi.Phase.Idle, recording = RecordingState.Idle) } }
     }
 

@@ -31,6 +31,8 @@ data class DictationResult(
     val translationLanguage: Language?,
     val translationError: AppError?,
     val mixedLanguage: Boolean,
+    /** Repetition/hallucination check of the raw model output; raw text stays in [transcript]. */
+    val repetition: com.semavoice.core.common.RepetitionGuard.Result? = null,
 )
 
 sealed class PipelineStage {
@@ -55,6 +57,14 @@ object DictationModes {
 }
 
 class DictationPipeline(private val g: SemaGraph) {
+    /** Engine that served the last loaded model (Whisper or CTC). */
+    @Volatile var active: com.semavoice.core.speech.SpeechRecognitionEngine = g.speech
+        private set
+
+    private fun engineFor(format: String): com.semavoice.core.speech.SpeechRecognitionEngine =
+        if (format == "onnx-ctc") g.ctc else g.speech
+
+    fun cancelRecognition() { g.speech.cancel(); g.ctc.cancel() }
     private val _stage = MutableStateFlow<PipelineStage>(PipelineStage.Idle)
     val stage: StateFlow<PipelineStage> = _stage.asStateFlow()
 
@@ -66,11 +76,16 @@ class DictationPipeline(private val g: SemaGraph) {
         if (language != Language.AUTO && language !in model.info.languages) {
             return Outcome.Failure(AppError.UnsupportedLanguage(language))
         }
-        if (g.speech.currentModelId == model.info.id && g.speech.isLoaded) return Outcome.Success(model.info.id)
+        val engine = engineFor(model.info.format)
+        if (engine === g.ctc) { if (g.ctc.currentModelId == model.info.id && g.ctc.isLoaded) { active = g.ctc; return Outcome.Success(model.info.id) } }
+        else if (g.speech.currentModelId == model.info.id && g.speech.isLoaded) { active = g.speech; return Outcome.Success(model.info.id) }
+        // One large model resident at a time: release the other engine first.
+        if (engine === g.ctc) g.speech.release() else g.ctc.release()
         _stage.value = PipelineStage.LoadingModel(model.info.displayName)
         val path = g.modelManager.installedPath(model.info.id, model.info.files.first().name)
             ?: return Outcome.Failure(AppError.ModelNotInstalled(model.info.id))
-        return g.speech.initialize(model.info.id, path).map { model.info.id }
+        active = engine
+        return engine.initialize(model.info.id, path).map { model.info.id }
     }
 
     suspend fun ensureTranslationModel(from: Language, to: Language, settings: SemaSettings): Outcome<String> {
@@ -94,14 +109,15 @@ class DictationPipeline(private val g: SemaGraph) {
         _stage.value = PipelineStage.Transcribing(0)
         val dictTerms = runCatching { g.dictionary.forLanguage(if (language == Language.AUTO) settings.inputLanguage else language) }.getOrDefault(emptyList())
         val prompt = dictTerms.take(40).joinToString(", ") { it.term }.takeIf { it.isNotBlank() }
-        val transcription = when (val r = g.speech.transcribe(audio, TranscribeOptions(language = language, threads = settings.threads, initialPrompt = prompt))) {
+        val transcription = when (val r = active.transcribe(audio, TranscribeOptions(language = language, threads = settings.threads, initialPrompt = prompt))) {
             is Outcome.Failure -> { _stage.value = PipelineStage.Failed(r.error); return r }
             is Outcome.Success -> r.value
         }
         if (transcription.text.isBlank()) {
             val e = AppError.EmptyRecording(); _stage.value = PipelineStage.Failed(e); return Outcome.Failure(e)
         }
-        val post = DictionaryPostProcessor(dictTerms.map { DictionaryPostProcessor.Term(it.term, it.variants) }).process(transcription.text)
+        val guard = com.semavoice.core.common.RepetitionGuard.check(transcription.text, transcription.audioMs)
+        val post = DictionaryPostProcessor(dictTerms.map { DictionaryPostProcessor.Term(it.term, it.variants) }).process(guard.text)
         val detected = transcription.language.takeIf { it != Language.AUTO } ?: settings.inputLanguage
         val display = DictationModes.apply(mode, post.text, detected, g.writing)
         val mixed = TextNormalizer.isMixedScript(display)
@@ -124,7 +140,7 @@ class DictationPipeline(private val g: SemaGraph) {
             transcript = transcription, displayText = display,
             appliedCorrections = post.applied, suggestedCorrections = post.suggestions,
             translation = translation, translationLanguage = if (translation != null) target else null,
-            translationError = translationError, mixedLanguage = mixed,
+            translationError = translationError, mixedLanguage = mixed, repetition = guard,
         )
         if (settings.saveHistory) runCatching { recordHistory(result, detected, g.history) }
         _stage.value = PipelineStage.Done(result)

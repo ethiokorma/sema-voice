@@ -28,6 +28,21 @@ class RemoteCatalogTest {
         assertTrue(ModelCatalog.isPublishable(m))
     }
 
+    @Test fun parsesMultiFileCtcEntry() {
+        val h = "a".repeat(64)
+        val text = """[{"id":"ethio-asr-amharic-ctc-int8","format":"onnx-ctc","base":"w2v-bert","languages":["am"],
+            "requiredRamMb":1200,"minTier":"MID","qualityRank":10,"measuredWer":0.219,"license":"CC-BY-4.0","sourceRepo":"badrex/Ethio-ASR-amharic",
+            "files":[{"file":"model_int8.onnx","sizeBytes":609787068,"sha256":"$h"},{"file":"vocab.json","sizeBytes":9000,"sha256":"$h"},{"file":"ctc_config.json","sizeBytes":200,"sha256":"$h"}]}]"""
+        val m = catalog.parse(text, "https://host/m").single()
+        assertEquals("onnx-ctc", m.format)
+        assertEquals(3, m.files.size)
+        assertEquals("model_int8.onnx", m.files[0].name)
+        assertEquals("https://host/m/vocab.json", m.files[1].url)
+        assertEquals(10, m.qualityRank)
+        assertTrue(m.recommended)
+        assertEquals(listOf(Language.AMHARIC), m.languages)
+    }
+
     @Test fun malformedJsonYieldsNothing() {
         assertTrue(catalog.parse("{oops", "https://x").isEmpty())
     }

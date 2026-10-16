@@ -136,6 +136,12 @@ Java_com_semavoice_core_speech_WhisperNative_nativeTranscribe(
     params.suppress_nst = true;          // no non-speech tokens like [MUSIC]
     params.temperature_inc = 0.2f;        // fallback decoding on low confidence
     params.no_speech_thold = 0.6f;
+    // Repetition-loop mitigation: trigger temperature fallback earlier on low-diversity output
+    // (entropy_thold ~ compression-ratio check) and cap tokens per segment. Ge'ez text needs
+    // ~3 tokens per syllable, so 30 s of fast speech stays well under 224 tokens.
+    params.entropy_thold = 2.0f;          // default 2.4
+    params.logprob_thold = -0.8f;         // default -1.0
+    params.max_tokens = 224;
     params.abort_callback = abort_callback;
     params.abort_callback_user_data = sc;
     params.progress_callback = progress_callback;

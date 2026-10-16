@@ -20,7 +20,10 @@
       "latency_ms": 5798,
       "audio_ms": 14760,
       "rtf": 0.3928342954000726,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "Besituč budenu ist arathebara do tenshara tachurch rutsha tchaan me jara saltchalung beguzufu sila lom ka lut ke metu asra sabat huyebara do tenshara tachurch arbom mistu paudidurudera jamang niye tachachalung.",
+      "repetition_loop": false,
+      "needs_review": true
     },
     {
       "audio": "clips/fleurs_am_test_001.wav",
@@ -32,7 +35,10 @@
       "latency_ms": 11068,
       "audio_ms": 12480,
       "rtf": 0.8868801041852491,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "nazi andandeye mitsan anneko yatilayu aynetye var dhar caunye kaba vusukoç yamikö nyubatçau yabit savi var dhar caunye çohoo moha nyatye mjesta maaminnau.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_002.wav",
@@ -44,7 +50,10 @@
       "latency_ms": 11328,
       "audio_ms": 10860,
       "rtf": 1.0431152670241166,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "Uttrasuzu kthengabu ona kutur. Yheweth haidebe letau in toihonai. Egyndandu sofitsumselamin narkata ni magnita kamallu.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_003.wav",
@@ -56,7 +65,10 @@
       "latency_ms": 3354,
       "audio_ms": 9360,
       "rtf": 0.3583846154073492,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "His Anatinin Nazan tünce Amrou, said Distetag Gajaj, Ennihum, Yafili Pino fotovala mojaoj, kadem mevelauta lekan.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_004.wav",
@@ -68,7 +80,10 @@
       "latency_ms": 6986,
       "audio_ms": 11340,
       "rtf": 0.6160779188451155,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "apia ye samu awan naka tamanat katama ba upholu desitlainat enna letin nish ke arba shi en nese ye hizbukut arallat",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_005.wav",
@@ -80,7 +95,10 @@
       "latency_ms": 3678,
       "audio_ms": 6960,
       "rtf": 0.5285485344537502,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "Selazi, Mustafa, and Emmelleya, Bicha, Itaqkelle lihun içilal.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_006.wav",
@@ -92,7 +110,10 @@
       "latency_ms": 7730,
       "audio_ms": 12840,
       "rtf": 0.6020987928609982,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "1. Çe-çinin kezvat nadergellen, 1. kezvat lüpsu, 1. Sarallen, 1. Minvelat çe-a-bzenyotchumig, 1. Esvatu, 1. Çe-na-chow, 1. Esvat, 1. Satsmanor, 1. Lung.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_007.wav",
@@ -104,7 +125,10 @@
       "latency_ms": 28072,
       "audio_ms": 8940,
       "rtf": 3.1401333109511094,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "1.11 mod, 3.8 mod thim.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_008.wav",
@@ -116,7 +140,10 @@
       "latency_ms": 11016,
       "audio_ms": 28920,
       "rtf": 0.3809423893393838,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "United States West, Ia Princeton University in now, yes, we didn't waste, absolutely University in Atadrageoj, Beverk Ia Darwin Finch, Jios Pizah Forteis and now, Baudjou, Kaktas Finch, Jios Pizah, Konyros, Trees, Makakkel, Maravat Mokniad, Yehidet, Yveletar, Jungeezen, Demyöset, Yiggemet, Henebara Bihonem, Addysu Zerja, Boholetetulul, Dojbeth, Chameffet, Arun Zaggeval.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_009.wav",
@@ -128,7 +155,10 @@
       "latency_ms": 3724,
       "audio_ms": 7080,
       "rtf": 0.526013502806404,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "hounu jaonete edelle, besenet yujeru aleyhiz afene garpinur mi jehihabht kartetla.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_010.wav",
@@ -140,7 +170,10 @@
       "latency_ms": 7832,
       "audio_ms": 15300,
       "rtf": 0.5119372679687598,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "Sawajqat anti-jamaro and the work berna, nasi alu mese ratavi kemi ka lau netra nageru ce nau ka alu, en nasi hulu, betha fetroost li ggenyu zulemi ce lu, betntavi mese rau ce luma adhun kofarok alan natsa.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_011.wav",
@@ -152,7 +185,10 @@
       "latency_ms": 1664,
       "audio_ms": 6360,
       "rtf": 0.2617466195381053,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "(sus)",
+      "repetition_loop": true,
+      "needs_review": true
     },
     {
       "audio": "clips/fleurs_am_test_012.wav",
@@ -164,7 +200,10 @@
       "latency_ms": 5295,
       "audio_ms": 16860,
       "rtf": 0.3141014234904169,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "Mahamed kezih tara kohon hüet başa ghar, baalugud döçlite el kef lagud tsnabbaro, lemas sellasel bennur brahantara ra, hira, bama bal y mithavuk awa sallai mehid jazot ternabbar.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_013.wav",
@@ -176,7 +215,10 @@
       "latency_ms": 3748,
       "audio_ms": 10200,
       "rtf": 0.3675471568553179,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "Good day, bu, bu, as rasa tinsil sa sost kata genne ba bohala, ba yametu, ba vanjun abora je mizeran, ja gurfmet leklek akoma.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_014.wav",
@@ -188,7 +230,10 @@
       "latency_ms": 8463,
       "audio_ms": 15840,
       "rtf": 0.5342889141474823,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "Yebete kristianu maka kalleniau vales 일단 kandrshih ametat belai, berohn muistine börn namp ni hi hihailinnai yagan zab kymitsit, bizoujme zaratawi yemem merea emnatu yetemunla, enda hone enda yukou adru kwa chal.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_015.wav",
@@ -200,7 +245,10 @@
       "latency_ms": 15641,
       "audio_ms": 12660,
       "rtf": 1.2355035702781796,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "makakelinga darajabad samanut satsin tendilka ena rahul dravid trudhhhajabatunne ematuru jagkar nathadarabdha",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_016.wav",
@@ -212,7 +260,10 @@
       "latency_ms": 4213,
       "audio_ms": 11160,
       "rtf": 0.3775649731160946,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "An desau bada bu Afrikaust la luth parkočmone la hulu me da bu Afrikaabihiray parkočma gwama rchae emset yerur khar demangzat takami lihon içilal",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_017.wav",
@@ -224,7 +275,10 @@
       "latency_ms": 3335,
       "audio_ms": 8760,
       "rtf": 0.38074216896829677,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "Kasablanka, behulum orokost, lemagab yet, bezrkhten nhá deraja, as desač ka hunu botaoč, andunau.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_018.wav",
@@ -236,7 +290,10 @@
       "latency_ms": 3688,
       "audio_ms": 10920,
       "rtf": 0.3377392582319022,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "Yedebu, medraba frikah zbcdrjit swspo gaju party, ba parlamomr jam zotcjirin deze koyit hal.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_019.wav",
@@ -248,7 +305,10 @@
       "latency_ms": 8468,
       "audio_ms": 6720,
       "rtf": 1.260239419657626,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "Yes, in a bit, I hon him. Yes, he and him are off with Gennar. Yes, I'm sorry for that.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_020.wav",
@@ -260,7 +320,10 @@
       "latency_ms": 6683,
       "audio_ms": 13320,
       "rtf": 0.5017702627504753,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "BABYOTAVYT OR NETWORKED AS RAZOUS TOOG ZATWICH BEMEJMEREDED KAMAMAA KELAVYMENGESTA KAKAMU KONGRAZU BETCENYAKAL HONATCHIOMALESNO BAKONFEDRIRITION ANGADSOSCHMESERED",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_021.wav",
@@ -272,7 +335,10 @@
       "latency_ms": 27005,
       "audio_ms": 18060,
       "rtf": 1.4952952048668056,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "Le lutu Ötrooch mırt messel directher sine matografi, y alva satt design, le film editing, ymjmreavet et, ymrt design, ymjmz editing, ymjmszink, ymjmredershethetta kall lillalu.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_022.wav",
@@ -284,7 +350,10 @@
       "latency_ms": 16073,
       "audio_ms": 18360,
       "rtf": 0.8754725217736025,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "jaanat aviyau, let radioj saalud ye kaise min matuhlet netab and a, se min matuhlet netab and a, nab se min matuhlet netab and a, nab se min matuhlet netab and a, nab jigar wa dhala ye misma ma an dihonyas jalaal.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_023.wav",
@@ -296,7 +365,10 @@
       "latency_ms": 6027,
       "audio_ms": 12360,
       "rtf": 0.48762361653161185,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "bukundali ni yoga, y ekundali ni hali emalk hali, be yoga oko moj, yaten ofafesin kzukasjj, mantrasin na be yitaočin neka gal.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_024.wav",
@@ -308,7 +380,10 @@
       "latency_ms": 6053,
       "audio_ms": 9480,
       "rtf": 0.6385393881824512,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "Mug çakolletu, jebel jamen masförtöči amwallanau, jafrahfreč amwagöču dbihunungen, betham durunat çau.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_025.wav",
@@ -320,7 +395,10 @@
       "latency_ms": 7092,
       "audio_ms": 15840,
       "rtf": 0.4477620202133131,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "Yeden de university professor Pamela Ferguson, Gazet Agnuch, foto ochin en ná, de lõuči tete tardaručin marräjaka tammu, Gazet Agnuch, badegenjá mesmer, yeto gazu imeslál, pylal.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_026.wav",
@@ -332,7 +410,10 @@
       "latency_ms": 5859,
       "audio_ms": 11700,
       "rtf": 0.500782538468066,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "bu andend mengeruçlai, thelaluçu kubaniyoç, yorasaça aroplanuç aloçau, nagargin, deliuluç mengeruçinna, tena nesh dyrgituç, chikgirnebbar.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_027.wav",
@@ -344,7 +425,10 @@
       "latency_ms": 6415,
       "audio_ms": 17700,
       "rtf": 0.3624703672235716,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "Leitan kata klem ns turgarbete de rego sipsabao kt, yövögetva kõts akaba vi avi yehe greki klai leot o tundidde regu, yövögetva kjoparti akaba vi avi yehe greki zir zir nai et hamoallau zohu fendik er bilačot a ye kaoan.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_028.wav",
@@ -356,7 +440,10 @@
       "latency_ms": 4360,
       "audio_ms": 10260,
       "rtf": 0.42501228074515945,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "Pesustem mokflese me en visi pegbzeb engetekena bota ala kopirami djamoto on faron la makuar kete kena bubbarkatat la lege pirami del s-o-chandu.",
+      "repetition_loop": false,
+      "needs_review": false
     },
     {
       "audio": "clips/fleurs_am_test_029.wav",
@@ -368,7 +455,15 @@
       "latency_ms": 4486,
       "audio_ms": 13440,
       "rtf": 0.3338199851333186,
-      "ref_translation": null
+      "ref_translation": null,
+      "hyp_guarded": "Felaas for are a stuttle hurlum nager kaandwem kezia vele kaara takala kdewillik undem hiun sinsa savun sattualin nesum medir uha ayer nasat nathchou.",
+      "repetition_loop": false,
+      "needs_review": false
     }
-  ]
+  ],
+  "wer_guarded": 1.286764705882353,
+  "cer_guarded": 1.6632366697848457,
+  "repetition_incidence": 0.03333333333333333,
+  "needs_review_rate": 0.06666666666666667,
+  "clips_wer_below_0_5": 0
 }

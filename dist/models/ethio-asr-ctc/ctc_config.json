@@ -1,0 +1,10 @@
+{
+  "blank_id": 408,
+  "word_delimiter": "|",
+  "languages": [
+    "am"
+  ],
+  "sample_rate": 16000,
+  "front_end": "SeamlessM4TFeatureExtractor(80 mel, stride 2)",
+  "source": "badrex/Ethio-ASR-amharic"
+}

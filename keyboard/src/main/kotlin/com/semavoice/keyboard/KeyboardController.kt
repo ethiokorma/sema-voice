@@ -80,6 +80,7 @@ class KeyboardController(
             }
         } }
         scope.launch { graph.speech.progress.collectLatest { p -> _state.update { it.copy(transcribeProgress = p) } } }
+        scope.launch { graph.ctc.progress.collectLatest { p -> _state.update { it.copy(transcribeProgress = p) } } }
         scope.launch { graph.modelManager.models.collectLatest { _state.update { it.copy(modelReady = graph.pipeline.hasAnySpeechModel()) } } }
     }
 
@@ -153,7 +154,8 @@ class KeyboardController(
                     is Outcome.Failure -> fail(r.error)
                     is Outcome.Success -> {
                         _state.update { it.copy(phase = KeyboardUiState.Phase.Review, result = r.value, editedText = null) }
-                        if (s.settings.autoInsert) insert(useTranslation = s.showTranslation && r.value.translation != null)
+                        // Never auto-insert output flagged as a possible hallucination/loop.
+                        if (s.settings.autoInsert && r.value.repetition?.needsReview != true) insert(useTranslation = s.showTranslation && r.value.translation != null)
                     }
                 }
             }
@@ -167,7 +169,7 @@ class KeyboardController(
     }
 
     fun cancelProcessing() {
-        graph.speech.cancel(); graph.translator.cancel()
+        graph.pipeline.cancelRecognition(); graph.translator.cancel()
         job?.cancel()
         graph.pipeline.reset()
         _state.update { it.copy(phase = KeyboardUiState.Phase.Idle, loadingLabel = null) }

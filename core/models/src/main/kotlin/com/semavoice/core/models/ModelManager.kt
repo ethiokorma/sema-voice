@@ -117,8 +117,11 @@ class ModelManager(
     fun bestSpeechModelFor(language: Language, preferredId: String = ""): ModelState? {
         val usable = installedSpeechModels()
         preferredId.takeIf { it.isNotEmpty() }?.let { id -> usable.firstOrNull { it.info.id == id && (language == Language.AUTO || language in it.info.languages) }?.let { return it } }
-        val candidates = if (language == Language.AUTO) usable else usable.filter { language in it.info.languages }
-        return candidates.maxByOrNull { it.info.totalBytes }
+        // Auto-detect needs a multilingual model (Whisper); CTC models are single-language.
+        val candidates = if (language == Language.AUTO) usable.filter { Language.ENGLISH in it.info.languages } .ifEmpty { usable }
+            else usable.filter { language in it.info.languages }
+        // Prefer measured quality rank when present, then size.
+        return candidates.maxWithOrNull(compareBy<ModelState> { it.info.qualityRank }.thenBy { it.info.totalBytes })
     }
 
     fun translationModelFor(from: Language, to: Language, preferredId: String = ""): ModelState? {

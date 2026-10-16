@@ -30,6 +30,8 @@ object SemaGraph {
     lateinit var settings: SettingsRepository private set
     lateinit var modelManager: ModelManager private set
     lateinit var speech: WhisperEngine private set
+    /** CTC acoustic models (w2v-BERT) via ONNX Runtime; used for models with format "onnx-ctc". */
+    lateinit var ctc: com.semavoice.core.speech.OnnxCtcEngine private set
     lateinit var translator: OnnxSeq2SeqTranslator private set
     lateinit var writing: RuleBasedWritingAssistant private set
     lateinit var database: SemaDatabase private set
@@ -50,6 +52,7 @@ object SemaGraph {
         settings = SettingsRepository(appContext)
         modelManager = ModelManager(appContext)
         speech = WhisperEngine(dispatchers)
+        ctc = com.semavoice.core.speech.OnnxCtcEngine(dispatchers)
         translator = OnnxSeq2SeqTranslator(dispatchers)
         writing = RuleBasedWritingAssistant()
         database = DatabaseFactory.create(appContext)

@@ -1,0 +1,11 @@
+model,utterances,wer,cer,wer_guarded,cer_guarded,repetition_incidence,needs_review_rate,clips_wer_below_0_5,mean_rtf,host,params
+badrex/Ethio-ASR-amharic,30,0.2188,0.0725,0.2188,0.0725,0.0,0.0,26,1.5754,Intel(R) Xeon(R) CPU E5-1607 v4 @ 3.10GHz,
+snapwre/hohe-asr-amharic,30,0.2206,0.0861,0.2206,0.0861,0.0,0.0,27,1.1093,Intel(R) Xeon(R) CPU E5-1607 v4 @ 3.10GHz,
+"badrex/Ethio-ASR-amharic (ONNX Runtime, dynamic int8 MatMul-only)",30,0.2353,0.0856,0.2353,0.0856,0.0,0.0,26,1.251,Intel(R) Xeon(R) CPU E5-1607 v4 @ 3.10GHz,
+ggml-tiny-waxal-amh.bin,30,0.7721,0.6277,0.7316,0.5706,0.0667,0.0667,6,4.9698,win32,{}
+ggml-tiny-amharic.bin,30,0.8125,0.609,0.6176,0.4027,0.2333,0.2333,12,3.1631,win32,
+ggml-tiny-waxal-amh-q5_1.bin,30,0.8695,0.8424,0.7316,0.594,0.2,0.2,7,1.9137,win32,
+agkphysics/wav2vec2-large-xlsr-53-amharic,30,0.9062,0.1221,0.9062,0.1221,0.0,0.0,1,0.4459,Intel(R) Xeon(R) CPU E5-1607 v4 @ 3.10GHz,
+ggml-small-amharic-q5_1.bin,30,1.1783,1.2633,1.1783,1.2633,0.0,0.0333,0,7.8534,win32,
+ggml-small-amharic.bin,30,1.1801,1.2395,1.1801,1.2395,0.0,0.0,0,5.7498,win32,
+ggml-tiny-q5_1.bin,30,1.2868,1.6632,1.2868,1.6632,0.0333,0.0667,0,0.6708,win32,

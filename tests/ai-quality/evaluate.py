@@ -71,6 +71,26 @@ def read_wav(path: str) -> tuple[np.ndarray, int]:
     return data, rate
 
 
+def guarded_metrics(rows: list) -> dict:
+    """Repetition-guarded WER/CER (reported alongside, never instead of, raw metrics)."""
+    from repetition_guard import check
+    words = errs = chars = cerrs = loops = review = 0
+    for r in rows:
+        g = check(r["hyp"], r.get("audio_ms", 0))
+        r["hyp_guarded"] = g["text"]
+        r["repetition_loop"] = g["loop"]
+        r["needs_review"] = g["needs_review"]
+        ref_w, hyp_w = normalize(r["ref"]).split(), normalize(g["text"]).split()
+        words += len(ref_w); errs += edit_distance(ref_w, hyp_w)
+        rc, hc = normalize(r["ref"]).replace(" ", ""), normalize(g["text"]).replace(" ", "")
+        chars += len(rc); cerrs += edit_distance(list(rc), list(hc))
+        loops += g["loop"]; review += g["needs_review"]
+    n = max(1, len(rows))
+    return {"wer_guarded": errs / max(1, words), "cer_guarded": cerrs / max(1, chars),
+            "repetition_incidence": loops / n, "needs_review_rate": review / n,
+            "clips_wer_below_0_5": sum(1 for r in rows if r["wer"] < 0.5)}
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", required=True, help="ggml .bin file (same file the app downloads)")
@@ -78,7 +98,12 @@ def main() -> int:
     ap.add_argument("--lang", default="am")
     ap.add_argument("--threads", type=int, default=4)
     ap.add_argument("--out", default=None)
+    ap.add_argument("--param", action="append", default=[], help="whisper.cpp param override key=value (repeatable), e.g. entropy_thold=2.0")
     args = ap.parse_args()
+    overrides = {}
+    for p in args.param:
+        k, v = p.split("=", 1)
+        overrides[k] = (v.lower() == "true") if v.lower() in ("true", "false") else (float(v) if "." in v else int(v))
 
     if not os.path.isfile(args.model):
         print(f"model not found: {args.model}"); return 2
@@ -89,7 +114,7 @@ def main() -> int:
     except ImportError:
         print("pip install pywhispercpp"); return 2
 
-    model = Model(args.model, n_threads=args.threads, print_realtime=False, print_progress=False)
+    model = Model(args.model, n_threads=args.threads, print_realtime=False, print_progress=False, **overrides)
     rows = []
     base = os.path.dirname(args.manifest)
     with open(args.manifest, encoding="utf-8") as f:
@@ -121,9 +146,12 @@ def main() -> int:
     total_errs = sum(edit_distance(normalize(r["ref"]).split(), normalize(r["hyp"]).split()) for r in rows)
     total_ref_chars = sum(len(normalize(r["ref"]).replace(" ", "")) for r in rows)
     total_cerrs = sum(edit_distance(list(normalize(r["ref"]).replace(" ", "")), list(normalize(r["hyp"]).replace(" ", ""))) for r in rows)
+    guarded = guarded_metrics(rows)
     summary = {
         "model": os.path.basename(args.model), "language": args.lang, "utterances": len(rows),
+        "params": overrides,
         "wer": total_errs / max(1, total_ref_words), "cer": total_cerrs / max(1, total_ref_chars),
+        **guarded,
         "mean_rtf": float(np.mean([r["rtf"] for r in rows])), "mean_latency_ms": float(np.mean([r["latency_ms"] for r in rows])),
         "host": sys.platform, "threads": args.threads, "note": "Host CPU numbers; phone RTF will differ.",
         "rows": rows,

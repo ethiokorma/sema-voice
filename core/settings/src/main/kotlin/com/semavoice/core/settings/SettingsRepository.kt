@@ -55,7 +55,7 @@ data class SemaSettings(
     // Models
     val wifiOnlyDownloads: Boolean = true,
     /** URL of an optional remote catalog.json (e.g. where the Amharic fine-tunes are hosted). */
-    val modelSourceUrl: String = "https://huggingface.co/semavoice/sema-voice-models/resolve/main/catalog.json",
+    val modelSourceUrl: String = "https://github.com/ethiokorma/sema-voice/releases/download/models-2026.10/catalog.json",
     // General
     val uiLanguage: AppUiLanguage = AppUiLanguage.SYSTEM,
     val onboardingComplete: Boolean = false,

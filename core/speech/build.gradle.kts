@@ -39,6 +39,7 @@ android {
 dependencies {
     api(project(":core:common"))
     implementation(project(":core:audio"))
+    implementation(libs.onnxruntime.android)
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.junit)

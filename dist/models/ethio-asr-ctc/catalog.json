@@ -1,0 +1,35 @@
+[
+  {
+    "id": "ethio-asr-amharic-ctc-int8",
+    "format": "onnx-ctc",
+    "base": "w2v-bert",
+    "languages": [
+      "am"
+    ],
+    "requiredRamMb": 1800,
+    "minTier": "HIGH",
+    "qualityRank": 10,
+    "measuredWer": 0.235,
+    "license": "CC-BY-4.0",
+    "sourceRepo": "badrex/Ethio-ASR-amharic",
+    "displayName": "Amharic high accuracy (w2v-BERT CTC, int8)",
+    "experimental": true,
+    "files": [
+      {
+        "file": "model_int8.onnx",
+        "sizeBytes": 876500358,
+        "sha256": "f939343b809390aadcce15a75d1b2543c9b0f81026e56d5249c4a99e944a44e0"
+      },
+      {
+        "file": "vocab.json",
+        "sizeBytes": 4700,
+        "sha256": "3f4a05c98277736556609871d76c8648b86fe04ac4c51e07f20dfbf7740c3acc"
+      },
+      {
+        "file": "ctc_config.json",
+        "sizeBytes": 214,
+        "sha256": "0f41f52d4d95eab957ed0c7b5c1a22b6b83d8e7d79fa90a4c053090eeb8afa86"
+      }
+    ]
+  }
+]

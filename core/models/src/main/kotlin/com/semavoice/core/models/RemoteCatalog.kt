@@ -28,9 +28,9 @@ class RemoteCatalog(private val cacheFile: File, private val client: OkHttpClien
     @Serializable
     data class Entry(
         val id: String,
-        val file: String,
-        val sizeBytes: Long,
-        val sha256: String,
+        val file: String = "",
+        val sizeBytes: Long = 0,
+        val sha256: String = "",
         val url: String? = null,
         val sourceRepo: String = "",
         val license: String = "",
@@ -42,7 +42,15 @@ class RemoteCatalog(private val cacheFile: File, private val client: OkHttpClien
         val minTier: String? = null,
         val version: String = "remote",
         val experimental: Boolean = true,
+        /** "whisper-ggml" (default, single [file]) or "onnx-ctc" (multi-file, see [files]). */
+        val format: String = "whisper-ggml",
+        val files: List<FileEntry> = emptyList(),
+        val qualityRank: Int = 0,
+        val measuredWer: Double? = null,
     )
+
+    @Serializable
+    data class FileEntry(val file: String, val sizeBytes: Long, val sha256: String, val url: String? = null)
 
     private val json = Json { ignoreUnknownKeys = true }
 
@@ -67,7 +75,11 @@ class RemoteCatalog(private val cacheFile: File, private val client: OkHttpClien
 
     fun parse(text: String, baseUrl: String): List<ModelInfo> {
         val entries: List<Entry> = runCatching { json.decodeFromString<List<Entry>>(text) }.getOrDefault(emptyList())
-        return entries.filter { it.sha256.matches(Regex("[0-9a-fA-F]{64}")) && it.sizeBytes > 0 }.map { e ->
+        val hex = Regex("[0-9a-fA-F]{64}")
+        return entries.filter { e ->
+            if (e.files.isNotEmpty()) e.files.all { it.sha256.matches(hex) && it.sizeBytes > 0 }
+            else e.sha256.matches(hex) && e.sizeBytes > 0
+        }.map { e ->
             val langs = e.languages.map(Language::fromCode).filter { it != Language.AUTO }.ifEmpty { listOf(Language.AMHARIC, Language.ENGLISH) }
             val sizeMb = e.sizeBytes / (1024 * 1024)
             val base = e.base.removePrefix("whisper-")
@@ -79,11 +91,13 @@ class RemoteCatalog(private val cacheFile: File, private val client: OkHttpClien
                 displayName = e.displayName ?: "Whisper ${base.ifBlank { "?" }} Amharic fine-tune",
                 description = e.description ?: "Fine-tuned Whisper converted to ggml (${e.sourceRepo}). Required for Amharic dictation.",
                 version = e.version,
-                files = listOf(ModelFile(e.file, e.url ?: "$baseUrl/${e.file}", e.sizeBytes, e.sha256.lowercase())),
+                files = if (e.files.isNotEmpty()) e.files.map { f -> ModelFile(f.file, f.url ?: "$baseUrl/${f.file}", f.sizeBytes, f.sha256.lowercase()) }
+                    else listOf(ModelFile(e.file, e.url ?: "$baseUrl/${e.file}", e.sizeBytes, e.sha256.lowercase())),
                 languages = langs, requiredRamMb = ram, minTier = tier,
                 license = e.license.ifBlank { "see source repository" },
                 attribution = "Fine-tuned Whisper from ${e.sourceRepo}; base model OpenAI Whisper (MIT)",
-                format = "whisper-ggml", recommended = Language.AMHARIC in langs && e.id.endsWith("q5_1"), experimental = e.experimental,
+                format = e.format, recommended = Language.AMHARIC in langs && (e.format == "onnx-ctc" || e.id.endsWith("q5_1")),
+                experimental = e.experimental, qualityRank = e.qualityRank, measuredWer = e.measuredWer,
             )
         }
     }
