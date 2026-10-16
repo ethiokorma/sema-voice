@@ -1,319 +1,490 @@
-// Sema Voice PWA — everything runs in the browser (transformers.js + ONNX Runtime Web).
-// No server, no account, no analytics. Models are cached by transformers.js in the Cache API.
-// transformers.js v3 (ships a current ONNX Runtime Web; v2.17's runtime rejects the opset-18 export).
-// Models run in worker.js so a heavy model can never freeze or crash the page.
+// Sema Voice PWA — app shell, engines, history. Models run in worker.js (never on the page thread).
 import { attachGeezKeyboard } from './keyboard.js';
 import { guard } from './guard.js';
 
 const $ = (id) => document.getElementById(id);
-const ui = { mic: $('mic'), status: $('status'), level: $('level'), progress: $('progress'), cancel: $('cancel'), result: $('result'),
-  text: $('text'), stats: $('stats'), trLabel: $('trLabel'), translation: $('translation'), trError: $('trError'),
-  copy: $('copy'), copyTr: $('copyTr'), share: $('share'), translate: $('translate'), speak: $('speak'), download: $('download'),
-  discard: $('discard'), inLang: $('inLang'), outLang: $('outLang'), mode: $('mode'), uiLang: $('uiLang'), modelStatus: $('modelStatus'), warm: $('warm'), install: $('install') };
-
-const STRINGS = {
-  en: { tagline: 'Speak in your language. Write in any language.', input: 'Input', output: 'Output', mode: 'Mode', modeExact: 'Exact', modeClean: 'Clean', modeTranslate: 'Translate',
-    tap: 'Tap the microphone and speak.', cancel: 'Cancel', transcript: 'Transcript', translation: 'Translation', copy: 'Copy', copyTr: 'Copy translation', share: 'Share',
-    translate: 'Translate', listen: 'Listen', save: 'Save .txt', discard: 'Discard', models: 'Models & privacy', warm: 'Download models for current languages', install: 'Install app',
-    privacy: 'Everything runs inside this browser tab (whisper + translation via transformers.js, ONNX Runtime Web). Audio never leaves your device. Models (30–115 MB) are downloaded once and cached for offline use.',
-    kbnote: 'Browsers cannot provide a system keyboard. Use the Android app for keyboard dictation inside other apps; here, copy or share the text.',
-    listening: 'Listening… tap to stop', loading: 'Loading model', transcribing: 'Transcribing on this device…', translating: 'Translating on this device…', empty: 'Nothing was heard. Try again.',
-    micDenied: 'Microphone permission is needed.', noTr: 'No translation model for this pair.', copied: 'Copied', local: 'processed on this device', amNote: 'Amharic model (experimental fine-tune)',
-    kb: 'Amharic keyboard', editHint: 'Tap any word in the box to correct it.', space: 'space',
-    workerCrash: 'The speech model stopped (likely out of memory). Close other tabs and try again.', review: 'check this text: the model repeated itself',
-    engineLocal: 'On-device · private', engineGoogle: 'Google · online, more accurate', googleNote: 'Uses Chrome’s built-in Google speech service: your audio is sent to Google. Free, needs internet.',
-    googleUnsupported: 'This browser has no built-in speech recognition. Use Chrome on Android or desktop.', liveListening: 'Listening… words appear as you speak', preparing: 'Preparing model', ready: 'Model ready', modelError: 'Model error', offlineGoogle: 'Google speech needs internet. Switch to On-device.' },
-  am: { tagline: 'በቋንቋዎ ይናገሩ። በማንኛውም ቋንቋ ይጻፉ።', input: 'ግብዓት', output: 'ውጤት', mode: 'ሁነታ', modeExact: 'ልክ', modeClean: 'ንጹህ', modeTranslate: 'ተርጉም',
-    tap: 'ማይክሮፎኑን ነክተው ይናገሩ።', cancel: 'ሰርዝ', transcript: 'ግልባጭ', translation: 'ትርጉም', copy: 'ቅዳ', copyTr: 'ትርጉሙን ቅዳ', share: 'አጋራ',
-    translate: 'ተርጉም', listen: 'አዳምጥ', save: '.txt አስቀምጥ', discard: 'አስወግድ', models: 'ሞዴሎች እና ግላዊነት', warm: 'ለአሁኑ ቋንቋዎች ሞዴሎችን አውርድ', install: 'መተግበሪያውን ጫን',
-    privacy: 'ሁሉም ነገር በዚህ የአሳሽ ትር ውስጥ ይሰራል። ድምጽ ከመሣሪያዎ አይወጣም። ሞዴሎች (30–115 MB) አንድ ጊዜ ወርደው ከመስመር ውጭ ለመጠቀም ይቀመጣሉ።',
-    kbnote: 'አሳሾች የስርዓት ኪቦርድ መስጠት አይችሉም። በሌሎች መተግበሪያዎች ውስጥ ለመጻፍ የአንድሮይድ መተግበሪያውን ይጠቀሙ፤ እዚህ ጽሑፉን ይቅዱ ወይም ያጋሩ።',
-    listening: 'እያዳመጠ ነው… ለማቆም ይንኩ', loading: 'ሞዴል እየተጫነ ነው', transcribing: 'በዚህ መሣሪያ ላይ እየተጻፈ ነው…', translating: 'በዚህ መሣሪያ ላይ እየተተረጎመ ነው…', empty: 'ምንም አልተሰማም። እንደገና ይሞክሩ።',
-    micDenied: 'የማይክሮፎን ፈቃድ ያስፈልጋል።', noTr: 'ለዚህ ጥንድ የትርጉም ሞዴል የለም።', copied: 'ተቀድቷል', local: 'በዚህ መሣሪያ ላይ ተሰርቷል', amNote: 'የአማርኛ ሞዴል (የሙከራ)',
-    kb: 'የአማርኛ ኪቦርድ', editHint: 'ለማረም በሳጥኑ ውስጥ ያለውን ቃል ይንኩ።', space: 'ክፍተት',
-    workerCrash: 'የንግግር ሞዴሉ ቆሟል (ማህደረ ትውስታ አልበቃም)። ሌሎች ትሮችን ዘግተው እንደገና ይሞክሩ።', review: 'ይህን ጽሑፍ ያረጋግጡ፤ ሞዴሉ ደግሟል',
-    engineLocal: 'በስልኩ ላይ · ግላዊ', engineGoogle: 'Google · በመስመር ላይ፣ የበለጠ ትክክል', googleNote: 'የChrome አብሮ የተሰራውን የGoogle ንግግር አገልግሎት ይጠቀማል፤ ድምጽዎ ወደ Google ይላካል። ነጻ ነው፣ ኢንተርኔት ያስፈልጋል።',
-    googleUnsupported: 'ይህ አሳሽ አብሮ የተሰራ የንግግር ማወቂያ የለውም። Chromeን ይጠቀሙ።', liveListening: 'እያዳመጠ ነው… ቃላት ሲናገሩ ይታያሉ', preparing: 'ሞዴል እየተዘጋጀ', ready: 'ሞዴሉ ዝግጁ ነው', modelError: 'የሞዴል ስህተት', offlineGoogle: 'Google ንግግር ኢንተርኔት ያስፈልገዋል። ወደ በስልኩ ላይ ይቀይሩ።' },
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('sema.' + k); return v === null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem('sema.' + k, JSON.stringify(v)); } catch {} },
+  del(k) { try { localStorage.removeItem('sema.' + k); } catch {} },
 };
-let L = STRINGS.en;
-function applyLang(code) {
-  L = STRINGS[code] || STRINGS.en; document.documentElement.lang = code; localStorage.setItem('ui', code);
-  document.querySelectorAll('[data-i18n]').forEach((el) => { const k = el.dataset.i18n; if (L[k]) el.textContent = L[k]; });
-}
 
-// ---- model selection ---------------------------------------------------------------------
-// Amharic: local ONNX export of b1n1yam/shook-tiny-amharic-600hr (Apache-2.0), see web/models/.
-// Other languages: Xenova/whisper-tiny (MIT) — stock Whisper is unusable for Amharic (WER > 100 %).
-const SPEECH = { am: 'whisper-tiny-amharic', en: 'Xenova/whisper-tiny', ar: 'Xenova/whisper-tiny', so: 'Xenova/whisper-tiny' };
-const WHISPER_LANG = { am: 'amharic', en: 'english', ar: 'arabic', so: 'somali' };
-const MARIAN_TARGET = { am: '>>amh<<', ar: '>>ara<<', so: '>>som<<', ti: '>>tir<<' };
-function translationModel(from, to) {
+// ---------------------------------------------------------------- strings (en / am)
+const S = {
+  en: {
+    speakTitle: 'Speak', historyTitle: 'History', translateTitle: 'Translate', settingsTitle: 'Settings',
+    tabSpeak: 'Speak', tabHistory: 'History', tabTranslate: 'Translate', tabSettings: 'Settings',
+    modeExact: 'Exact', modeClean: 'Clean', modeTranslate: '+ English',
+    heroTitle: 'Speak Amharic. Get text.', heroSub: 'Tap the microphone and talk naturally. Your words appear here.',
+    translation: 'Translation', copy: 'Copy', translate: 'Translate', share: 'Share', edit: 'Edit', listen: 'Listen', clear: 'Clear',
+    searchPh: 'Search your notes', historyEmpty: 'Your dictations will appear here. They stay on this device.',
+    tPh: 'Type or paste text', amKeyboard: 'Amharic keyboard', tNote: 'Translation runs on this device (OPUS-MT). Amharic → English is usable; English → Amharic is basic.',
+    engineSec: 'Recognition engine', langSec: 'Languages', spokenLang: 'I speak', targetLang: 'Translate to', uiLangLabel: 'App language',
+    offlineSec: 'Offline model', prepare: 'Download & prepare now', appSec: 'App', install: 'Install app', clearHistory: 'Delete all history', diagnostics: 'Diagnostics',
+    privacy: 'On-device engines keep your audio in this browser. The Google engine sends audio to Google. History is saved only on this device.',
+    welcomeTitle: 'Welcome to Sema Voice', welcomeSub: 'Choose how your voice is turned into text. You can change this any time in Settings.', start: 'Start', done: 'Done', dismiss: 'Dismiss',
+    eGoogle: 'Google (online)', eGoogleDesc: 'Most accurate for Amharic in the browser. Words appear live as you speak. Audio is sent to Google. Needs internet and Chrome.',
+    eLocal: 'On-device (private)', eLocalDesc: 'Works offline, audio never leaves this phone. Uses a small 56 MB model: fast, but makes more mistakes.',
+    recommended: 'Recommended', private: 'Private', unavailable: 'Not available in this browser',
+    tapToSpeak: 'Tap to speak', listening: 'Listening…', liveListening: 'Listening… words appear as you speak', transcribing: 'Writing it down…', translating: 'Translating…',
+    preparing: 'Preparing model', ready: 'Model ready', modelError: 'Model error',
+    empty: "I didn't catch anything. Try again a bit closer.", micDenied: 'Microphone permission is needed. Allow it in the browser settings.',
+    googleOffline: 'Google speech needs internet. Switch to On-device in Settings.', googleLang: 'Google speech does not support this language here.',
+    copied: 'Copied', saved: 'Saved to History', deleted: 'Deleted', review: 'check this text: the model repeated itself',
+    noTr: 'No translation model for this language pair.', workerCrash: 'The on-device model stopped (probably not enough memory). Try the Google engine, or close other tabs.',
+    crashed: 'Sema Voice closed unexpectedly last time while {stage}. The on-device model may be too heavy for this phone.', useGoogle: 'Use Google engine',
+    stage_loading: 'loading the on-device model', stage_transcribing: 'transcribing on this device', stage_translating: 'translating',
+    offlineReady: 'The on-device model is ready and works without internet.', offlineNot: 'Not downloaded yet. It downloads automatically the first time you use the on-device engine (about 56 MB, Wi-Fi recommended).',
+    lowMem: 'This device reports {mem} GB memory. The on-device model may crash here; the Google engine is safer.',
+    confirmClear: 'Tap again to delete all history', noVoice: 'No voice for this language in this browser.',
+  },
+  am: {
+    speakTitle: 'ይናገሩ', historyTitle: 'ታሪክ', translateTitle: 'ተርጉም', settingsTitle: 'ቅንብሮች',
+    tabSpeak: 'ይናገሩ', tabHistory: 'ታሪክ', tabTranslate: 'ተርጉም', tabSettings: 'ቅንብሮች',
+    modeExact: 'ልክ', modeClean: 'ንጹህ', modeTranslate: '+ እንግሊዝኛ',
+    heroTitle: 'አማርኛ ይናገሩ። ጽሑፍ ያግኙ።', heroSub: 'ማይክሮፎኑን ነክተው በተፈጥሮ ይናገሩ። ቃላትዎ እዚህ ይታያሉ።',
+    translation: 'ትርጉም', copy: 'ቅዳ', translate: 'ተርጉም', share: 'አጋራ', edit: 'አርትዕ', listen: 'አዳምጥ', clear: 'አጽዳ',
+    searchPh: 'ማስታወሻዎችዎን ይፈልጉ', historyEmpty: 'የተናገሯቸው ጽሑፎች እዚህ ይታያሉ። በዚህ መሣሪያ ላይ ብቻ ይቀመጣሉ።',
+    tPh: 'ጽሑፍ ይተይቡ ወይም ይለጥፉ', amKeyboard: 'የአማርኛ ኪቦርድ', tNote: 'ትርጉም በዚህ መሣሪያ ላይ ይሰራል። አማርኛ → እንግሊዝኛ ጥሩ ነው፤ እንግሊዝኛ → አማርኛ መሠረታዊ ነው።',
+    engineSec: 'የማወቂያ ሞተር', langSec: 'ቋንቋዎች', spokenLang: 'የምናገረው', targetLang: 'የሚተረጎመው', uiLangLabel: 'የመተግበሪያ ቋንቋ',
+    offlineSec: 'ከመስመር ውጭ ሞዴል', prepare: 'አሁን አውርድና አዘጋጅ', appSec: 'መተግበሪያ', install: 'መተግበሪያውን ጫን', clearHistory: 'ሁሉንም ታሪክ ሰርዝ', diagnostics: 'ምርመራ',
+    privacy: 'በስልኩ ላይ የሚሰሩ ሞተሮች ድምጽዎን በዚህ አሳሽ ውስጥ ያቆያሉ። የGoogle ሞተር ድምጽን ወደ Google ይልካል። ታሪክ በዚህ መሣሪያ ላይ ብቻ ይቀመጣል።',
+    welcomeTitle: 'ወደ ሰማ ቮይስ እንኳን በደህና መጡ', welcomeSub: 'ድምጽዎ ወደ ጽሑፍ የሚቀየርበትን መንገድ ይምረጡ። በኋላ በቅንብሮች መቀየር ይችላሉ።', start: 'ጀምር', done: 'ተጠናቀቀ', dismiss: 'ዝጋ',
+    eGoogle: 'Google (በመስመር ላይ)', eGoogleDesc: 'በአሳሽ ውስጥ ለአማርኛ በጣም ትክክለኛ። ቃላት ሲናገሩ ወዲያው ይታያሉ። ድምጽ ወደ Google ይላካል። ኢንተርኔትና Chrome ያስፈልጋል።',
+    eLocal: 'በስልኩ ላይ (ግላዊ)', eLocalDesc: 'ያለ ኢንተርኔት ይሰራል፤ ድምጽ ከስልኩ አይወጣም። ትንሽ 56 MB ሞዴል ነው፤ ፈጣን ነው ግን ብዙ ስህተት ይሰራል።',
+    recommended: 'የሚመከር', private: 'ግላዊ', unavailable: 'በዚህ አሳሽ አይገኝም',
+    tapToSpeak: 'ለመናገር ይንኩ', listening: 'እያዳመጠ ነው…', liveListening: 'እያዳመጠ ነው… ቃላት ሲናገሩ ይታያሉ', transcribing: 'እየጻፈ ነው…', translating: 'እየተረጎመ ነው…',
+    preparing: 'ሞዴል እየተዘጋጀ', ready: 'ሞዴሉ ዝግጁ ነው', modelError: 'የሞዴል ስህተት',
+    empty: 'ምንም አልሰማሁም። ቀረብ ብለው እንደገና ይሞክሩ።', micDenied: 'የማይክሮፎን ፈቃድ ያስፈልጋል። በአሳሹ ቅንብሮች ውስጥ ይፍቀዱ።',
+    googleOffline: 'የGoogle ንግግር ኢንተርኔት ያስፈልገዋል። በቅንብሮች ወደ በስልኩ ላይ ይቀይሩ።', googleLang: 'የGoogle ንግግር ይህን ቋንቋ እዚህ አይደግፍም።',
+    copied: 'ተቀድቷል', saved: 'በታሪክ ተቀምጧል', deleted: 'ተሰርዟል', review: 'ይህን ጽሑፍ ያረጋግጡ፤ ሞዴሉ ደግሟል',
+    noTr: 'ለዚህ ቋንቋ ጥንድ የትርጉም ሞዴል የለም።', workerCrash: 'የስልኩ ሞዴል ቆሟል (ማህደረ ትውስታ አልበቃም)። የGoogle ሞተርን ይሞክሩ ወይም ሌሎች ትሮችን ይዝጉ።',
+    crashed: 'ባለፈው ጊዜ ሰማ ቮይስ {stage} ላይ ሳለ በድንገት ተዘግቷል። የስልኩ ሞዴል ለዚህ ስልክ ከባድ ሊሆን ይችላል።', useGoogle: 'የGoogle ሞተር ተጠቀም',
+    stage_loading: 'የስልኩን ሞዴል በመጫን', stage_transcribing: 'በስልኩ ላይ በመጻፍ', stage_translating: 'በመተርጎም',
+    offlineReady: 'የስልኩ ሞዴል ዝግጁ ነው፤ ያለ ኢንተርኔት ይሰራል።', offlineNot: 'ገና አልወረደም። የስልኩን ሞተር መጀመሪያ ሲጠቀሙ በራሱ ይወርዳል (56 MB ገደማ፤ Wi-Fi ይመከራል)።',
+    lowMem: 'ይህ መሣሪያ {mem} GB ማህደረ ትውስታ አለው። የስልኩ ሞዴል ሊቆም ይችላል፤ የGoogle ሞተር ይሻላል።',
+    confirmClear: 'ሁሉንም ታሪክ ለመሰረዝ እንደገና ይንኩ', noVoice: 'በዚህ አሳሽ ለዚህ ቋንቋ ድምጽ የለም።',
+  },
+};
+let L = S.en;
+const t = (k, vars = {}) => (L[k] || S.en[k] || k).replace(/\{(\w+)\}/g, (_, v) => vars[v] ?? '');
+
+// ---------------------------------------------------------------- languages & models
+const LANGS = {
+  am: { name: 'አማርኛ', en: 'Amharic', bcp: 'am-ET', whisper: 'amharic', model: 'whisper-tiny-amharic' },
+  en: { name: 'English', en: 'English', bcp: 'en-US', whisper: 'english', model: 'Xenova/whisper-tiny' },
+  ar: { name: 'العربية', en: 'Arabic', bcp: 'ar-SA', whisper: 'arabic', model: 'Xenova/whisper-tiny' },
+};
+const OUT = { en: 'English', am: 'አማርኛ', ar: 'العربية', so: 'Soomaali', ti: 'ትግርኛ' };
+const MARIAN = { am: '>>amh<<', ar: '>>ara<<', so: '>>som<<', ti: '>>tir<<' };
+function trModel(from, to) {
   if (from === to) return null;
-  if (to === 'en') return { id: 'Xenova/opus-mt-mul-en', prefix: '' };            // am/ar/so/ti -> en (Apache-2.0)
-  if (from === 'en' && MARIAN_TARGET[to]) return { id: 'Xenova/opus-mt-en-mul', prefix: MARIAN_TARGET[to] + ' ' };
-  return null; // e.g. am -> ar would need M2M100 (630 MB); not offered in the PWA
+  if (to === 'en') return { id: 'Xenova/opus-mt-mul-en', prefix: '' };
+  if (from === 'en' && MARIAN[to]) return { id: 'Xenova/opus-mt-en-mul', prefix: MARIAN[to] + ' ' };
+  return null;
 }
 
-// ---- inference worker ----------------------------------------------------------------------
-let worker = null, seq = 0;
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const isPhone = /Android|iPhone|iPad|Mobile/i.test(navigator.userAgent);
+const mem = navigator.deviceMemory || 0; // Chrome-only hint, GB, capped at 8
+const state = {
+  engine: store.get('engine', null), in: store.get('in', 'am'), out: store.get('out', 'en'), mode: store.get('mode', 'clean'),
+  ui: store.get('ui', navigator.language.startsWith('am') ? 'am' : 'en'),
+};
+if (!LANGS[state.in]) state.in = 'am';
+
+// ---------------------------------------------------------------- crash detection
+// A "stage" marker is written before heavy work and cleared after. If it is still present on
+// the next start, the tab died during that stage (typically out of memory).
+const STAGE_KEY = 'stage';
+function stageBegin(s) { store.set(STAGE_KEY, { s, at: Date.now() }); }
+function stageEnd() { store.del(STAGE_KEY); }
+const crashed = store.get(STAGE_KEY, null);
+stageEnd();
+if (crashed) store.set('crashes', [...store.get('crashes', []).slice(-4), { ...crashed, ua: navigator.userAgent.slice(0, 120), mem }]);
+
+// ---------------------------------------------------------------- inference worker
+let worker = null, seq = 0, workerFailed = false;
 const pending = new Map();
-function startWorker() {
+function ensureWorker() {
+  if (worker) return worker;
   worker = new Worker(new URL('./worker.js', import.meta.url), { type: 'module' });
   worker.onmessage = ({ data: m }) => {
     const p = pending.get(m.id); if (!p) return;
-    // Model download/loading is shown only as a small header chip; the page stays usable.
-    if (m.type === 'progress') setChip(`${L.preparing} ${Math.round(m.progress)}%`, 'busy');
+    if (m.type === 'progress') setChip(`${t('preparing')} ${Math.round(m.progress)}%`, 'busy');
     else if (m.type === 'status') {
-      if (m.stage === 'loading') setChip(`${L.preparing}…`, 'busy');
-      else if (!p.background) ui.status.textContent = m.stage === 'translating' ? L.translating : L.transcribing;
-    } else if (m.type === 'result') { pending.delete(m.id); setChip(L.ready, 'ok'); p.resolve(m); }
-    else if (m.type === 'error') { pending.delete(m.id); setChip(L.modelError, 'err'); p.reject(new Error(m.message)); }
+      if (m.stage === 'loading') { setChip(`${t('preparing')}…`, 'busy'); stageBegin('loading'); }
+      else { stageBegin(m.stage); if (!p.background) setStatus(m.stage === 'translating' ? t('translating') : t('transcribing')); }
+    } else if (m.type === 'result') { pending.delete(m.id); stageEnd(); setChip(t('ready'), 'ok'); hideChipSoon(); p.resolve(m); }
+    else if (m.type === 'error') { pending.delete(m.id); stageEnd(); setChip(t('modelError'), 'err'); p.reject(new Error(m.message)); }
   };
-  // A crashed worker (e.g. out of memory) must not take the page down: fail pending jobs, restart.
   worker.onerror = (e) => {
     e.preventDefault?.();
-    for (const [, p] of pending) p.reject(new Error(L.workerCrash));
-    pending.clear(); ui.progress.hidden = true;
+    workerFailed = true; stageEnd();
+    for (const [, p] of pending) p.reject(new Error(t('workerCrash')));
+    pending.clear(); setChip(t('modelError'), 'err');
     try { worker.terminate(); } catch {}
-    startWorker();
+    worker = null;
   };
+  return worker;
 }
-startWorker();
 function run(msg, transfer = [], background = false) {
+  ensureWorker();
   return new Promise((resolve, reject) => { const id = ++seq; pending.set(id, { resolve, reject, background }); worker.postMessage({ ...msg, id }, transfer); });
 }
-function setChip(text, state) { const c = $('modelChip'); if (!c) return; c.hidden = false; c.textContent = text; c.dataset.state = state; }
-// Warm the speech model in the background as soon as the page is idle, and whenever the input
-// language changes, so the first tap on the mic does not wait for a download.
-function warmSpeech() {
-  if (engine() !== 'local') return;
-  run({ type: 'warm', task: 'automatic-speech-recognition', model: SPEECH[ui.inLang.value] }, [], true).catch(() => {});
+let chipTimer = 0;
+function setChip(text, st) { const c = $('modelChip'); clearTimeout(chipTimer); c.hidden = false; c.textContent = text; c.dataset.state = st; }
+function hideChipSoon() { clearTimeout(chipTimer); chipTimer = setTimeout(() => { $('modelChip').hidden = true; }, 2500); }
+
+// ---------------------------------------------------------------- UI helpers
+function setStatus(s) { $('status').textContent = s; }
+let toastTimer = 0;
+function toast(s) { const el = $('toast'); el.textContent = s; el.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => (el.hidden = true), 1800); }
+function describe(err) {
+  const parts = []; if (err?.errors?.length) parts.push(...err.errors.map((e) => e.message || String(e)));
+  parts.push(err?.message || String(err)); return [...new Set(parts)].join(' | ');
+}
+function applyLang() {
+  L = S[state.ui] || S.en; document.documentElement.lang = state.ui;
+  document.querySelectorAll('[data-i18n]').forEach((el) => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-ph]').forEach((el) => { el.placeholder = t(el.dataset.i18nPh); });
+  const active = document.querySelector('.screen:not([hidden])'); if (active) $('screenTitle').textContent = t(active.dataset.title);
+  renderEngineOptions(); renderLangPair(); renderOffline(); if (!recActive()) setStatus(t('tapToSpeak'));
 }
 
-// ---- recording ---------------------------------------------------------------------------
-let mediaRecorder = null, chunks = [], audioCtx = null, analyser = null, levelTimer = null, stream = null, cancelled = false;
-
-async function startRecording() {
-  try { stream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } }); }
-  catch { ui.status.textContent = L.micDenied; return; }
-  chunks = []; cancelled = false;
-  mediaRecorder = new MediaRecorder(stream);
-  mediaRecorder.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
-  mediaRecorder.onstop = onStopped;
-  mediaRecorder.start(250);
-  audioCtx = new AudioContext();
-  analyser = audioCtx.createAnalyser(); analyser.fftSize = 512;
-  audioCtx.createMediaStreamSource(stream).connect(analyser);
-  const buf = new Uint8Array(analyser.fftSize);
-  levelTimer = setInterval(() => { analyser.getByteTimeDomainData(buf); let s = 0; for (const v of buf) { const d = (v - 128) / 128; s += d * d; } const lv = Math.min(1, Math.sqrt(s / buf.length) * 4); ui.level.style.width = (lv * 100) + '%'; document.documentElement.style.setProperty('--lvl', lv.toFixed(3)); }, 80);
-  ui.mic.classList.add('rec'); document.body.classList.add('recording'); ui.mic.setAttribute('aria-label', 'Stop'); ui.status.textContent = L.listening; ui.cancel.hidden = false;
-  // One utterance is capped at 30 s: a single Whisper window keeps browser memory low on phones.
-  const rec = mediaRecorder;
-  setTimeout(() => { if (rec.state === 'recording') rec.stop(); }, MAX_UTTERANCE_MS);
+// ---------------------------------------------------------------- navigation
+function showTab(name) {
+  document.querySelectorAll('.screen').forEach((s) => (s.hidden = s.id !== 'screen-' + name));
+  document.querySelectorAll('[data-tab]').forEach((b) => b.classList.toggle('on', b.dataset.tab === name));
+  $('screenTitle').textContent = t($('screen-' + name).dataset.title);
+  if (name === 'history') renderHistory();
+  if (name === 'settings') renderDiag();
+  scrollTo({ top: 0 });
 }
-const MAX_UTTERANCE_MS = 30000;
+document.querySelectorAll('[data-tab]').forEach((b) => b.addEventListener('click', () => showTab(b.dataset.tab)));
 
-function stopRecording() { if (mediaRecorder?.state === 'recording') mediaRecorder.stop(); }
+// ---------------------------------------------------------------- engines
+function engineAvailable(e) { return e === 'google' ? !!SR : true; }
+function engine() { return state.engine && engineAvailable(state.engine) ? state.engine : (SR ? 'google' : 'local'); }
+function setEngine(e) {
+  state.engine = e; store.set('engine', e); renderEngineOptions();
+  if (e === 'local' && !isPhone) warmLocal(); // phones load the model only when the mic is used
+}
+function engineCard(e, host, onPick) {
+  const avail = engineAvailable(e);
+  const b = document.createElement('button');
+  b.type = 'button'; b.className = 'opt'; b.setAttribute('role', 'radio');
+  b.setAttribute('aria-checked', String(engine() === e && avail)); if (!avail) b.setAttribute('aria-disabled', 'true');
+  const title = e === 'google' ? t('eGoogle') : t('eLocal');
+  const desc = !avail ? t('unavailable') : e === 'google' ? t('eGoogleDesc') : t('eLocalDesc');
+  const badge = e === 'google' ? `<span class="badge">${t('recommended')}</span>` : `<span class="badge">${t('private')}</span>`;
+  b.innerHTML = `<span class="radio"></span><span><span class="opt-title">${title} ${badge}</span><span class="opt-desc">${desc}</span></span>`;
+  b.addEventListener('click', () => { if (avail) onPick(e); });
+  host.append(b);
+}
+function renderEngineOptions() {
+  const host = $('engineOptions'); host.innerHTML = '';
+  ['google', 'local'].forEach((e) => engineCard(e, host, setEngine));
+  const badge = $('engineBadge');
+  badge.textContent = engine() === 'google' ? 'Google' : (state.ui === 'am' ? 'በስልኩ' : 'On-device');
+  badge.dataset.kind = engine() === 'google' ? 'cloud' : 'local';
+}
+$('engineBadge').addEventListener('click', () => showTab('settings'));
 
-function teardown() {
-  clearInterval(levelTimer); ui.level.style.width = '0'; document.documentElement.style.setProperty('--lvl', '0');
-  stream?.getTracks().forEach((t) => t.stop()); stream = null;
-  audioCtx?.close(); audioCtx = null;
-  ui.mic.classList.remove('rec'); document.body.classList.remove('recording'); ui.mic.setAttribute('aria-label', 'Start dictation'); ui.cancel.hidden = true;
+function warmLocal() {
+  if (workerFailed) return;
+  run({ type: 'warm', task: 'automatic-speech-recognition', model: LANGS[state.in].model }, [], true).then(() => { store.set('localReady', true); renderOffline(); }).catch(() => {});
+}
+function renderOffline() {
+  $('offlineInfo').textContent = store.get('localReady', false) ? t('offlineReady') : t('offlineNot');
+  if (mem && mem <= 4) $('offlineInfo').textContent += ' ' + t('lowMem', { mem });
+}
+$('warm').addEventListener('click', warmLocal);
+
+// ---------------------------------------------------------------- languages
+function renderLangPair() {
+  $('lpIn').textContent = LANGS[state.in].name; $('lpOut').textContent = OUT[state.out];
+  $('trLang').textContent = OUT[state.out];
+  fillSelect($('inLang'), Object.fromEntries(Object.entries(LANGS).map(([k, v]) => [k, v.name])), state.in);
+  fillSelect($('outLang'), OUT, state.out);
+  fillSelect($('tFrom'), OUT, store.get('tFrom', 'am')); fillSelect($('tTo'), OUT, store.get('tTo', 'en'));
+  $('uiLang').value = state.ui;
+  document.querySelectorAll('[data-mode]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mode === state.mode)));
+}
+function fillSelect(sel, map, val) { sel.innerHTML = Object.entries(map).map(([k, v]) => `<option value="${k}">${v}</option>`).join(''); sel.value = val; }
+function setIn(v) { state.in = v; store.set('in', v); renderLangPair(); }
+function setOut(v) { state.out = v; store.set('out', v); renderLangPair(); }
+$('inLang').addEventListener('change', (e) => setIn(e.target.value));
+$('outLang').addEventListener('change', (e) => setOut(e.target.value));
+$('uiLang').addEventListener('change', (e) => { state.ui = e.target.value; store.set('ui', state.ui); applyLang(); });
+document.querySelectorAll('[data-mode]').forEach((b) => b.addEventListener('click', () => { state.mode = b.dataset.mode; store.set('mode', state.mode); renderLangPair(); }));
+
+function openLangSheet() {
+  const build = (host, map, cur, pick) => { host.innerHTML = ''; for (const [k, v] of Object.entries(map)) { const b = document.createElement('button'); b.type = 'button'; b.textContent = v; b.setAttribute('aria-checked', String(k === cur)); b.onclick = () => { pick(k); openLangSheet(); }; host.append(b); } };
+  build($('lsIn'), Object.fromEntries(Object.entries(LANGS).map(([k, v]) => [k, v.name])), state.in, setIn);
+  build($('lsOut'), OUT, state.out, setOut);
+  $('langSheet').hidden = false;
+}
+$('langPair').addEventListener('click', openLangSheet);
+$('langDone').addEventListener('click', () => ($('langSheet').hidden = true));
+$('langSheet').addEventListener('click', (e) => { if (e.target.id === 'langSheet') $('langSheet').hidden = true; });
+
+// ---------------------------------------------------------------- result display
+function showLive() { $('hero').hidden = true; $('live').hidden = false; }
+function showHero() { $('hero').hidden = false; $('live').hidden = true; $('resultActions').hidden = true; $('kb').hidden = true; }
+function resetResult() { $('text').value = ''; $('trBlock').hidden = true; $('trError').hidden = true; $('stats').textContent = ''; $('stats').classList.remove('warn'); }
+function autosize() { const el = $('text'); el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight + 4, innerHeight * 0.46) + 'px'; }
+$('text').addEventListener('input', autosize);
+
+let current = null; // {id, text, translation, lang, engine, at}
+function finishResult(text, meta, needsReview, eng) {
+  text = text.trim();
+  if (!text) { showHero(); setStatus(t('empty')); return; }
+  if (state.mode !== 'exact') text = clean(text, state.in);
+  $('text').value = text; showLive(); autosize();
+  $('stats').textContent = meta + (needsReview ? ' · ' + t('review') : ''); $('stats').classList.toggle('warn', !!needsReview);
+  $('resultActions').hidden = false; setStatus(t('tapToSpeak'));
+  current = { id: Date.now().toString(36), text, translation: null, lang: state.in, engine: eng, at: Date.now() };
+  saveHistory(current);
+  if (state.mode === 'translate') doTranslate();
 }
 
-async function onStopped() {
-  teardown();
-  if (cancelled) { ui.status.textContent = L.tap; return; }
-  const blob = new Blob(chunks, { type: mediaRecorder.mimeType });
-  if (blob.size < 2000) { ui.status.textContent = L.empty; return; }
-  try {
-    const pcm = await decodeTo16k(blob);
-    if (pcm.length < 16000 * 0.3) { ui.status.textContent = L.empty; return; }
-    await transcribe(pcm);
-  } catch (err) { console.error(err); ui.status.textContent = describeError(err); }
-}
-
-function describeError(err) {
-  // transformers.js may throw an AggregateError or a plain Error; show everything we know.
-  const parts = [];
-  if (err?.errors?.length) parts.push(...err.errors.map((e) => e.message || String(e)));
-  parts.push(err?.message || String(err));
-  return 'Error: ' + [...new Set(parts)].join(' | ');
-}
-
-async function decodeTo16k(blob) {
-  const ctx = new OfflineAudioContext(1, 1, 16000);
-  const decoded = await ctx.decodeAudioData(await blob.arrayBuffer());
-  const off = new OfflineAudioContext(1, Math.ceil(decoded.duration * 16000), 16000);
-  const src = off.createBufferSource(); src.buffer = decoded; src.connect(off.destination); src.start();
-  const out = await off.startRendering();
-  return out.getChannelData(0);
-}
-
-// ---- transcription -----------------------------------------------------------------------
-let lastAudioMs = 0;
-async function transcribe(pcm) {
-  document.body.classList.add('busy');
-  try { await transcribeInner(pcm); } finally { document.body.classList.remove('busy'); }
-}
-async function transcribeInner(pcm) {
-  const lang = ui.inLang.value;
-  // Single 30 s window: one Whisper pass keeps browser memory low on phones.
-  const samples = pcm.length > 16000 * 30 ? pcm.slice(0, 16000 * 30) : pcm;
-  lastAudioMs = Math.round(samples.length / 16);
-  const r = await run({ type: 'asr', model: SPEECH[lang], samples, language: WHISPER_LANG[lang] }, [samples.buffer]);
-  const g = guard(r.text.replace(/\s+/g, ' '), lastAudioMs);
-  let text = g.text;
-  if (ui.mode.value !== 'exact') text = clean(text, lang);
-  if (!text) { ui.status.textContent = L.empty; return; }
-  showResult(text, `${r.ms} ms · RTF ${(r.ms / lastAudioMs).toFixed(2)} · ${SPEECH[lang]} · ${L.local}`, g.needsReview);
-  if (ui.mode.value === 'translate') await doTranslate();
-}
-
-function showResult(text, stats, needsReview) {
-  ui.text.value = text;
-  ui.stats.textContent = stats + (needsReview ? ` · ${L.review}` : '');
-  ui.stats.classList.toggle('warn', !!needsReview);
-  ui.result.hidden = false;
-  if (matchMedia('(max-width: 899px)').matches) requestAnimationFrame(() => ui.result.scrollIntoView({ behavior: 'smooth', block: 'start' }));
-  ui.translation.hidden = true; ui.trLabel.hidden = true; ui.copyTr.hidden = true; ui.trError.hidden = true;
-  ui.status.textContent = L.tap;
-}
-
-/** Deterministic cleanup, same rules as the Android RuleBasedWritingAssistant (no meaning changes). */
+/** Deterministic clean-up (same rules as the Android app); never changes words. */
 function clean(text, lang) {
   const fillers = lang === 'am' ? ['እ', 'እም', 'ኧ', 'um', 'uh', 'uhm', 'erm', 'hmm'] : ['um', 'uh', 'uhm', 'erm', 'hmm'];
-  let t = text;
-  for (const f of fillers) t = t.replace(new RegExp(`(?:,\\s*)?(?<![\\p{L}\\p{M}])${f}(?![\\p{L}\\p{M}])[,\\s]*`, 'giu'), ' ');
-  t = t.replace(/\s+([,.;:?!።፣፤፥፧])/g, '$1').replace(/\s+/g, ' ').trim();
-  const geez = /[ሀ-፿]/.test(t) && (t.match(/[ሀ-፿]/g) || []).length > (t.match(/[A-Za-z]/g) || []).length;
-  if (geez) t = t.replace(/\.(?=\s|$)/g, '።').replace(/\?(?=\s|$)/g, '፧').replace(/,(?=\s)/g, '፣');
-  if (t && /[\p{L}\p{N}]$/u.test(t)) t += geez ? '።' : '.';
-  if (!geez) t = t.replace(/(^|[.!?]\s+)([a-z])/g, (m, a, b) => a + b.toUpperCase());
-  return t;
+  let s = text;
+  for (const f of fillers) s = s.replace(new RegExp(`(?:,\\s*)?(?<![\\p{L}\\p{M}])${f}(?![\\p{L}\\p{M}])[,\\s]*`, 'giu'), ' ');
+  s = s.replace(/\s+([,.;:?!።፣፤፥፧])/g, '$1').replace(/\s+/g, ' ').trim();
+  const geez = (s.match(/[ሀ-፿]/g) || []).length > (s.match(/[A-Za-z]/g) || []).length;
+  if (geez) s = s.replace(/\.(?=\s|$)/g, '።').replace(/\?(?=\s|$)/g, '፧').replace(/,(?=\s)/g, '፣');
+  if (s && /[\p{L}\p{N}]$/u.test(s)) s += geez ? '።' : '.';
+  if (!geez) s = s.replace(/(^|[.!?]\s+)(\p{Ll})/gu, (m, a, b) => a + b.toUpperCase());
+  return s;
 }
 
-async function doTranslate() {
-  const from = ui.inLang.value, to = ui.outLang.value, text = ui.text.value.trim();
-  if (!text) return;
-  const m = translationModel(from, to);
-  ui.trError.hidden = true;
-  if (!m) { ui.trError.textContent = L.noTr; ui.trError.hidden = false; return; }
-  const r = await run({ type: 'translate', model: m.id, text, prefix: m.prefix });
-  const t0 = performance.now() - r.ms;
-  const parts = [r.text];
-  ui.translation.textContent = parts.join(' ');
-  ui.translation.hidden = false; ui.trLabel.hidden = false; ui.copyTr.hidden = false;
-  ui.status.textContent = `${Math.round(performance.now() - t0)} ms · ${m.id} · ${L.local}`;
-}
-
-// ---- actions -----------------------------------------------------------------------------
-// ---- engine: on-device (default) or Chrome's built-in Google speech service (opt-in) ----------
-const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-const BCP47 = { am: 'am-ET', en: 'en-US', ar: 'ar-SA', so: 'so-SO' };
-function engine() { return localStorage.getItem('engine') === 'google' && SR ? 'google' : 'local'; }
-function syncEngine() {
-  document.querySelectorAll('[data-engine]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.engine === engine())));
-  const n = $('engineNote'); if (n) n.textContent = engine() === 'google' ? L.googleNote : '';
-  const net = $('net'); if (net && engine() === 'google') { net.textContent = 'Google'; net.dataset.state = 'cloud'; } else syncOnline();
-}
-document.querySelectorAll('[data-engine]').forEach((b) => b.addEventListener('click', () => {
-  if (b.dataset.engine === 'google' && !SR) { ui.status.textContent = L.googleUnsupported; return; }
-  localStorage.setItem('engine', b.dataset.engine); syncEngine(); warmSpeech();
-}));
-
-let rec = null, finalText = '', recCancelled = false;
+// ---------------------------------------------------------------- recording: Google engine
+let rec = null, recFinal = '', recCancelled = false, recError = '';
 function startGoogle() {
-  rec = new SR();
-  rec.lang = BCP47[ui.inLang.value] || 'am-ET';
-  rec.continuous = true; rec.interimResults = true; rec.maxAlternatives = 1;
-  finalText = ''; recCancelled = false;
-  ui.text.value = ''; ui.result.hidden = false; ui.translation.hidden = true; ui.trLabel.hidden = true; ui.copyTr.hidden = true; ui.trError.hidden = true;
-  ui.stats.textContent = '';
+  rec = new SR(); rec.lang = LANGS[state.in].bcp; rec.continuous = true; rec.interimResults = true; rec.maxAlternatives = 1;
+  recFinal = ''; recCancelled = false; recError = '';
+  resetResult(); showLive(); $('resultActions').hidden = true;
   rec.onresult = (e) => {
     let interim = '';
-    for (let i = e.resultIndex; i < e.results.length; i++) {
-      const t = e.results[i][0].transcript;
-      if (e.results[i].isFinal) finalText += t + ' '; else interim += t;
-    }
-    ui.text.value = (finalText + interim).replace(/\s+/g, ' ').trim();
+    for (let i = e.resultIndex; i < e.results.length; i++) { const tx = e.results[i][0].transcript; if (e.results[i].isFinal) recFinal += tx + ' '; else interim += tx; }
+    $('text').value = (recFinal + interim).replace(/\s+/g, ' ').trim(); autosize();
   };
   rec.onerror = (e) => {
-    const map = { 'not-allowed': L.micDenied, 'service-not-allowed': L.micDenied, 'language-not-supported': L.googleUnsupported, 'no-speech': L.empty, network: L.offlineGoogle };
-    ui.status.textContent = map[e.error] || `Error: ${e.error}`;
+    recError = e.error;
+    const map = { 'not-allowed': t('micDenied'), 'service-not-allowed': t('micDenied'), 'language-not-supported': t('googleLang'), network: t('googleOffline'), 'no-speech': t('empty') };
+    setStatus(map[e.error] || `Error: ${e.error}`);
   };
-  rec.onend = async () => {
-    ui.mic.classList.remove('rec'); document.body.classList.remove('recording'); ui.cancel.hidden = true; rec = null;
-    if (recCancelled) { ui.text.value = ''; ui.result.hidden = true; ui.status.textContent = L.tap; return; }
-    let text = ui.text.value.trim();
-    if (!text) { if (!/Error|ፈቃድ|permission/i.test(ui.status.textContent)) ui.status.textContent = L.empty; ui.result.hidden = true; return; }
-    if (ui.mode.value !== 'exact') text = clean(text, ui.inLang.value);
-    showResult(text, `Google speech (${rec?.lang || BCP47[ui.inLang.value]}) · online`, false);
-    if (ui.mode.value === 'translate') await doTranslate().catch((err) => { ui.trError.textContent = describeError(err); ui.trError.hidden = false; });
+  rec.onend = () => {
+    const wasCancelled = recCancelled; rec = null; recordingUi(false);
+    if (wasCancelled) { resetResult(); showHero(); setStatus(t('tapToSpeak')); return; }
+    const text = $('text').value;
+    if (!text.trim()) { showHero(); if (!recError) setStatus(t('empty')); return; }
+    finishResult(text, `Google · ${LANGS[state.in].bcp} · online`, false, 'google');
   };
-  rec.start();
-  ui.mic.classList.add('rec'); document.body.classList.add('recording'); ui.cancel.hidden = false; ui.status.textContent = L.liveListening;
+  try { rec.start(); } catch (err) { setStatus(describe(err)); rec = null; return; }
+  recordingUi(true, t('liveListening'));
 }
 
-ui.mic.onclick = () => {
-  if (engine() === 'google') { if (rec) rec.stop(); else startGoogle(); return; }
-  if (mediaRecorder?.state === 'recording') stopRecording(); else startRecording();
-};
-ui.cancel.onclick = () => { if (rec) { recCancelled = true; rec.abort(); return; } cancelled = true; stopRecording(); };
-ui.copy.onclick = async () => { await navigator.clipboard.writeText(ui.text.value); ui.status.textContent = L.copied; };
-ui.copyTr.onclick = async () => { await navigator.clipboard.writeText(ui.translation.textContent); ui.status.textContent = L.copied; };
-ui.share.onclick = async () => { const text = ui.translation.hidden ? ui.text.value : `${ui.text.value}\n${ui.translation.textContent}`; if (navigator.share) await navigator.share({ text }); else { await navigator.clipboard.writeText(text); ui.status.textContent = L.copied; } };
-ui.translate.onclick = () => doTranslate().catch((e) => { ui.trError.textContent = String(e.message || e); ui.trError.hidden = false; });
-ui.discard.onclick = () => { ui.result.hidden = true; ui.text.value = ''; };
-ui.download.onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([ui.text.value + (ui.translation.hidden ? '' : '\n\n' + ui.translation.textContent)], { type: 'text/plain' })); a.download = 'sema-voice.txt'; a.click(); };
-ui.speak.onclick = () => {
-  const text = ui.translation.hidden ? ui.text.value : ui.translation.textContent;
-  const lang = ui.translation.hidden ? ui.inLang.value : ui.outLang.value;
-  const voices = speechSynthesis.getVoices().filter((v) => v.lang.toLowerCase().startsWith(lang));
-  if (!voices.length) { ui.status.textContent = `No system voice for "${lang}" in this browser.`; return; }
-  const u = new SpeechSynthesisUtterance(text); u.voice = voices[0]; u.lang = voices[0].lang; speechSynthesis.speak(u);
-};
-ui.warm.onclick = async () => {
+// ---------------------------------------------------------------- recording: on-device engine
+let media = null, chunks = [], stream = null, actx = null, levelTimer = 0, mediaCancelled = false;
+async function startLocal() {
+  if (workerFailed) { worker = null; workerFailed = false; }
+  // Start loading the model now (in the worker) so it is ready by the time you stop talking.
+  run({ type: 'warm', task: 'automatic-speech-recognition', model: LANGS[state.in].model }, [], true).then(() => { store.set('localReady', true); }).catch(() => {});
+  try { stream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true } }); }
+  catch { setStatus(t('micDenied')); return; }
+  chunks = []; mediaCancelled = false;
+  media = new MediaRecorder(stream);
+  media.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
+  media.onstop = onLocalStop;
+  media.start(250);
   try {
-    await run({ type: 'warm', task: 'automatic-speech-recognition', model: SPEECH[ui.inLang.value] });
-    ui.modelStatus.textContent = 'Models cached for offline use.';
-  } catch (e) { ui.modelStatus.textContent = String(e.message || e); }
-};
-ui.inLang.onchange = () => { localStorage.setItem('in', ui.inLang.value); setTimeout(warmSpeech, 300); ui.modelStatus.textContent = ui.inLang.value === 'am' ? L.amNote : ''; };
-ui.outLang.onchange = () => localStorage.setItem('out', ui.outLang.value);
-ui.mode.onchange = () => localStorage.setItem('mode', ui.mode.value);
-ui.uiLang.onchange = () => applyLang(ui.uiLang.value);
+    actx = new AudioContext(); const an = actx.createAnalyser(); an.fftSize = 512; actx.createMediaStreamSource(stream).connect(an);
+    const buf = new Uint8Array(an.fftSize);
+    levelTimer = setInterval(() => { an.getByteTimeDomainData(buf); let s = 0; for (const v of buf) { const d = (v - 128) / 128; s += d * d; } document.documentElement.style.setProperty('--lvl', Math.min(1, Math.sqrt(s / buf.length) * 4).toFixed(3)); }, 80);
+  } catch {}
+  resetResult(); showHero(); recordingUi(true, t('listening'));
+  const m = media; setTimeout(() => { if (m.state === 'recording') m.stop(); }, 30000); // one Whisper window
+}
+function stopLocalStream() {
+  clearInterval(levelTimer); document.documentElement.style.setProperty('--lvl', '0');
+  stream?.getTracks().forEach((tr) => tr.stop()); stream = null; actx?.close().catch(() => {}); actx = null;
+}
+async function onLocalStop() {
+  stopLocalStream(); recordingUi(false);
+  if (mediaCancelled) { setStatus(t('tapToSpeak')); return; }
+  const blob = new Blob(chunks, { type: media.mimeType }); chunks = [];
+  if (blob.size < 2000) { setStatus(t('empty')); return; }
+  document.body.classList.add('busy'); setStatus(t('transcribing'));
+  try {
+    const pcm = await decode16k(blob);
+    if (pcm.length < 16000 * 0.3) { setStatus(t('empty')); return; }
+    const samples = pcm.length > 480000 ? pcm.slice(0, 480000) : pcm;
+    const audioMs = Math.round(samples.length / 16);
+    const r = await run({ type: 'asr', model: LANGS[state.in].model, samples, language: LANGS[state.in].whisper }, [samples.buffer]);
+    const g = guard(r.text.replace(/\s+/g, ' '), audioMs);
+    finishResult(g.text, `${(r.ms / 1000).toFixed(1)} s · on-device · ${LANGS[state.in].model.split('/').pop()}`, g.needsReview, 'local');
+  } catch (err) { setStatus(describe(err)); }
+  finally { document.body.classList.remove('busy'); }
+}
+async function decode16k(blob) {
+  const ab = await blob.arrayBuffer();
+  const tmp = new (window.AudioContext || window.webkitAudioContext)();
+  let decoded;
+  try { decoded = await tmp.decodeAudioData(ab); } finally { tmp.close().catch(() => {}); }
+  const off = new OfflineAudioContext(1, Math.ceil(decoded.duration * 16000), 16000);
+  const src = off.createBufferSource(); src.buffer = decoded; src.connect(off.destination); src.start();
+  return (await off.startRendering()).getChannelData(0);
+}
 
-// Swap input/output languages (only when the output language is also a speech language).
-$('swap')?.addEventListener('click', () => {
-  const a = ui.inLang.value, b = ui.outLang.value;
-  if (![...ui.inLang.options].some((o) => o.value === b)) return;
-  ui.inLang.value = b; ui.outLang.value = a; ui.inLang.onchange(); ui.outLang.onchange();
+// ---------------------------------------------------------------- mic control
+let timerInt = 0, recStart = 0;
+function recActive() { return !!rec || media?.state === 'recording'; }
+function recordingUi(on, msg) {
+  $('mic').classList.toggle('rec', on); document.body.classList.toggle('recording', on);
+  $('mic').setAttribute('aria-label', on ? 'Stop' : 'Start dictation'); $('cancel').hidden = !on; $('timer').hidden = !on;
+  clearInterval(timerInt);
+  if (on) { recStart = Date.now(); $('timer').textContent = '0:00'; timerInt = setInterval(() => { const s = Math.floor((Date.now() - recStart) / 1000); $('timer').textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; }, 500); setStatus(msg); }
+}
+$('mic').addEventListener('click', () => {
+  if (engine() === 'google') { if (rec) rec.stop(); else startGoogle(); return; }
+  if (media?.state === 'recording') media.stop(); else startLocal();
 });
-// Segmented mode control mirrors the hidden <select id="mode">.
-document.querySelectorAll('[data-mode]').forEach((b) => b.addEventListener('click', () => {
-  ui.mode.value = b.dataset.mode; ui.mode.onchange(); syncMode();
-}));
-function syncMode() { document.querySelectorAll('[data-mode]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mode === ui.mode.value))); }
-// Offline badge
-function syncOnline() { const el = $('net'); if (el) { el.textContent = navigator.onLine ? 'On-device' : 'Offline'; el.dataset.state = navigator.onLine ? 'on' : 'off'; } }
-addEventListener('online', syncOnline); addEventListener('offline', syncOnline);
+$('cancel').addEventListener('click', () => {
+  if (rec) { recCancelled = true; rec.abort(); return; }
+  if (media?.state === 'recording') { mediaCancelled = true; media.stop(); }
+});
 
-// ---- init ---------------------------------------------------------------------------------
-ui.inLang.value = localStorage.getItem('in') || 'am';
-ui.outLang.value = localStorage.getItem('out') || 'en';
-ui.mode.value = localStorage.getItem('mode') || 'clean';
-ui.uiLang.value = localStorage.getItem('ui') || (navigator.language.startsWith('am') ? 'am' : 'en');
-applyLang(ui.uiLang.value);
-ui.inLang.onchange();
-syncMode(); syncOnline(); syncEngine();
-// Background warm-up once the page is idle (does not block first paint or the mic).
-(window.requestIdleCallback || ((f) => setTimeout(f, 1500)))(() => warmSpeech());
+// ---------------------------------------------------------------- result actions
+$('copy').addEventListener('click', async () => {
+  const s = $('text').value + ($('trBlock').hidden ? '' : '\n' + $('translation').textContent);
+  try { await navigator.clipboard.writeText(s); toast(t('copied')); } catch { $('text').select(); }
+});
+$('share').addEventListener('click', async () => {
+  const s = $('text').value + ($('trBlock').hidden ? '' : '\n' + $('translation').textContent);
+  if (navigator.share) { try { await navigator.share({ text: s }); } catch {} } else { await navigator.clipboard.writeText(s).catch(() => {}); toast(t('copied')); }
+});
+$('translate').addEventListener('click', () => doTranslate());
+$('discard').addEventListener('click', () => { resetResult(); showHero(); current = null; });
+$('speak').addEventListener('click', () => speakText($('trBlock').hidden ? $('text').value : $('translation').textContent, $('trBlock').hidden ? state.in : state.out));
+$('text').addEventListener('change', () => { if (current) { current.text = $('text').value; saveHistory(current); } });
+
+async function doTranslate() {
+  const text = $('text').value.trim(); if (!text) return;
+  const m = trModel(state.in, state.out);
+  $('trError').hidden = true;
+  if (!m) { $('trError').textContent = t('noTr'); $('trError').hidden = false; return; }
+  document.body.classList.add('busy'); setStatus(t('translating'));
+  try {
+    const r = await run({ type: 'translate', model: m.id, text, prefix: m.prefix });
+    $('translation').textContent = r.text; $('trBlock').hidden = false;
+    if (current) { current.translation = r.text; current.out = state.out; saveHistory(current); }
+    setStatus(t('tapToSpeak'));
+  } catch (err) { $('trError').textContent = describe(err); $('trError').hidden = false; setStatus(t('tapToSpeak')); }
+  finally { document.body.classList.remove('busy'); }
+}
+
+function speakText(text, lang) {
+  const code = (LANGS[lang]?.bcp || lang).slice(0, 2);
+  const voices = speechSynthesis.getVoices().filter((v) => v.lang.toLowerCase().startsWith(code));
+  if (!voices.length) { toast(t('noVoice')); return; }
+  const u = new SpeechSynthesisUtterance(text); u.voice = voices[0]; u.lang = voices[0].lang; speechSynthesis.speak(u);
+}
+
+// keyboard
+attachGeezKeyboard($('text'), $('kb'), { space: state.ui === 'am' ? 'ክፍተት' : 'space' });
+$('kbToggle').addEventListener('click', () => { $('kb').hidden = !$('kb').hidden; if (!$('kb').hidden) $('text').focus({ preventScroll: true }); });
+
+// ---------------------------------------------------------------- history (local only)
+function loadHistory() { return store.get('history', []); }
+function saveHistory(item) {
+  const list = loadHistory().filter((x) => x.id !== item.id); list.unshift(item);
+  store.set('history', list.slice(0, 300));
+}
+function renderHistory() {
+  const q = $('historySearch').value.trim().toLowerCase();
+  const list = loadHistory().filter((x) => !q || x.text.toLowerCase().includes(q) || (x.translation || '').toLowerCase().includes(q));
+  const host = $('historyList'); host.innerHTML = '';
+  $('historyEmpty').hidden = list.length > 0;
+  let fmt; try { fmt = new Intl.DateTimeFormat(state.ui === 'am' ? 'am-ET' : undefined, { dateStyle: 'medium', timeStyle: 'short' }); } catch { fmt = new Intl.DateTimeFormat(); }
+  for (const x of list) {
+    const card = document.createElement('article'); card.className = 'note-card';
+    const head = document.createElement('div'); head.className = 'note-head';
+    head.innerHTML = `<span class="tag">${LANGS[x.lang]?.name || x.lang}</span><span class="tag">${x.engine === 'google' ? 'Google' : 'On-device'}</span><span>${fmt.format(x.at)}</span>`;
+    const p = document.createElement('p'); p.className = 'note-text'; p.textContent = x.text;
+    card.append(head, p);
+    if (x.translation) { const tr = document.createElement('p'); tr.className = 'note-tr'; tr.textContent = x.translation; card.append(tr); }
+    const acts = document.createElement('div'); acts.className = 'note-actions';
+    const mk = (label, fn) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = label; b.onclick = fn; acts.append(b); };
+    mk(t('copy'), async () => { await navigator.clipboard.writeText(x.text + (x.translation ? '\n' + x.translation : '')).catch(() => {}); toast(t('copied')); });
+    mk(t('share'), async () => { if (navigator.share) navigator.share({ text: x.text }).catch(() => {}); });
+    mk(t('listen'), () => speakText(x.text, x.lang));
+    mk(t('clear'), () => { store.set('history', loadHistory().filter((y) => y.id !== x.id)); renderHistory(); toast(t('deleted')); });
+    card.append(acts); host.append(card);
+  }
+}
+$('historySearch').addEventListener('input', renderHistory);
+let clearArmed = false;
+$('clearHistory').addEventListener('click', () => {
+  if (!clearArmed) { clearArmed = true; toast(t('confirmClear')); setTimeout(() => (clearArmed = false), 3000); return; }
+  store.set('history', []); clearArmed = false; toast(t('deleted')); renderHistory();
+});
+
+// ---------------------------------------------------------------- translate tab
+$('tFrom').addEventListener('change', (e) => store.set('tFrom', e.target.value));
+$('tTo').addEventListener('change', (e) => store.set('tTo', e.target.value));
+$('tSwap').addEventListener('click', () => { const a = $('tFrom').value; $('tFrom').value = $('tTo').value; $('tTo').value = a; store.set('tFrom', $('tFrom').value); store.set('tTo', $('tTo').value); });
+$('tGo').addEventListener('click', async () => {
+  const text = $('tInput').value.trim(); if (!text) return;
+  const m = trModel($('tFrom').value, $('tTo').value);
+  $('tOutCard').hidden = false;
+  if (!m) { $('tOut').textContent = t('noTr'); $('tMeta').textContent = ''; return; }
+  $('tOut').textContent = '…'; $('tMeta').textContent = t('translating');
+  try { const r = await run({ type: 'translate', model: m.id, text, prefix: m.prefix }); $('tOut').textContent = r.text; $('tMeta').textContent = `${(r.ms / 1000).toFixed(1)} s · on-device · ${m.id.split('/').pop()}`; }
+  catch (err) { $('tOut').textContent = describe(err); $('tMeta').textContent = ''; }
+});
+$('tCopy').addEventListener('click', async () => { await navigator.clipboard.writeText($('tOut').textContent).catch(() => {}); toast(t('copied')); });
+$('tListen').addEventListener('click', () => speakText($('tOut').textContent, $('tTo').value));
+attachGeezKeyboard($('tInput'), $('tKbHost'), { space: 'ክፍተት' });
+$('tKb').addEventListener('click', () => ($('tKbHost').hidden = !$('tKbHost').hidden));
+
+// ---------------------------------------------------------------- diagnostics, install, banner
+function renderDiag() {
+  const c = store.get('crashes', []);
+  $('diag').textContent = [`engine=${engine()} speechApi=${!!SR} phone=${isPhone} deviceMemory=${mem || '?'}GB`,
+    `cores=${navigator.hardwareConcurrency || '?'} online=${navigator.onLine}`,
+    ...c.map((x) => `crash during ${x.s} at ${new Date(x.at).toLocaleString()}`)].join('\n');
+}
+let installEvt = null;
+addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); installEvt = e; $('install').hidden = false; });
+$('install').addEventListener('click', () => installEvt?.prompt());
+function banner(text, actionLabel, action) {
+  $('bannerText').textContent = text; $('bannerAction').textContent = actionLabel; $('banner').hidden = false;
+  $('bannerAction').onclick = () => { action(); $('banner').hidden = true; };
+}
+$('bannerClose').addEventListener('click', () => ($('banner').hidden = true));
+
+// ---------------------------------------------------------------- first run
+function openWelcome() {
+  const host = $('welcomeOptions');
+  const render = () => { host.innerHTML = ''; ['google', 'local'].forEach((e) => engineCard(e, host, (x) => { state.engine = x; render(); })); };
+  render();
+  $('welcome').hidden = false;
+}
+$('welcomeGo').addEventListener('click', () => { setEngine(engine()); store.set('welcomed', true); $('welcome').hidden = true; });
+
+// ---------------------------------------------------------------- start
+applyLang();
+showTab('speak');
+showHero();
+if (!store.get('welcomed', false)) openWelcome();
+if (crashed && ['loading', 'transcribing'].includes(crashed.s)) {
+  banner(t('crashed', { stage: t('stage_' + crashed.s) }), SR ? t('useGoogle') : t('dismiss'), () => { if (SR) setEngine('google'); });
+}
+// Desktop only: prepare the on-device model in the background when it is the chosen engine.
+if (engine() === 'local' && !isPhone && !crashed) (window.requestIdleCallback || ((f) => setTimeout(f, 1500)))(warmLocal);
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
-// On-screen phonetic Ge'ez keyboard for phones without an Amharic keyboard.
-const geezKeyboard = attachGeezKeyboard(ui.text, $('kb'), { space: L.space });
-$('kbToggle').onclick = () => { const kb = $('kb'); kb.hidden = !kb.hidden; if (!kb.hidden) ui.text.focus({ preventScroll: true }); };
-let installEvent = null;
-window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); installEvent = e; ui.install.hidden = false; });
-ui.install.onclick = () => installEvent?.prompt();
