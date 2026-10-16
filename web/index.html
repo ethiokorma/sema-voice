@@ -4,305 +4,190 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>Sema Voice</title>
-<meta name="description" content="Speak in your language. Write in any language. Offline voice typing and translation in your browser.">
-<meta name="theme-color" content="#4F46E5" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0B1220" media="(prefers-color-scheme: dark)">
+<meta name="description" content="Speak Amharic, get text. Voice typing and translation for Amharic and English.">
+<meta name="theme-color" content="#F6F7FB" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0A0F1C" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon.svg">
-<style>
-  :root {
-    --primary:#4F46E5; --primary-2:#6366F1; --secondary:#14B8A6; --record:#EF4444;
-    --bg:#F4F6FB; --surface:#FFFFFF; --surface-2:#F1F4F9; --text:#0F172A; --muted:#64748B; --border:#E3E8F0;
-    --shadow: 0 1px 2px rgba(15,23,42,.05), 0 8px 24px rgba(15,23,42,.06);
-    --radius: 20px; --lvl: 0;
-    --safe-t: env(safe-area-inset-top, 0px); --safe-b: env(safe-area-inset-bottom, 0px);
-    color-scheme: light;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root { --bg:#0B1220; --surface:#111A2E; --surface-2:#18233B; --text:#E8EDF7; --muted:#94A3B8; --border:#24314D;
-      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35); color-scheme: dark; }
-  }
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body { margin: 0; }
-  body {
-    min-height: 100dvh; background: var(--bg); color: var(--text);
-    font: 16px/1.55 system-ui, -apple-system, "Segoe UI", "Noto Sans Ethiopic", "Nyala", "Abyssinica SIL", Roboto, sans-serif;
-  }
-  button, select, textarea { font: inherit; color: inherit; }
-  button { cursor: pointer; }
-  [hidden] { display: none !important; }
-  :focus-visible { outline: 3px solid color-mix(in srgb, var(--primary) 55%, transparent); outline-offset: 2px; }
-
-  /* ---------- header ---------- */
-  .top {
-    position: sticky; top: 0; z-index: 10; padding: calc(var(--safe-t) + 10px) 16px 10px;
-    background: color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter: saturate(160%) blur(14px);
-    -webkit-backdrop-filter: saturate(160%) blur(14px); border-bottom: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
-  }
-  .top-in { max-width: 1120px; margin: 0 auto; display: flex; align-items: center; gap: 10px; }
-  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: .02em; }
-  .brand img { width: 34px; height: 34px; border-radius: 10px; }
-  .brand small { display: block; font-weight: 500; font-size: 12px; color: var(--muted); letter-spacing: 0; }
-  .spacer { flex: 1; }
-  @media (max-width: 480px) { .brand small { display: none; } .top-in { gap: 8px; } }
-  .pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 5px 10px;
-    border-radius: 999px; background: color-mix(in srgb, var(--secondary) 14%, transparent); color: var(--secondary); white-space: nowrap; }
-  .pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
-  .pill[data-state="cloud"] { background: color-mix(in srgb, #F59E0B 16%, transparent); color: #B45309; }
-  .chip { font-size: 12px; font-weight: 600; padding: 5px 10px; border-radius: 999px; background: var(--surface-2); color: var(--muted); white-space: nowrap; border: 1px solid var(--border); }
-  .chip[data-state="busy"]::before { content: ""; display: inline-block; width: 9px; height: 9px; margin-right: 6px; border-radius: 50%;
-    border: 2px solid currentColor; border-right-color: transparent; vertical-align: -1px; animation: spin .9s linear infinite; }
-  .chip[data-state="ok"] { color: var(--secondary); }
-  .chip[data-state="err"] { color: var(--record); }
-  @media (max-width: 480px) { .chip[data-state="ok"] { display: none; } }
-  .meta.warn { color: #B45309; }
-  .pill[data-state="off"] { background: color-mix(in srgb, var(--muted) 16%, transparent); color: var(--muted); }
-  .ghost { border: 1px solid var(--border); background: var(--surface); border-radius: 12px; padding: 7px 10px; font-size: 14px; }
-  .ghost-sel { appearance: none; -webkit-appearance: none; padding-right: 26px;
-    background: var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%2364748B' stroke-width='2'/%3E%3C/svg%3E") no-repeat right 9px center; }
-
-  /* ---------- layout ---------- */
-  main { max-width: 1120px; margin: 0 auto; padding: 16px 16px calc(var(--safe-b) + 96px); display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
-  @media (min-width: 900px) {
-    main { grid-template-columns: minmax(340px, 420px) minmax(0, 1fr); align-items: start; padding-bottom: 32px; }
-    .recorder { position: sticky; top: 84px; }
-  }
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
-  .tagline { margin: 2px 2px 0; color: var(--muted); font-size: 15px; }
-
-  /* ---------- recorder ---------- */
-  .recorder { padding: 18px; display: flex; flex-direction: column; gap: 16px; }
-  .langs { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 8px; align-items: end; }
-  .field { min-width: 0; }
-  .field label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin: 0 0 4px 4px; text-transform: uppercase; letter-spacing: .06em; }
-  .field select { width: 100%; min-width: 0; text-overflow: ellipsis; padding: 11px 30px 11px 12px; border-radius: 14px; border: 1px solid var(--border); background-color: var(--surface-2); font-size: 15px; }
-  .swap { width: 44px; height: 44px; border-radius: 14px; border: 1px solid var(--border); background: var(--surface-2); display: grid; place-items: center; }
-  .swap svg { width: 20px; height: 20px; }
-  .seg { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--surface-2); border: 1px solid var(--border); border-radius: 14px; padding: 4px; gap: 4px; }
-  .seg button { border: 0; background: transparent; padding: 9px 6px; border-radius: 10px; font-size: 14px; font-weight: 600; color: var(--muted); transition: background .15s, color .15s; }
-  .seg2 { grid-template-columns: 1fr 1fr; }
-  .seg2 button { font-size: 13px; }
-  .note { margin: -6px 4px 0; font-size: 12.5px; color: var(--muted); min-height: 0; }
-  .note:empty { display: none; }
-  .seg button[aria-pressed="true"] { background: var(--surface); color: var(--primary); box-shadow: 0 1px 3px rgba(15,23,42,.12); }
-
-  .stage { display: grid; place-items: center; padding: 18px 0 6px; }
-  .mic-wrap { position: relative; width: 148px; height: 148px; display: grid; place-items: center; }
-  .mic-wrap::before, .mic-wrap::after { content: ""; position: absolute; inset: 0; border-radius: 50%;
-    background: color-mix(in srgb, var(--primary) 16%, transparent); transform: scale(calc(.78 + var(--lvl) * .35)); transition: transform .09s linear, background .2s; }
-  .mic-wrap::after { inset: 14px; background: color-mix(in srgb, var(--primary) 22%, transparent); transform: scale(calc(.9 + var(--lvl) * .2)); }
-  body.recording .mic-wrap::before { background: color-mix(in srgb, var(--record) 18%, transparent); }
-  body.recording .mic-wrap::after { background: color-mix(in srgb, var(--record) 26%, transparent); }
-  .mic { position: relative; z-index: 1; width: 96px; height: 96px; border-radius: 50%; border: 0; color: #fff;
-    background: linear-gradient(145deg, var(--primary-2), var(--primary)); box-shadow: 0 10px 28px color-mix(in srgb, var(--primary) 45%, transparent);
-    display: grid; place-items: center; transition: transform .12s, background .2s, box-shadow .2s; touch-action: manipulation; }
-  .mic:active { transform: scale(.95); }
-  .mic svg { width: 40px; height: 40px; }
-  .mic .i-stop { display: none; }
-  .mic.rec { background: linear-gradient(145deg, #F87171, var(--record)); box-shadow: 0 10px 28px color-mix(in srgb, var(--record) 45%, transparent); }
-  .mic.rec .i-mic { display: none; } .mic.rec .i-stop { display: block; }
-  body.busy .mic { pointer-events: none; opacity: .85; }
-  body.busy .mic::after { content: ""; position: absolute; inset: -6px; border-radius: 50%; border: 3px solid transparent;
-    border-top-color: #fff; border-right-color: color-mix(in srgb, #fff 50%, transparent); animation: spin 1s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  @media (prefers-reduced-motion: reduce) { .mic-wrap::before, .mic-wrap::after { transition: none; } body.busy .mic::after { animation: none; } }
-
-  .status { text-align: center; color: var(--muted); min-height: 1.6em; font-size: 15px; margin: 4px 0 0; overflow-wrap: anywhere; }
-  .level { height: 4px; width: 60%; margin: 2px auto 0; background: var(--surface-2); border-radius: 4px; overflow: hidden; }
-  .level > div { height: 100%; width: 0; background: var(--primary); transition: width .08s; }
-  body.recording .level > div { background: var(--record); }
-  progress { width: 100%; height: 6px; appearance: none; -webkit-appearance: none; border: 0; border-radius: 6px; overflow: hidden; background: var(--surface-2); }
-  progress::-webkit-progress-bar { background: var(--surface-2); }
-  progress::-webkit-progress-value { background: var(--primary); }
-  progress::-moz-progress-bar { background: var(--primary); }
-  .center { display: flex; justify-content: center; }
-  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 16px;
-    border-radius: 14px; border: 1px solid var(--border); background: var(--surface); font-size: 15px; font-weight: 600; }
-  .btn svg { width: 18px; height: 18px; flex: none; }
-  .btn.primary { background: var(--primary); border-color: var(--primary); color: #fff; }
-  .btn.danger { color: var(--record); }
-  .btn.small { min-height: 36px; padding: 6px 12px; font-size: 14px; }
-
-  /* ---------- results ---------- */
-  .results { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
-  .empty { padding: 28px 22px; text-align: center; color: var(--muted); }
-  .empty svg { width: 46px; height: 46px; opacity: .5; }
-  .empty h2 { margin: 10px 0 4px; font-size: 18px; color: var(--text); }
-  .panel { padding: 16px; }
-  .panel-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-  .panel-head h3 { margin: 0; font-size: 13px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
-  .panel-head .spacer { flex: 1; }
-  textarea#text { width: 100%; min-height: 132px; resize: vertical; border: 1px solid var(--border); border-radius: 14px; padding: 14px;
-    background: var(--surface-2); font-size: 19px; line-height: 1.7; }
-  textarea#text:focus { background: var(--surface); }
-  .hint { font-size: 13px; color: var(--muted); margin: 8px 2px 0; }
-  .meta { font-size: 12px; color: var(--secondary); margin-top: 8px; overflow-wrap: anywhere; }
-  .out { font-size: 19px; line-height: 1.7; color: var(--primary); white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; }
-  @media (prefers-color-scheme: dark) { .out { color: #A5B4FC; } }
-  .err { color: var(--record); font-size: 14px; }
-
-  /* sticky action bar on phones, inline on wide screens */
-  .actions { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 2px; }
-  .actions::-webkit-scrollbar { display: none; }
-  .actions .btn { flex: none; }
-  @media (max-width: 899px) {
-    .actions-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 9; padding: 10px 12px calc(var(--safe-b) + 10px);
-      background: color-mix(in srgb, var(--surface) 90%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-      border-top: 1px solid var(--border); }
-  }
-  @media (min-width: 900px) { .actions-bar { padding: 0 16px 16px; } }
-
-  /* ---------- Ge'ez keyboard ---------- */
-  .gkb { margin-top: 10px; user-select: none; -webkit-user-select: none; }
-  .gkrow { display: flex; gap: 5px; margin-bottom: 6px; justify-content: center; }
-  .gk { flex: 1; min-width: 0; height: 46px; padding: 0; font-size: 19px; border-radius: 10px; background: var(--surface);
-    border: 1px solid var(--border); box-shadow: 0 1px 0 var(--border); touch-action: manipulation; }
-  .gk:active { background: var(--surface-2); }
-  .gk.alt { background: var(--surface-2); font-size: 14px; flex: 1.4; }
-  .gk.alt.on { color: var(--primary); font-weight: 700; }
-  .gk.space { flex: 5; font-size: 13px; color: var(--muted); }
-  .gk.form { background: var(--primary); color: #fff; border-color: var(--primary); font-size: 20px; }
-  @media (min-width: 900px) { .gk { height: 50px; } }
-
-  details.info { padding: 14px 16px; }
-  details.info summary { cursor: pointer; font-weight: 600; list-style: none; display: flex; align-items: center; gap: 8px; }
-  details.info summary::-webkit-details-marker { display: none; }
-  details.info summary::after { content: "+"; margin-left: auto; color: var(--muted); font-size: 20px; }
-  details.info[open] summary::after { content: "–"; }
-  details.info p { color: var(--muted); font-size: 14px; }
-  .label { font-size: 13px; color: var(--muted); }
-  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-</style>
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<header class="top">
-  <div class="top-in">
-    <div class="brand"><img src="icon.svg" alt=""><div>Sema Voice<small data-i18n="tagline">Speak in your language. Write in any language.</small></div></div>
-    <span class="spacer"></span>
-    <span class="chip" id="modelChip" hidden data-state="busy"></span>
-    <span class="pill" id="net" data-state="on">On-device</span>
-    <label class="sr" for="uiLang">UI language</label>
-    <select id="uiLang" class="ghost ghost-sel" aria-label="Interface language"><option value="en">EN</option><option value="am">አማ</option></select>
-    <button id="install" class="ghost" hidden data-i18n="install">Install app</button>
+<div id="app">
+  <header class="appbar">
+    <div class="appbar-in">
+      <img class="logo" src="icon.svg" alt="">
+      <h1 id="screenTitle">Sema Voice</h1>
+      <span class="grow"></span>
+      <span class="chip" id="modelChip" hidden></span>
+      <button class="engine-badge" id="engineBadge" type="button" aria-label="Recognition engine"></button>
+    </div>
+  </header>
+
+  <div class="banner" id="banner" hidden>
+    <p id="bannerText"></p>
+    <div class="banner-actions">
+      <button class="btn small" id="bannerAction" type="button"></button>
+      <button class="btn small ghost" id="bannerClose" type="button" data-i18n="dismiss">Dismiss</button>
+    </div>
   </div>
-</header>
 
-<main>
-  <!-- ===== Recorder ===== -->
-  <section class="card recorder" aria-label="Record">
-    <div class="langs">
-      <div class="field">
-        <label for="inLang" data-i18n="input">Input</label>
-        <select id="inLang" class="ghost-sel">
-          <option value="am">አማርኛ · Amharic</option>
-          <option value="en">English</option>
-          <option value="ar">العربية · Arabic</option>
-          <option value="so">Soomaali (unverified)</option>
-        </select>
-      </div>
-      <button class="swap" id="swap" type="button" aria-label="Swap languages">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h13l-4-4M17 17H4l4 4"/></svg>
-      </button>
-      <div class="field">
-        <label for="outLang" data-i18n="output">Output</label>
-        <select id="outLang" class="ghost-sel">
-          <option value="en">English</option>
-          <option value="am">አማርኛ · Amharic</option>
-          <option value="ar">العربية · Arabic</option>
-          <option value="so">Soomaali · Somali</option>
-          <option value="ti">ትግርኛ · Tigrinya (basic)</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="seg" role="group" aria-label="Mode">
-      <button type="button" data-mode="exact" data-i18n="modeExact">Exact</button>
-      <button type="button" data-mode="clean" data-i18n="modeClean">Clean</button>
-      <button type="button" data-mode="translate" data-i18n="modeTranslate">Translate</button>
-    </div>
-    <div class="seg seg2" role="group" aria-label="Engine">
-      <button type="button" data-engine="local" data-i18n="engineLocal">On-device · private</button>
-      <button type="button" data-engine="google" data-i18n="engineGoogle">Google · online, more accurate</button>
-    </div>
-    <p id="engineNote" class="note"></p>
-    <select id="mode" hidden aria-hidden="true">
-      <option value="exact">Exact</option><option value="clean" selected>Clean</option><option value="translate">Translate</option>
-    </select>
-
-    <div class="stage">
-      <div class="mic-wrap">
-        <button id="mic" class="mic" aria-label="Start dictation">
-          <svg class="i-mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5M8 22h8"/></svg>
-          <svg class="i-stop" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2.5"/></svg>
+  <main id="screens">
+    <!-- SPEAK -->
+    <section class="screen" id="screen-speak" data-title="speakTitle">
+      <div class="speak-top">
+        <button class="lang-pair" id="langPair" type="button">
+          <span id="lpIn">አማርኛ</span>
+          <svg viewBox="0 0 24 24" class="ico sm"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          <span id="lpOut">English</span>
         </button>
+        <div class="modes" role="group" aria-label="Mode">
+          <button type="button" data-mode="exact" data-i18n="modeExact">Exact</button>
+          <button type="button" data-mode="clean" data-i18n="modeClean">Clean</button>
+          <button type="button" data-mode="translate" data-i18n="modeTranslate">+ English</button>
+        </div>
       </div>
-    </div>
-    <div>
-      <p id="status" class="status" role="status" aria-live="polite" data-i18n="tap">Tap the microphone and speak.</p>
-      <div class="level" aria-hidden="true"><div id="level"></div></div>
-    </div>
-    <progress id="progress" max="100" value="0" hidden></progress>
-    <div class="center"><button id="cancel" class="btn small" hidden data-i18n="cancel">Cancel</button></div>
-  </section>
 
-  <!-- ===== Results ===== -->
-  <section class="results" aria-label="Result">
-    <div class="card empty" id="emptyState">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 6h16M4 12h10M4 18h7"/></svg>
-      <h2 data-i18n="transcript">Transcript</h2>
-      <div data-i18n="tap">Tap the microphone and speak.</div>
-    </div>
-
-    <div id="result" hidden>
-      <div class="card">
-        <div class="panel">
-          <div class="panel-head">
-            <h3 data-i18n="transcript">Transcript</h3><span class="spacer"></span>
-            <button id="kbToggle" class="btn small" type="button" data-i18n="kb">Amharic keyboard</button>
-          </div>
-          <textarea id="text" aria-label="Transcript" spellcheck="false"></textarea>
+      <div class="stage" id="stage">
+        <div class="hero" id="hero">
+          <div class="hero-mark" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+          <p class="hero-title" data-i18n="heroTitle">Speak Amharic. Get text.</p>
+          <p class="hero-sub" id="heroSub" data-i18n="heroSub">Tap the microphone and talk naturally. Your words appear here.</p>
+        </div>
+        <div class="live" id="live" hidden>
+          <textarea id="text" class="live-text" spellcheck="false" aria-label="Transcript"></textarea>
           <div id="kb" hidden></div>
-          <p class="hint" data-i18n="editHint">Tap any word in the box to correct it.</p>
-          <div id="stats" class="meta"></div>
-        </div>
-
-        <div class="panel" style="border-top:1px solid var(--border)">
-          <div class="panel-head"><h3 id="trLabel" hidden data-i18n="translation">Translation</h3></div>
-          <p id="translation" class="out" hidden></p>
-          <div id="trError" class="err" hidden></div>
-        </div>
-
-        <div class="actions-bar">
-          <div class="actions">
-            <button class="btn primary" id="copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span data-i18n="copy">Copy</span></button>
-            <button class="btn" id="translate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 5h9M8.5 3v2M6 5c0 4 3 7 6 8M11 5c0 4-3 7-6 8M13 21l4-9 4 9M14.5 18h5"/></svg><span data-i18n="translate">Translate</span></button>
-            <button class="btn" id="copyTr" hidden><span data-i18n="copyTr">Copy translation</span></button>
-            <button class="btn" id="share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M16 6l-4-4-4 4M12 2v13"/></svg><span data-i18n="share">Share</span></button>
-            <button class="btn" id="speak"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 5 6 9H3v6h3l5 4V5zM15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg><span data-i18n="listen">Listen</span></button>
-            <button class="btn" id="download"><span data-i18n="save">Save .txt</span></button>
-            <button class="btn danger" id="discard"><span data-i18n="discard">Discard</span></button>
+          <div class="tr-block" id="trBlock" hidden>
+            <div class="tr-label"><span data-i18n="translation">Translation</span> · <span id="trLang">English</span></div>
+            <p class="tr-text" id="translation"></p>
           </div>
+          <p class="err" id="trError" hidden></p>
+          <p class="meta" id="stats"></p>
         </div>
       </div>
-    </div>
 
-    <details class="card info">
-      <summary data-i18n="models">Models &amp; privacy</summary>
-      <p data-i18n="privacy">Everything runs inside this browser tab (whisper + translation via transformers.js, ONNX Runtime Web). Audio never leaves your device. Models (30–115 MB) are downloaded once and cached for offline use.</p>
-      <div id="modelStatus" class="label"></div>
-      <p><button id="warm" class="btn small" data-i18n="warm">Download models for current languages</button></p>
-      <p class="label" data-i18n="kbnote">Browsers cannot provide a system keyboard. Use the Android app for keyboard dictation inside other apps; here, copy or share the text.</p>
-    </details>
-  </section>
-</main>
+      <div class="result-actions" id="resultActions" hidden>
+        <button class="act primary" id="copy" type="button"><svg viewBox="0 0 24 24" class="ico"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg><span data-i18n="copy">Copy</span></button>
+        <button class="act" id="translate" type="button"><svg viewBox="0 0 24 24" class="ico"><path d="M4 5h9M8.5 3v2M6 5c0 4 3 7 6 8M11 5c0 4-3 7-6 8M13 21l4-9 4 9M14.5 18h5"/></svg><span data-i18n="translate">Translate</span></button>
+        <button class="act" id="share" type="button"><svg viewBox="0 0 24 24" class="ico"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M16 6l-4-4-4 4M12 2v13"/></svg><span data-i18n="share">Share</span></button>
+        <button class="act" id="kbToggle" type="button"><svg viewBox="0 0 24 24" class="ico"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg><span data-i18n="edit">Edit</span></button>
+        <button class="act" id="speak" type="button"><svg viewBox="0 0 24 24" class="ico"><path d="M11 5 6 9H3v6h3l5 4V5zM15.5 8.5a5 5 0 0 1 0 7"/></svg><span data-i18n="listen">Listen</span></button>
+        <button class="act danger" id="discard" type="button"><svg viewBox="0 0 24 24" class="ico"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg><span data-i18n="clear">Clear</span></button>
+      </div>
+
+      <div class="dock">
+        <p class="status" id="status" role="status" aria-live="polite"></p>
+        <div class="mic-row">
+          <button class="round ghost" id="cancel" type="button" hidden aria-label="Cancel"><svg viewBox="0 0 24 24" class="ico"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+          <div class="mic-wrap" id="micWrap">
+            <button class="mic" id="mic" type="button" aria-label="Start dictation">
+              <svg class="i-mic" viewBox="0 0 24 24"><rect x="9" y="2.5" width="6" height="11.5" rx="3"/><path d="M5.5 10.5a6.5 6.5 0 0 0 13 0M12 17v4.5M8.5 21.5h7"/></svg>
+              <svg class="i-stop" viewBox="0 0 24 24"><rect x="6.5" y="6.5" width="11" height="11" rx="2.5" fill="currentColor" stroke="none"/></svg>
+            </button>
+          </div>
+          <span class="round-spacer"></span>
+        </div>
+        <div class="timer" id="timer" hidden>0:00</div>
+      </div>
+    </section>
+
+    <!-- HISTORY -->
+    <section class="screen" id="screen-history" data-title="historyTitle" hidden>
+      <div class="search"><svg viewBox="0 0 24 24" class="ico sm"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="historySearch" type="search" data-i18n-ph="searchPh" placeholder="Search your notes"></div>
+      <div id="historyList" class="list"></div>
+      <div class="empty" id="historyEmpty" hidden>
+        <svg viewBox="0 0 24 24" class="ico xl"><path d="M4 6h16M4 12h10M4 18h7"/></svg>
+        <p data-i18n="historyEmpty">Your dictations will appear here. They stay on this device.</p>
+      </div>
+    </section>
+
+    <!-- TRANSLATE -->
+    <section class="screen" id="screen-translate" data-title="translateTitle" hidden>
+      <div class="card pad">
+        <div class="row between">
+          <select id="tFrom" class="select"></select>
+          <button class="round ghost" id="tSwap" type="button" aria-label="Swap"><svg viewBox="0 0 24 24" class="ico"><path d="M7 7h13l-4-4M17 17H4l4 4"/></svg></button>
+          <select id="tTo" class="select"></select>
+        </div>
+        <textarea id="tInput" class="t-input" data-i18n-ph="tPh" placeholder="Type or paste text"></textarea>
+        <div class="row">
+          <button class="btn primary" id="tGo" type="button" data-i18n="translate">Translate</button>
+          <button class="btn ghost" id="tKb" type="button" data-i18n="amKeyboard">Amharic keyboard</button>
+        </div>
+        <div id="tKbHost" hidden></div>
+      </div>
+      <div class="card pad" id="tOutCard" hidden>
+        <p class="tr-text" id="tOut"></p>
+        <p class="meta" id="tMeta"></p>
+        <div class="row"><button class="btn small" id="tCopy" type="button" data-i18n="copy">Copy</button><button class="btn small ghost" id="tListen" type="button" data-i18n="listen">Listen</button></div>
+      </div>
+      <p class="note" data-i18n="tNote">Translation runs on this device (OPUS-MT). Amharic → English is usable; English → Amharic is basic.</p>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="screen" id="screen-settings" data-title="settingsTitle" hidden>
+      <h2 class="sec" data-i18n="engineSec">Recognition engine</h2>
+      <div class="options" id="engineOptions"></div>
+
+      <h2 class="sec" data-i18n="langSec">Languages</h2>
+      <div class="card list-card">
+        <label class="li"><span data-i18n="spokenLang">I speak</span><select id="inLang" class="select"></select></label>
+        <label class="li"><span data-i18n="targetLang">Translate to</span><select id="outLang" class="select"></select></label>
+        <label class="li"><span data-i18n="uiLangLabel">App language</span><select id="uiLang" class="select"><option value="en">English</option><option value="am">አማርኛ</option></select></label>
+      </div>
+
+      <h2 class="sec" data-i18n="offlineSec">Offline model</h2>
+      <div class="card pad">
+        <p class="small" id="offlineInfo"></p>
+        <div class="row"><button class="btn" id="warm" type="button" data-i18n="prepare">Download &amp; prepare now</button></div>
+      </div>
+
+      <h2 class="sec" data-i18n="appSec">App</h2>
+      <div class="card list-card">
+        <button class="li" id="install" type="button" hidden><span data-i18n="install">Install app</span><span class="muted">›</span></button>
+        <button class="li" id="clearHistory" type="button"><span class="danger-t" data-i18n="clearHistory">Delete all history</span></button>
+        <div class="li col"><span data-i18n="diagnostics">Diagnostics</span><code id="diag" class="diag"></code></div>
+      </div>
+      <p class="note" data-i18n="privacy">On-device engines keep your audio in this browser. The Google engine sends audio to Google. History is saved only on this device.</p>
+      <select id="mode" hidden aria-hidden="true"><option value="exact">exact</option><option value="clean" selected>clean</option><option value="translate">translate</option></select>
+    </section>
+  </main>
+
+  <nav class="tabbar" aria-label="Sections">
+    <button data-tab="speak" class="on"><svg viewBox="0 0 24 24" class="ico"><rect x="9" y="2.5" width="6" height="11.5" rx="3"/><path d="M5.5 10.5a6.5 6.5 0 0 0 13 0M12 17v4"/></svg><span data-i18n="tabSpeak">Speak</span></button>
+    <button data-tab="history"><svg viewBox="0 0 24 24" class="ico"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l3 2"/></svg><span data-i18n="tabHistory">History</span></button>
+    <button data-tab="translate"><svg viewBox="0 0 24 24" class="ico"><path d="M4 5h9M8.5 3v2M6 5c0 4 3 7 6 8M11 5c0 4-3 7-6 8M13 21l4-9 4 9M14.5 18h5"/></svg><span data-i18n="tabTranslate">Translate</span></button>
+    <button data-tab="settings"><svg viewBox="0 0 24 24" class="ico"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg><span data-i18n="tabSettings">Settings</span></button>
+  </nav>
+
+  <div class="sheet-bg" id="welcome" hidden>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="wTitle">
+      <div class="sheet-grip"></div>
+      <img class="sheet-logo" src="icon.svg" alt="">
+      <h2 id="wTitle" data-i18n="welcomeTitle">Welcome to Sema Voice</h2>
+      <p class="muted" data-i18n="welcomeSub">Choose how your voice is turned into text. You can change this any time in Settings.</p>
+      <div class="options" id="welcomeOptions"></div>
+      <button class="btn primary wide" id="welcomeGo" type="button" data-i18n="start">Start</button>
+    </div>
+  </div>
+
+  <div class="sheet-bg" id="langSheet" hidden>
+    <div class="sheet" role="dialog" aria-modal="true">
+      <div class="sheet-grip"></div>
+      <h2 data-i18n="langSec">Languages</h2>
+      <div class="lang-cols">
+        <div><p class="sec" data-i18n="spokenLang">I speak</p><div class="opt-list" id="lsIn"></div></div>
+        <div><p class="sec" data-i18n="targetLang">Translate to</p><div class="opt-list" id="lsOut"></div></div>
+      </div>
+      <button class="btn primary wide" id="langDone" type="button" data-i18n="done">Done</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" hidden></div>
+</div>
 <script type="module" src="app.js"></script>
-<script>
-  // Show/hide the empty state alongside the result card (app.js toggles #result).
-  new MutationObserver(() => { document.getElementById('emptyState').hidden = !document.getElementById('result').hidden; })
-    .observe(document.getElementById('result'), { attributes: true, attributeFilter: ['hidden'] });
-</script>
 </body>
 </html>
