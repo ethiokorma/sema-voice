@@ -56,7 +56,8 @@ this, ONNX Runtime's missing `ConvInteger` kernel forced them to stay fp32.
 | fp32 PyTorch | 2.4 GB | 0.219 | 0.072 | 26 | 1.58 | reference |
 | v1 int8, MatMul-only, convs fp32 | 876 MB | 0.235 | 0.086 | 26 | 1.25 | superseded |
 | **v2 int8 per-channel, convs as MatMul** | **652 MB** | **0.222** | **0.072** | 26 | 2.26 | Android (`ethio-asr-ctc-v2-model_int8.onnx`) |
-| **v2 4-bit MatMulNBits, block 128** | **372 MB** | **0.246** | **0.086** | 25 | 1.54 | Web "Best accuracy" engine (4 chunks on GitHub Pages) |
+| v2 4-bit MatMulNBits, block 128 | 372 MB | 0.246 | 0.086 | 25 | 1.54 | not used (+2.8 WER points) |
+| **v2 4-bit MatMulNBits, block 32** | **427 MB** | **0.226** | **0.084** | 26 | 1.52 | Web "Best accuracy" engine (5 chunks on GitHub Pages) |
 
 Browser measurement on clip 000 (14.8 s audio) in headless Chrome on the same 4-core Xeon:
 
@@ -65,6 +66,8 @@ Browser measurement on clip 000 (14.8 s audio) in headless Chrome on the same 4-
 * 4-bit WebGPU: 32 s but **garbage output** (possibly software WebGPU in headless mode), so it is
   disabled.
 * Text from both CPU paths matched the reference except for one number ("117" came out as "17").
+* Shipped 4-bit block-32, 4 threads, clip 002 (about 12 s): 27 s, close to the reference text.
+* The 1 GB GitHub Pages site limit leaves room for one browser model only.
 
 ## Why the WAXAL Whisper models underperform here
 
