@@ -79,8 +79,8 @@ async function startRecording() {
   analyser = audioCtx.createAnalyser(); analyser.fftSize = 512;
   audioCtx.createMediaStreamSource(stream).connect(analyser);
   const buf = new Uint8Array(analyser.fftSize);
-  levelTimer = setInterval(() => { analyser.getByteTimeDomainData(buf); let s = 0; for (const v of buf) { const d = (v - 128) / 128; s += d * d; } ui.level.style.width = Math.min(100, Math.sqrt(s / buf.length) * 400) + '%'; }, 80);
-  ui.mic.classList.add('rec'); ui.mic.textContent = '⏹'; ui.mic.setAttribute('aria-label', 'Stop'); ui.status.textContent = L.listening; ui.cancel.hidden = false;
+  levelTimer = setInterval(() => { analyser.getByteTimeDomainData(buf); let s = 0; for (const v of buf) { const d = (v - 128) / 128; s += d * d; } const lv = Math.min(1, Math.sqrt(s / buf.length) * 4); ui.level.style.width = (lv * 100) + '%'; document.documentElement.style.setProperty('--lvl', lv.toFixed(3)); }, 80);
+  ui.mic.classList.add('rec'); document.body.classList.add('recording'); ui.mic.setAttribute('aria-label', 'Stop'); ui.status.textContent = L.listening; ui.cancel.hidden = false;
   // One utterance is capped at 30 s: a single Whisper window keeps browser memory low on phones.
   const rec = mediaRecorder;
   setTimeout(() => { if (rec.state === 'recording') rec.stop(); }, MAX_UTTERANCE_MS);
@@ -90,10 +90,10 @@ const MAX_UTTERANCE_MS = 30000;
 function stopRecording() { if (mediaRecorder?.state === 'recording') mediaRecorder.stop(); }
 
 function teardown() {
-  clearInterval(levelTimer); ui.level.style.width = '0';
+  clearInterval(levelTimer); ui.level.style.width = '0'; document.documentElement.style.setProperty('--lvl', '0');
   stream?.getTracks().forEach((t) => t.stop()); stream = null;
   audioCtx?.close(); audioCtx = null;
-  ui.mic.classList.remove('rec'); ui.mic.textContent = '🎤'; ui.mic.setAttribute('aria-label', 'Start dictation'); ui.cancel.hidden = true;
+  ui.mic.classList.remove('rec'); document.body.classList.remove('recording'); ui.mic.setAttribute('aria-label', 'Start dictation'); ui.cancel.hidden = true;
 }
 
 async function onStopped() {
@@ -128,6 +128,10 @@ async function decodeTo16k(blob) {
 // ---- transcription -----------------------------------------------------------------------
 let lastAudioMs = 0;
 async function transcribe(pcm) {
+  document.body.classList.add('busy');
+  try { await transcribeInner(pcm); } finally { document.body.classList.remove('busy'); }
+}
+async function transcribeInner(pcm) {
   const lang = ui.inLang.value;
   ui.status.textContent = `${L.loading}…`;
   const asr = await getPipe('automatic-speech-recognition', SPEECH[lang]);
@@ -144,7 +148,9 @@ async function transcribe(pcm) {
   if (!text) { ui.status.textContent = L.empty; return; }
   ui.text.value = text;
   ui.stats.textContent = `${ms} ms · RTF ${(ms / lastAudioMs).toFixed(2)} · ${SPEECH[lang]} · ${L.local}`;
-  ui.result.hidden = false; ui.translation.hidden = true; ui.trLabel.hidden = true; ui.copyTr.hidden = true; ui.trError.hidden = true;
+  ui.result.hidden = false;
+  if (matchMedia('(max-width: 899px)').matches) requestAnimationFrame(() => ui.result.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+  ui.translation.hidden = true; ui.trLabel.hidden = true; ui.copyTr.hidden = true; ui.trError.hidden = true;
   ui.status.textContent = L.tap;
   if (ui.mode.value === 'translate') await doTranslate();
 }
@@ -208,6 +214,21 @@ ui.outLang.onchange = () => localStorage.setItem('out', ui.outLang.value);
 ui.mode.onchange = () => localStorage.setItem('mode', ui.mode.value);
 ui.uiLang.onchange = () => applyLang(ui.uiLang.value);
 
+// Swap input/output languages (only when the output language is also a speech language).
+$('swap')?.addEventListener('click', () => {
+  const a = ui.inLang.value, b = ui.outLang.value;
+  if (![...ui.inLang.options].some((o) => o.value === b)) return;
+  ui.inLang.value = b; ui.outLang.value = a; ui.inLang.onchange(); ui.outLang.onchange();
+});
+// Segmented mode control mirrors the hidden <select id="mode">.
+document.querySelectorAll('[data-mode]').forEach((b) => b.addEventListener('click', () => {
+  ui.mode.value = b.dataset.mode; ui.mode.onchange(); syncMode();
+}));
+function syncMode() { document.querySelectorAll('[data-mode]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mode === ui.mode.value))); }
+// Offline badge
+function syncOnline() { const el = $('net'); if (el) { el.textContent = navigator.onLine ? 'On-device' : 'Offline'; el.dataset.state = navigator.onLine ? 'on' : 'off'; } }
+addEventListener('online', syncOnline); addEventListener('offline', syncOnline);
+
 // ---- init ---------------------------------------------------------------------------------
 ui.inLang.value = localStorage.getItem('in') || 'am';
 ui.outLang.value = localStorage.getItem('out') || 'en';
@@ -215,6 +236,7 @@ ui.mode.value = localStorage.getItem('mode') || 'clean';
 ui.uiLang.value = localStorage.getItem('ui') || (navigator.language.startsWith('am') ? 'am' : 'en');
 applyLang(ui.uiLang.value);
 ui.inLang.onchange();
+syncMode(); syncOnline();
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
 // On-screen phonetic Ge'ez keyboard for phones without an Amharic keyboard.
 const geezKeyboard = attachGeezKeyboard(ui.text, $('kb'), { space: L.space });
