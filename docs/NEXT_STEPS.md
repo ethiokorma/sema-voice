@@ -143,3 +143,12 @@ See `docs/IOS_PLAN.md`; nothing can be compiled here.
   Write tool; `pos += readVarint()` evaluation order bug pattern in Kotlin; `VERSION` file name
   shadows the C++ `<version>` header on case-insensitive filesystems; onnxruntime-node 1.14 crashes
   here (0xC06D007F) but 1.20 (v3) works.
+
+## Update 2026-10-16
+
+* **Done:** the "Best accuracy" browser engine is live. It runs Ethio-ASR 4-bit block-32 (427 MB, WER 0.226) in 5 chunks from GitHub Pages, on multi-threaded WASM.
+* **Done:** the Android catalog now points to the v2 int8 model (652 MB, WER 0.222; was 876 MB / 0.235).
+* **Fixed:** the service worker never installed on the live site because Chrome rejected `cache.addAll` with "Entry already exists". Offline mode and cross-origin isolation were therefore off. v10 installs and the page is now cross-origin isolated.
+* **Still open:** the phone crash in Chrome mobile. The phone model and the crash-stage banner text are needed.
+* **Still open:** WebGPU gave garbage output in headless testing, so it stays off until it is checked on a real GPU.
+* **Measured speed:** host CPU, 4 threads, about 2x real time in the browser. That suits desktops, not phones.
