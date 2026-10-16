@@ -1,0 +1,15 @@
+{
+  "dataset": "FLEURS am_et test, first 30 utterances (same audio as amharic-model-comparison)",
+  "model": "b1n1yam/shook-tiny-amharic-600hr, ggml f16 (ggml-tiny-amharic.bin)",
+  "runtime": "pywhispercpp (whisper.cpp), 4 threads, Intel Xeon E5-1607 v4",
+  "experiments": [
+    {"name": "default", "params": {}, "wer": 0.812, "cer": 0.609, "wer_guarded": 0.618, "cer_guarded": 0.403, "source": "docs/ai-quality-tiny-amharic.json"},
+    {"name": "tuned", "params": {"entropy_thold": 2.0, "logprob_thold": -0.8, "max_tokens": 224}, "wer": 0.860, "cer": 0.648, "wer_guarded": 0.599, "cer_guarded": 0.381, "source": "docs/ai-quality-tiny-amharic-tuned.json"}
+  ],
+  "decision": "Thresholds reverted to defaults (raw WER worse); max_tokens=224 kept as a safety cap.",
+  "not_tested": {
+    "q5_1 builds": "shook-tiny q5_1 and WAXAL small q5_1 hung on clip 1 under pywhispercpp; not measured",
+    "beam_search": null,
+    "single_segment": null
+  }
+}

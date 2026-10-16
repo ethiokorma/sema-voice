@@ -73,6 +73,24 @@
       "params": null
     },
     {
+      "model": "ggml-model.bin",
+      "utterances": 30,
+      "wer": 0.8603,
+      "cer": 0.6483,
+      "wer_guarded": 0.5993,
+      "cer_guarded": 0.3807,
+      "repetition_incidence": 0.2333,
+      "needs_review_rate": 0.2333,
+      "clips_wer_below_0_5": 12,
+      "mean_rtf": 1.9214,
+      "host": "win32",
+      "params": {
+        "entropy_thold": 2.0,
+        "logprob_thold": -0.8,
+        "max_tokens": 224
+      }
+    },
+    {
       "model": "ggml-tiny-waxal-amh-q5_1.bin",
       "utterances": 30,
       "wer": 0.8695,

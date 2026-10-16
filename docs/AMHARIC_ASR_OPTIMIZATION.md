@@ -45,16 +45,13 @@ Measured effect (raw WER is still the official figure):
 | Setting | Value | Note |
 |---|---|---|
 | Strategy | greedy, `temperature_inc = 0.2` | Fallback is already on |
-| `entropy_thold` | 2.0 (default 2.4) | Triggers the fallback earlier on low-diversity output |
-| `logprob_thold` | -0.8 (default -1.0) | |
-| `max_tokens` | 224 per segment | |
+| `entropy_thold`, `logprob_thold` | defaults (2.4, -1.0) | 2.0 / -0.8 was A/B tested: raw WER worse (0.812 → 0.860), guarded slightly better (0.618 → 0.599), so it was reverted |
+| `max_tokens` | 224 per segment | Safety cap against runaway decodes |
 | `no_speech_thold` | 0.6 | |
 | `suppress_blank`, `suppress_nst` | on | |
 
-These values are set in the app. Their effect has **not yet been isolated**: the harness supports
-`--param entropy_thold=2.0 --param logprob_thold=-0.8 --param max_tokens=224`, but that A/B run is
-still pending (see `benchmarks/amharic-decoder-experiments.json`). Whisper remains the fallback,
-so the CTC path matters more than tuning Whisper.
+See `benchmarks/amharic-decoder-experiments.json`. Decoder tuning did not beat the guard, and
+Whisper is now only the fallback, so the CTC path matters more than tuning Whisper further.
 
 ## 4. CTC path (the real fix)
 

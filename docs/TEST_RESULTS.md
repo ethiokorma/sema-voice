@@ -70,6 +70,20 @@ Observations:
 
 Phone RTF/memory numbers are pending device validation.
 
+## Session 2026-10-15: Amharic ASR upgrade
+
+| Step | Result |
+|---|---|
+| Baseline unit tests before changes | 67/67 pass |
+| After changes `./gradlew testDebugUnitTest :app:assembleDebug :app:assembleRelease` | **79/79 pass**, BUILD SUCCESSFUL. Debug APK 125 MB; release unsigned 83 MB (no size change, because ONNX Runtime was already bundled). |
+| New tests | RepetitionGuardTest (9), W2vBertFeatureExtractorTest (2: Kotlin front-end vs Python reference on real Amharic, mean abs error < 1e-3; CTC decode), RemoteCatalogTest multi-file CTC entry, catalog publishability |
+| Model benchmarks (30 FLEURS am_et clips, host CPU Xeon E5-1607 v4) | See `ASR_MODEL_COMPARISON.md`. Best: **Ethio-ASR int8 ONNX WER 0.235 / CER 0.086**, fp32 0.219 / 0.072; hohe 0.221 / 0.086; previous fallback 0.812 raw / 0.618 guarded |
+| Model hosting | GitHub release `models-2026.10` (5 assets). SHA-256 of a re-downloaded asset matches the catalog. |
+| shook-tiny **q5_1** benchmark | **Hangs on clip 1** in pywhispercpp on this host (seen twice), while the f16 build of the same model runs. Unknown whether the app's whisper.cpp 1.9.5 build with `max_tokens = 224` is affected. **Must be checked on a device**; if it hangs, ship the f16 file (77 MB). |
+| WAXAL small q5_1 | Also hung on clip 1 after over 60 min; not measured |
+| Decoder A/B on f16 (entropy_thold 2.0, logprob_thold -0.8, max_tokens 224) | raw WER 0.860 vs 0.812 default (worse); guarded 0.599 vs 0.618. Thresholds reverted; token cap kept. |
+| On-device (CTC speed, RAM, keyboard) | **Not run**: no device connected |
+
 ## PWA (`web/`)
 
 | Step | Result |
