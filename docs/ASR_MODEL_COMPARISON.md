@@ -45,6 +45,27 @@ Against the release gates in the plan:
   characters within otherwise correct words.
 * No Whisper-based model reaches 0.50 raw.
 
+## Compressed Ethio-ASR variants (2026-10-15, same 30 clips, ONNX Runtime CPU 4 threads)
+
+The conformer's pointwise `Conv1d` (kernel 1) layers were rewritten as `MatMul` before export
+(numerically identical in PyTorch). That lets the int8 and 4-bit quantizers compress them. Before
+this, ONNX Runtime's missing `ConvInteger` kernel forced them to stay fp32.
+
+| Variant | Size | WER | CER | Clips WER < 0.5 | RTF (native) | Used by |
+|---|---|---|---|---|---|---|
+| fp32 PyTorch | 2.4 GB | 0.219 | 0.072 | 26 | 1.58 | reference |
+| v1 int8, MatMul-only, convs fp32 | 876 MB | 0.235 | 0.086 | 26 | 1.25 | superseded |
+| **v2 int8 per-channel, convs as MatMul** | **652 MB** | **0.222** | **0.072** | 26 | 2.26 | Android (`ethio-asr-ctc-v2-model_int8.onnx`) |
+| **v2 4-bit MatMulNBits, block 128** | **372 MB** | **0.246** | **0.086** | 25 | 1.54 | Web "Best accuracy" engine (4 chunks on GitHub Pages) |
+
+Browser measurement on clip 000 (14.8 s audio) in headless Chrome on the same 4-core Xeon:
+
+* int8 WASM, 1 thread: 76 s. With 4 threads under service-worker cross-origin isolation: 55 s.
+* 4-bit WASM, 4 threads: 67 s.
+* 4-bit WebGPU: 32 s but **garbage output** (possibly software WebGPU in headless mode), so it is
+  disabled.
+* Text from both CPU paths matched the reference except for one number ("117" came out as "17").
+
 ## Why the WAXAL Whisper models underperform here
 
 The WAXAL card reports a test WER of 33.6 % for small and 41.3 % for tiny. Those figures are on

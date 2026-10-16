@@ -4,8 +4,8 @@
   "utterances": 30,
   "wer": 0.22242647058823528,
   "cer": 0.0715622076707203,
-  "mean_rtf": 2.258794835628298,
-  "mean_latency_ms": 28955.333333333332,
+  "mean_rtf": 1.103116232020477,
+  "mean_latency_ms": 14341.033333333333,
   "host": "Intel(R) Xeon(R) CPU E5-1607 v4 @ 3.10GHz",
   "threads": 4,
   "note": "Host CPU numbers (CPU-only, greedy CTC, no LM); ONNX Runtime CPU EP, 4 threads; pointwise Conv1d rewritten as Linear before export; variant int8mm: dynamic int8 MatMul-only per-channel, pointwise convs as MatMul; model files 652.2 MB; latency includes feature extraction.",
@@ -17,13 +17,10 @@
       "hyp": "በሴቶች ቡድን ውስጥ አራት የበረዶ ተንሸራታቾች ሩጫቸውን መጨረስ አልቻሉም። በግዙፉ ስላሎም ካሉት ከ17 የበረዶ ተንሸራታቾች 45ቱ በውድድሩ ደረጃ ማግኘት አልቻሉም።",
       "wer": 0.05,
       "cer": 0.023529411764705882,
-      "latency_ms": 31756,
+      "latency_ms": 18623,
       "audio_ms": 14760,
-      "rtf": 2.151499640923448,
-      "ref_translation": null,
-      "hyp_guarded": "በሴቶች ቡድን ውስጥ አራት የበረዶ ተንሸራታቾች ሩጫቸውን መጨረስ አልቻሉም። በግዙፉ ስላሎም ካሉት ከ17 የበረዶ ተንሸራታቾች 45ቱ በውድድሩ ደረጃ ማግኘት አልቻሉም።",
-      "repetition_loop": false,
-      "needs_review": false
+      "rtf": 1.2617337601675795,
+      "ref_translation": null
     },
     {
       "audio": "clips/fleurs_am_test_001.wav",
@@ -32,13 +29,10 @@
       "hyp": "እነዚህ አንዳንዴ የሚጨናነቁ የተለያዩ አይነት የባህር ዳርቻውን የከበቡ ሱቆች የሚገኙባቸው የቤተሰብ የባህር ዳርቻዎች ናቸው። መኘት የሚያስተማምን ነው።",
       "wer": 0.23529411764705882,
       "cer": 0.05128205128205128,
-      "latency_ms": 27715,
+      "latency_ms": 11792,
       "audio_ms": 12480,
-      "rtf": 2.220820584923972,
-      "ref_translation": null,
-      "hyp_guarded": "እነዚህ አንዳንዴ የሚጨናነቁ የተለያዩ አይነት የባህር ዳርቻውን የከበቡ ሱቆች የሚገኙባቸው የቤተሰብ የባህር ዳርቻዎች ናቸው። መኘት የሚያስተማምን ነው።",
-      "repetition_loop": false,
-      "needs_review": false
+      "rtf": 0.9449257772454681,
+      "ref_translation": null
     },
     {
       "audio": "clips/fleurs_am_test_002.wav",
@@ -47,13 +41,10 @@
       "hyp": "ወጥረቱ ዝቅተኛ በሆነ ቁጥር የሕይወት ኃይል የበለጠ አውንታዊ ይሆናል። እያንዳንዱ ሰው ፍጹም ሰላም እና እርካታን የማግኘት አቅም አለው።",
       "wer": 0.16666666666666666,
       "cer": 0.04411764705882353,
-      "latency_ms": 26443,
+      "latency_ms": 8373,
       "audio_ms": 10860,
-      "rtf": 2.4349746869321276,
-      "ref_translation": null,
-      "hyp_guarded": "ወጥረቱ ዝቅተኛ በሆነ ቁጥር የሕይወት ኃይል የበለጠ አውንታዊ ይሆናል። እያንዳንዱ ሰው ፍጹም ሰላም እና እርካታን የማግኘት አቅም አለው።",
-      "repetition_loop": false,
-      "needs_review": false
+      "rtf": 0.7710737569007207,
+      "ref_translation": null
     },
     {
       "audio": "clips/fleurs_am_test_003.wav",
@@ -62,13 +53,10 @@
       "hyp": "ህፃናትንና አዛውንትን ጨምሮ ስድስት ታጋቾች እንዲሁም የፊሊፒኖ ፎቶ ባለሙያዎች ቀደም ብለው ተለቀዋል።",
       "wer": 0.16666666666666666,
       "cer": 0.038461538461538464,
-      "latency_ms": 21500,
+      "latency_ms": 7781,
       "audio_ms": 9360,
-      "rtf": 2.2971141239146617,
-      "ref_translation": null,
-      "hyp_guarded": "ህፃናትንና አዛውንትን ጨምሮ ስድስት ታጋቾች እንዲሁም የፊሊፒኖ ፎቶ ባለሙያዎች ቀደም ብለው ተለቀዋል።",
-      "repetition_loop": false,
-      "needs_review": false
+      "rtf": 0.8313144337779914,
+      "ref_translation": null
     },
     {
       "audio": "clips/fleurs_am_test_004.wav",
@@ -77,13 +65,10 @@
       "hyp": "አፒያ የሰሙአ ዋና ከተማ ናት። ከተማዋ በኡፖሉ ደሴት ላይ ናት። እና ለትንሽ ከአርባሺ ያነሰ የህዝብ ቁጥር አላት።",
       "wer": 0.16666666666666666,
       "cer": 0.12962962962962962,
-      "latency_ms": 27696,
+      "latency_ms": 9581,
       "audio_ms": 11340,
-      "rtf": 2.4423759788721537,
-      "ref_translation": null,
-      "hyp_guarded": "አፒያ የሰሙአ ዋና ከተማ ናት። ከተማዋ በኡፖሉ ደሴት ላይ ናት። እና ለትንሽ ከአርባሺ ያነሰ የህዝብ ቁጥር አላት።",
-      "repetition_loop": false,
-      "needs_review": false
+      "rtf": 0.844905802502085,
+      "ref_translation": null
     },
     {
       "audio": "clips/fleurs_am_test_005.wav",
@@ -92,13 +77,10 @@
       "hyp": "ስለዚህ ማስታወሻው እንደ መለያ ብቻ የታከለ ሊሆን ይችላል።",
       "wer": 0.0,
       "cer": 0.0,
-      "latency_ms": 16276,
+      "latency_ms": 5408,
       "audio_ms": 6960,
-      "rtf": 2.338602844807694,
-      "ref_translation": null,
-      "hyp_guarded": "ስለዚህ ማስታወሻው እንደ መለያ ብቻ የታከለ ሊሆን ይችላል።",
-      "repetition_loop": false,
-      "needs_review": false
+      "rtf": 0.7771007040242568,
+      "ref_translation": null
     },
     {
       "audio": "clips/fleurs_am_test_006.wav",
@@ -107,13 +89,10 @@
       "hyp": "ቤቶቻችንን ከእጽዋት እናደርጋለን እንዲሁም ከእጽዋት ልብሶችን እንሰራለን የምንበላቸው አብዛኛቹ ምግቦች እጽዋቶች ናቸው ያለእጽዋት እንስሳት መኖር አይችሉም።",
       "wer": 0.23529411764705882,
       "cer": 0.04819277108433735,
-      "latency_ms": 28711,
+      "latency_ms": 16826,
       "audio_ms": 12840,
-      "rtf": 2.236102157304313,
-      "ref_translation": null,
-      "hyp_guarded": "ቤቶቻችንን ከእጽዋት እናደርጋለን እንዲሁም ከእጽዋት ልብሶችን እንሰራለን የምንበላቸው አብዛኛቹ ምግቦች እጽዋቶች ናቸው ያለእጽዋት እንስሳት መኖር አይችሉም።",
-      "repetition_loop": false,
-      "needs_review": false
+      "rtf": 1.3105007087248972,
+      "ref_translation": null
     },
     {
       "audio": "clips/fleurs_am_test_007.wav",
@@ -122,13 +101,10 @@
       "hyp": "በተመኮረ ኬሚካል ውስጥ ያለ የፒኤች መጠን በሃይድሮጅን ኤች በፒኤች ውስጥ አይኖች መጠን ያመለክታል።",
       "wer": 0.5714285714285714,
       "cer": 0.2857142857142857,
-      "latency_ms": 19008,
+      "latency_ms": 14100,
       "audio_ms": 8940,
-      "rtf": 2.126194619713247,
-      "ref_translation": null,
-      "hyp_guarded": "በተመኮረ ኬሚካል ውስጥ ያለ የፒኤች መጠን በሃይድሮጅን ኤች በፒኤች ውስጥ አይኖች መጠን ያመለክታል።",
-      "repetition_loop": false,
-      "needs_review": false
+      "rtf": 1.5772234899527342,
+      "ref_translation": null
     },
     {
       "audio": "clips/fleurs_am_test_008.wav",
@@ -137,13 +113,10 @@
       "hyp": "ዩናይትድ ስቴትስ ውስጥ የፕሪንስተን ዩኒቨርስቲ እና የስዊድን ውስጥ አፕሳላ ዩኒቨርሲቲ ጥናት አድራጊዎች በብርቅዬ ዳርዊን ፊንች ጂኦስፒቴስ እና በውጭ ካክተስ ፊ ኦስፒ ኮኒሮስትስ መካከል መራባት ምክንያት ይህ ሂደት የበለጠ ረጅም ጊዜ እንደሚወስድ ይገመት የነበረ ቢሆንም አዲሱ ዝርያ በሁለት ትውልዶች ብቻ መፈጠሩን ዘግበዋል።",
       "wer": 0.16666666666666666,
       "cer": 0.05813953488372093,
-      "latency_ms": 81960,
+      "latency_ms": 45649,
       "audio_ms": 28920,
-      "rtf": 2.834045511759292,
-      "ref_translation": null,
-      "hyp_guarded": "ዩናይትድ ስቴትስ ውስጥ የፕሪንስተን ዩኒቨርስቲ እና የስዊድን ውስጥ አፕሳላ ዩኒቨርሲቲ ጥናት አድራጊዎች በብርቅዬ ዳርዊን ፊንች ጂኦስፒቴስ እና በውጭ ካክተስ ፊ ኦስፒ ኮኒሮስትስ መካከል መራባት ምክንያት ይህ ሂደት የበለጠ ረጅም ጊዜ እንደሚወስድ ይገመት የነበረ ቢሆንም አዲሱ ዝርያ በሁለት ትውልዶች ብቻ መፈጠሩን ዘግበዋል።",
-      "repetition_loop": false,
-      "needs_review": false
+      "rtf": 1.5784734439808117,
+      "ref_translation": null
     },
     {
       "audio": "clips/fleurs_am_test_009.wav",
@@ -152,13 +125,10 @@
       "hyp": "ሆኖ ያእውነት አይደለም። በሰነዱ ጀርባ ላይ የፃፈ ነገር ቢኖርም ይህ የሀብት ካርታ አይደለም።",
       "wer": 0.4,
       "cer": 0.06382978723404255,
-      "latency_ms": 15942,
+      "latency_ms": 8258,
       "audio_ms": 7080,
-      "rtf": 2.251816963274453,
-      "ref_translation": null,
-      "hyp_guarded": "ሆኖ ያእውነት አይደለም። በሰነዱ ጀርባ ላይ የፃፈ ነገር ቢኖርም ይህ የሀብት ካርታ አይደለም።",
-      "repetition_loop": false,
-      "needs_review": false
+      "rtf": 1.1664285310701925,
+      "ref_translation": null
     },
     {
       "audio": "clips/fleurs_am_test_010.wav",
@@ -167,13 +137,10 @@
       "hyp": "ሰዎች ከጥንት ጀምሮ እንደ ወርቅ፣ ብር እና ናስ ያሉ መሠረታዊ ኬሚካላዊ ንጥረ ነገሮችን ያውቃሉ። እነዚህ ሁሉ በተፈጥሮ ውስጥ ሊገኙ ስለሚችሉ በጥንታዊ መሳሪያዎች ልማድን ቁፋሮ ቀላል ናቸው።",
       "wer": 0.07692307692307693,
       "cer": 0.03225806451612903,
-      "latency_ms": 36813,
+      "latency_ms": 18241,
       "audio_ms": 15300,
-      "rtf": 2.4060891241784774,
-      "ref_translation": null,
-      "hyp_guarded": "ሰዎች ከጥንት ጀምሮ እንደ ወርቅ፣ ብር እና ናስ ያሉ መሠረታዊ ኬሚካላዊ ንጥረ ነገሮችን ያውቃሉ። እነዚህ ሁሉ በተፈጥሮ ውስጥ ሊገኙ ስለሚችሉ በጥንታዊ መሳሪያዎች ልማድን ቁፋሮ ቀላል ናቸው።",
-      "repetition_loop": false,
-      "needs_review": false
+      "rtf": 1.192255901976251,
+      "ref_translation": null
     },
     {
       "audio": "clips/fleurs_am_test_011.wav",
@@ -182,13 +149,10 @@
       "hyp": "ይህ ምክንያት ይመስላል። ምክንያቱም ምድር የምትንቀሳቀስ አይመስልም አይደም።",
       "wer": 0.25,
       "cer": 0.075,
-      "latency_ms": 13720,
+      "latency_ms": 5778,
       "audio_ms": 6360,
-      "rtf": 2.1572483018913404,
-      "ref_translation": null,
-      "hyp_guarded": "ይህ ምክንያት ይመስላል። ምክንያቱም ምድር የምትንቀሳቀስ አይመስልም አይደም።",
-      "repetition_loop": false,
-      "needs_review": false
+      "rtf": 0.9085241666374106,
+      "ref_translation": null
     },
     {
       "audio": "clips/fleurs_am_test_012.wav",
@@ -197,13 +161,10 @@
       "hyp": "መሐመድ ከዚህ ተራ ከሆነ ህይወት ባሻገር ባሉ ጉዳዮች ላይ ጥልቅ ፍላጎት ነበረው። ለማሰላሰል በኑር ብርሃን ተራራ ሂራ በመባል የሚታወቀው ዋሻ ላይ መሄድ ያዘወትር ነበር።",
       "wer": 0.12,
       "cer": 0.012195121951219513,
-      "latency_ms": 39986,
+      "latency_ms": 20208,
       "audio_ms": 16860,
-      "rtf": 2.3716830723606326,
-      "ref_translation": null,
-      "hyp_guarded": "መሐመድ ከዚህ ተራ ከሆነ ህይወት ባሻገር ባሉ ጉዳዮች ላይ ጥልቅ ፍላጎት ነበረው። ለማሰላሰል በኑር ብርሃን ተራራ ሂራ በመባል የሚታወቀው ዋሻ ላይ መሄድ ያዘወትር ነበር።",
-      "repetition_loop": false,
-      "needs_review": false
+      "rtf": 1.1986023783993114,
+      "ref_translation": null
     },
     {
       "audio": "clips/fleurs_am_test_013.wav",
@@ -212,13 +173,10 @@
       "hyp": "ግድቡ በ196 ከተገነባ በኋላ በየአመቱ በወንዙን አቧራ የሚዘራውን የጎርፍ መጥለቅለቅ አቆመ።",
       "wer": 0.16666666666666666,
       "cer": 0.020833333333333332,
-      "latency_ms": 24249,
+      "latency_ms": 10587,
       "audio_ms": 10200,
-      "rtf": 2.3774423137508043,
-      "ref_translation": null,
-      "hyp_guarded": "ግድቡ በ196 ከተገነባ በኋላ በየአመቱ በወንዙን አቧራ የሚዘራውን የጎርፍ መጥለቅለቅ አቆመ።",
-      "repetition_loop": false,
-      "needs_review": false
+      "rtf": 1.0380366666461616,
+      "ref_translation": null
     },
     {
       "audio": "clips/fleurs_am_test_014.wav",
@@ -227,13 +185,10 @@
       "hyp": "የቤተክርስቲያኑ መካከለኛው ባለስልጣን ከ1ሺህ አመታት በላይ በሮም ውስጥ ነበር። እናም ይህ የኃይል ና የገንዘብ ክምችት ብዙዎች መሰረታዊ የመመሪያ እምነቱ እየተሞላ እንደሆነ እንዲጠይቁ አድርጓቸዋል።",
       "wer": 0.25,
       "cer": 0.0673076923076923,
-      "latency_ms": 36822,
+      "latency_ms": 17932,
       "audio_ms": 15840,
-      "rtf": 2.3246798547916114,
-      "ref_translation": null,
-      "hyp_guarded": "የቤተክርስቲያኑ መካከለኛው ባለስልጣን ከ1ሺህ አመታት በላይ በሮም ውስጥ ነበር። እናም ይህ የኃይል ና የገንዘብ ክምችት ብዙዎች መሰረታዊ የመመሪያ እምነቱ እየተሞላ እንደሆነ እንዲጠይቁ አድርጓቸዋል።",
-      "repetition_loop": false,
-      "needs_review": false
+      "rtf": 1.1320797222339538,
+      "ref_translation": null
     },
     {
       "audio": "clips/fleurs_am_test_015.wav",
@@ -242,13 +197,10 @@
       "hyp": "መካከለኛ ደረጃ አባት ሰማኖች ሳ ቴዱልካ እናሆልድራቪት  ተጫወቱና የመቶ ሩጫ አጋርነት አደረጉ።",
       "wer": 0.6666666666666666,
       "cer": 0.25925925925925924,
-      "latency_ms": 26365,
+      "latency_ms": 13247,
       "audio_ms": 12660,
-      "rtf": 2.082575979461602,
-      "ref_translation": null,
-      "hyp_guarded": "መካከለኛ ደረጃ አባት ሰማኖች ሳ ቴዱልካ እናሆልድራቪት ተጫወቱና የመቶ ሩጫ አጋርነት አደረጉ።",
-      "repetition_loop": false,
-      "needs_review": false
+      "rtf": 1.0463711137311036,
+      "ref_translation": null
     },
     {
       "audio": "clips/fleurs_am_test_016.wav",
@@ -257,13 +209,10 @@
       "hyp": "አንድ ሰው በደቡብ አፍሪካ ውስጥ ላሉት ፓርኮችም ሆነ ለሁሉም የደቡብ አፍሪካ ብሔራዊ ፓርኮች መግቢያ ምርጫ የሚሰጥ የዱር ካርድ መግዛት ጠቃሚ ሊሆን ይችላል።",
       "wer": 0.0,
       "cer": 0.0,
-      "latency_ms": 24939,
+      "latency_ms": 13064,
       "audio_ms": 11160,
-      "rtf": 2.2347220698685306,
-      "ref_translation": null,
-      "hyp_guarded": "አንድ ሰው በደቡብ አፍሪካ ውስጥ ላሉት ፓርኮችም ሆነ ለሁሉም የደቡብ አፍሪካ ብሔራዊ ፓርኮች መግቢያ ምርጫ የሚሰጥ የዱር ካርድ መግዛት ጠቃሚ ሊሆን ይችላል።",
-      "repetition_loop": false,
-      "needs_review": false
+      "rtf": 1.1706343816933773,
+      "ref_translation": null
     },
     {
       "audio": "clips/fleurs_am_test_017.wav",
@@ -272,13 +221,10 @@
       "hyp": "ካዛ ብላንካ በሁሉም ሞሮኮ ውስጥ ለመገብየት በዝቅተኛ ደረጃ አስደሳች ከሆኑ ቦታዎች አንዱ ነው።",
       "wer": 0.16666666666666666,
       "cer": 0.0,
-      "latency_ms": 17614,
+      "latency_ms": 10993,
       "audio_ms": 8760,
-      "rtf": 2.0107885159777488,
-      "ref_translation": null,
-      "hyp_guarded": "ካዛ ብላንካ በሁሉም ሞሮኮ ውስጥ ለመገብየት በዝቅተኛ ደረጃ አስደሳች ከሆኑ ቦታዎች አንዱ ነው።",
-      "repetition_loop": false,
-      "needs_review": false
+      "rtf": 1.2549710502001759,
+      "ref_translation": null
     },
     {
       "audio": "clips/fleurs_am_test_018.wav",
@@ -287,13 +233,10 @@
       "hyp": "የደቡብ ምዕራብ አፍሪካ ህዝቦች ድርጅት ኤስ ደብሊው ኤስፒኦ ገዥው ፓርቲ በፓርላማው ምርጫም ብዙዎችን እንደያዘ ቆይቷል።",
       "wer": 0.23529411764705882,
       "cer": 0.03333333333333333,
-      "latency_ms": 22841,
+      "latency_ms": 13174,
       "audio_ms": 10920,
-      "rtf": 2.0917044963598963,
-      "ref_translation": null,
-      "hyp_guarded": "የደቡብ ምዕራብ አፍሪካ ህዝቦች ድርጅት ኤስ ደብሊው ኤስፒኦ ገዥው ፓርቲ በፓርላማው ምርጫም ብዙዎችን እንደያዘ ቆይቷል።",
-      "repetition_loop": false,
-      "needs_review": false
+      "rtf": 1.2064839468931186,
+      "ref_translation": null
     },
     {
       "audio": "clips/fleurs_am_test_019.wav",
@@ -302,13 +245,10 @@
       "hyp": "ይህ ስንብት አይሆንም ይህ የአንድ ምዕራፍ መዝጊያ እና የአዲሱ መክፈቻ ነው።",
       "wer": 0.09090909090909091,
       "cer": 0.02702702702702703,
-      "latency_ms": 14337,
+      "latency_ms": 7637,
       "audio_ms": 6720,
-      "rtf": 2.1335508036177737,
-      "ref_translation": null,
-      "hyp_guarded": "ይህ ስንብት አይሆንም ይህ የአንድ ምዕራፍ መዝጊያ እና የአዲሱ መክፈቻ ነው።",
-      "repetition_loop": false,
-      "needs_review": false
+      "rtf": 1.1365134226036302,
+      "ref_translation": null
     },
     {
       "audio": "clips/fleurs_am_test_020.wav",
@@ -317,13 +257,10 @@
       "hyp": "በአብዮታዊ ጦርነት ወቅት አስራ ሶስቱ ግዛቶች በመጀመሪያ ደካማ ማዕከላዊ መንግስት አቋቋሙ። ኮንግረሱ ብቸኛ አካል ሆኗቸው ማለት ነው። በኮንፌዴሬሽን አንቅጾች መሠረት።",
       "wer": 0.2,
       "cer": 0.04819277108433735,
-      "latency_ms": 32759,
+      "latency_ms": 15971,
       "audio_ms": 13320,
-      "rtf": 2.4594242192312583,
-      "ref_translation": null,
-      "hyp_guarded": "በአብዮታዊ ጦርነት ወቅት አስራ ሶስቱ ግዛቶች በመጀመሪያ ደካማ ማዕከላዊ መንግስት አቋቋሙ። ኮንግረሱ ብቸኛ አካል ሆኗቸው ማለት ነው። በኮንፌዴሬሽን አንቅጾች መሠረት።",
-      "repetition_loop": false,
-      "needs_review": false
+      "rtf": 1.1990301276056528,
+      "ref_translation": null
     },
     {
       "audio": "clips/fleurs_am_test_021.wav",
@@ -332,13 +269,10 @@
       "hyp": "ሌሎች እጭዎች ምርጥ ምስል ዳይሬክተር ሲኒማቶግራፊ የአልባሳት ዲዛይን ለፊልም ኤዲቲንግ የመጀመሪያ ውጤት የምርት ዲዛይን የድምፅ ኤዲቲንግ የድምፅ ሚክሲንግ እና የመጀመሪያ ደርሳት ያጠቃልላሉ።",
       "wer": 0.22727272727272727,
       "cer": 0.061224489795918366,
-      "latency_ms": 39965,
+      "latency_ms": 24377,
       "audio_ms": 18060,
-      "rtf": 2.2129445071956133,
-      "ref_translation": null,
-      "hyp_guarded": "ሌሎች እጭዎች ምርጥ ምስል ዳይሬክተር ሲኒማቶግራፊ የአልባሳት ዲዛይን ለፊልም ኤዲቲንግ የመጀመሪያ ውጤት የምርት ዲዛይን የድምፅ ኤዲቲንግ የድምፅ ሚክሲንግ እና የመጀመሪያ ደርሳት ያጠቃልላሉ።",
-      "repetition_loop": false,
-      "needs_review": false
+      "rtf": 1.3497916002038988,
+      "ref_translation": null
     },
     {
       "audio": "clips/fleurs_am_test_022.wav",
@@ -347,13 +281,10 @@
       "hyp": "የዋና ጣቢያ ሁለት ሬዲዮዎች ሳሉት ይህ ከ8መቶ 2 ነጥብ 11 ኤ 8ቶ 2 ነጥብ 1 አ ቢ እና 8መቶ 2 ነጥብ 1ድ አንድ ጂ ጋር ወደኋላ የሚስማማ እንዲሆን ያስችላዋል።",
       "wer": 1.0,
       "cer": 0.38095238095238093,
-      "latency_ms": 42222,
+      "latency_ms": 22627,
       "audio_ms": 18360,
-      "rtf": 2.299705294112032,
-      "ref_translation": null,
-      "hyp_guarded": "የዋና ጣቢያ ሁለት ሬዲዮዎች ሳሉት ይህ ከ8መቶ 2 ነጥብ 11 ኤ 8ቶ 2 ነጥብ 1 አ ቢ እና 8መቶ 2 ነጥብ 1ድ አንድ ጂ ጋር ወደኋላ የሚስማማ እንዲሆን ያስችላዋል።",
-      "repetition_loop": false,
-      "needs_review": false
+      "rtf": 1.232424232026274,
+      "ref_translation": null
     },
     {
       "audio": "clips/fleurs_am_test_023.wav",
@@ -362,13 +293,10 @@
       "hyp": "በኩንዳሊኒ ዮጋ የኩንዳሊኒ ኃይል የማወቅ ኃይል በዮጋ አቋሞች የአተናፋፈስ እንቅስቃሴዎች ማንትራስ እና በእይታዎች ይነቃቃል።",
       "wer": 0.14285714285714285,
       "cer": 0.03125,
-      "latency_ms": 25784,
+      "latency_ms": 12690,
       "audio_ms": 12360,
-      "rtf": 2.0861531310552026,
-      "ref_translation": null,
-      "hyp_guarded": "በኩንዳሊኒ ዮጋ የኩንዳሊኒ ኃይል የማወቅ ኃይል በዮጋ አቋሞች የአተናፋፈስ እንቅስቃሴዎች ማንትራስ እና በእይታዎች ይነቃቃል።",
-      "repetition_loop": false,
-      "needs_review": false
+      "rtf": 1.0267458252177777,
+      "ref_translation": null
     },
     {
       "audio": "clips/fleurs_am_test_024.wav",
@@ -377,13 +305,10 @@
       "hyp": "ሙቅ ቸኮሌቱ የቤልጃምን መስፈርቶች ያሟላ ነው። የፍራፍሬ ጭማቂዎች ውድ ቢሆኑም ግን በጣም ጥሩ ናቸው።",
       "wer": 0.07142857142857142,
       "cer": 0.04,
-      "latency_ms": 19882,
+      "latency_ms": 11129,
       "audio_ms": 9480,
-      "rtf": 2.0973423206569617,
-      "ref_translation": null,
-      "hyp_guarded": "ሙቅ ቸኮሌቱ የቤልጃምን መስፈርቶች ያሟላ ነው። የፍራፍሬ ጭማቂዎች ውድ ቢሆኑም ግን በጣም ጥሩ ናቸው።",
-      "repetition_loop": false,
-      "needs_review": false
+      "rtf": 1.1739585232303993,
+      "ref_translation": null
     },
     {
       "audio": "clips/fleurs_am_test_025.wav",
@@ -392,13 +317,10 @@
       "hyp": "የዳንዴ ዩኒቨርሲቲ ፕሮፌሰር ፓሜላ ፈርግሰን ጋዜጠኞች ፎቶዎችን እና ሌሎች የተጠርጣሪዎችን መረጃ አካተሙ ጋዜጠኞች በአደገኛ መስመር እየተጓዙ ይመስላል ብለዋል።",
       "wer": 0.1111111111111111,
       "cer": 0.024691358024691357,
-      "latency_ms": 37545,
+      "latency_ms": 14994,
       "audio_ms": 15840,
-      "rtf": 2.3702981502271605,
-      "ref_translation": null,
-      "hyp_guarded": "የዳንዴ ዩኒቨርሲቲ ፕሮፌሰር ፓሜላ ፈርግሰን ጋዜጠኞች ፎቶዎችን እና ሌሎች የተጠርጣሪዎችን መረጃ አካተሙ ጋዜጠኞች በአደገኛ መስመር እየተጓዙ ይመስላል ብለዋል።",
-      "repetition_loop": false,
-      "needs_review": false
+      "rtf": 0.9466171464553536,
+      "ref_translation": null
     },
     {
       "audio": "clips/fleurs_am_test_026.wav",
@@ -407,13 +329,10 @@
       "hyp": "በአንዳንድ መንገዶች ላይ ትላልቆቹ ኩባንያዎች የራሳቸው አውሮፕላኖች አሏቸው። ነገር ግን ለሌሎች መንገዶችና ትናንሽ ድርጅቶች ችግር ነበር።",
       "wer": 0.11764705882352941,
       "cer": 0.014084507042253521,
-      "latency_ms": 24535,
+      "latency_ms": 9295,
       "audio_ms": 11700,
-      "rtf": 2.0970370256716118,
-      "ref_translation": null,
-      "hyp_guarded": "በአንዳንድ መንገዶች ላይ ትላልቆቹ ኩባንያዎች የራሳቸው አውሮፕላኖች አሏቸው። ነገር ግን ለሌሎች መንገዶችና ትናንሽ ድርጅቶች ችግር ነበር።",
-      "repetition_loop": false,
-      "needs_review": false
+      "rtf": 0.7945046068415937,
+      "ref_translation": null
     },
     {
       "audio": "clips/fleurs_am_test_027.wav",
@@ -422,13 +341,10 @@
       "hyp": "ሌይተን ከጠቅላይ ሚኒስትሩ ጋር በተደረገው ስብሰባ ወቅት የበግ አጥባቂዎች አካባቢያዊ የህግ ረቂቅ ላይ ለውጦች እንዲደረጉ የበግ አጥባቂው ፓርቲ አካባቢያዊ የህግ ረቂቅ ዝርዝር እና የተሟላ ጽሑፍ እንዲቀርብላቸው ጠይቀዋል።",
       "wer": 0.1111111111111111,
       "cer": 0.03571428571428571,
-      "latency_ms": 38306,
+      "latency_ms": 18980,
       "audio_ms": 17700,
-      "rtf": 2.164226502816766,
-      "ref_translation": null,
-      "hyp_guarded": "ሌይተን ከጠቅላይ ሚኒስትሩ ጋር በተደረገው ስብሰባ ወቅት የበግ አጥባቂዎች አካባቢያዊ የህግ ረቂቅ ላይ ለውጦች እንዲደረጉ የበግ አጥባቂው ፓርቲ አካባቢያዊ የህግ ረቂቅ ዝርዝር እና የተሟላ ጽሑፍ እንዲቀርብላቸው ጠይቀዋል።",
-      "repetition_loop": false,
-      "needs_review": false
+      "rtf": 1.0723659943389354,
+      "ref_translation": null
     },
     {
       "audio": "clips/fleurs_am_test_028.wav",
@@ -437,13 +353,10 @@
       "hyp": "በሶስተኛው ክፍለ ዘመን ቢሲ በግብተገነ ታቁ ራሚድ የሞቶፈ ለማክበር ከተገነቡ በርካታ ትላልቅ የራሚድ ህንፃዎች አንዱ ነው።",
       "wer": 0.5555555555555556,
       "cer": 0.28205128205128205,
-      "latency_ms": 22179,
+      "latency_ms": 10613,
       "audio_ms": 10260,
-      "rtf": 2.1616965886768225,
-      "ref_translation": null,
-      "hyp_guarded": "በሶስተኛው ክፍለ ዘመን ቢሲ በግብተገነ ታቁ ራሚድ የሞቶፈ ለማክበር ከተገነቡ በርካታ ትላልቅ የራሚድ ህንፃዎች አንዱ ነው።",
-      "repetition_loop": false,
-      "needs_review": false
+      "rtf": 1.034440068241216,
+      "ref_translation": null
     },
     {
       "audio": "clips/fleurs_am_test_029.wav",
@@ -452,17 +365,14 @@
       "hyp": "ፈላስፈው አርስቶትል ሁሉም ነገር ከአንድ ወይም ከዚያ በላይ ከአራት አካላት ድብልቅ እንደሚሆን ጽንሳሰቡን ሰጥቷል። እነሱም ምድር ውሃ፣ አየር እና እሳት ናቸው።",
       "wer": 0.13636363636363635,
       "cer": 0.06329113924050633,
-      "latency_ms": 30790,
+      "latency_ms": 12303,
       "audio_ms": 13440,
-      "rtf": 2.290985684521729,
-      "ref_translation": null,
-      "hyp_guarded": "ፈላስፈው አርስቶትል ሁሉም ነገር ከአንድ ወይም ከዚያ በላይ ከአራት አካላት ድብልቅ እንደሚሆን ጽንሳሰቡን ሰጥቷል። እነሱም ምድር ውሃ፣ አየር እና እሳት ናቸው።",
-      "repetition_loop": false,
-      "needs_review": false
+      "rtf": 0.9154556770919867,
+      "ref_translation": null
     }
   ],
-  "wer_guarded": 0.22242647058823528,
-  "cer_guarded": 0.0715622076707203,
+  "wer_guarded": 0.23529411764705882,
+  "cer_guarded": 0.08559401309635173,
   "repetition_incidence": 0.0,
   "needs_review_rate": 0.0,
   "clips_wer_below_0_5": 26

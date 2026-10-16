@@ -37,7 +37,7 @@ const S = {
     offlineReady: 'The on-device model is ready and works without internet.', offlineNot: 'Not downloaded yet. It downloads automatically the first time you use the on-device engine (about 56 MB, Wi-Fi recommended).',
     lowMem: 'This device reports {mem} GB memory. The on-device model may crash here; the Google engine is safer.',
     confirmClear: 'Tap again to delete all history', noVoice: 'No voice for this language in this browser.',
-    eBest: 'Best accuracy (on this computer)', eBestDesc: 'Our most accurate Amharic model (about 22% word error, vs 60–80% for the small model). Private and offline after a one-time ~400 MB download. Needs a computer or a phone with 8 GB memory.', eBestNo: 'Needs a computer or a phone with 8 GB memory.', bestBadge: 'Most accurate',
+    eBest: 'Best accuracy (on this computer)', eBestDesc: 'Our most accurate Amharic model (about 22% word error, vs 60–80% for the small model). Private and offline after a one-time ~430 MB download. Needs a computer or a phone with 8 GB memory.', eBestNo: 'Needs a computer or a phone with 8 GB memory.', bestBadge: 'Most accurate',
   },
   am: {
     speakTitle: 'ይናገሩ', historyTitle: 'ታሪክ', translateTitle: 'ተርጉም', settingsTitle: 'ቅንብሮች',
@@ -65,7 +65,7 @@ const S = {
     offlineReady: 'የስልኩ ሞዴል ዝግጁ ነው፤ ያለ ኢንተርኔት ይሰራል።', offlineNot: 'ገና አልወረደም። የስልኩን ሞተር መጀመሪያ ሲጠቀሙ በራሱ ይወርዳል (56 MB ገደማ፤ Wi-Fi ይመከራል)።',
     lowMem: 'ይህ መሣሪያ {mem} GB ማህደረ ትውስታ አለው። የስልኩ ሞዴል ሊቆም ይችላል፤ የGoogle ሞተር ይሻላል።',
     confirmClear: 'ሁሉንም ታሪክ ለመሰረዝ እንደገና ይንኩ', noVoice: 'በዚህ አሳሽ ለዚህ ቋንቋ ድምጽ የለም።',
-    eBest: 'ምርጥ ትክክለኛነት (በዚህ ኮምፒውተር)', eBestDesc: 'በጣም ትክክለኛው የአማርኛ ሞዴላችን (22% ገደማ ስህተት)። አንድ ጊዜ ~400 MB ከወረደ በኋላ ግላዊና ከመስመር ውጭ ይሰራል። ኮምፒውተር ወይም 8 GB ማህደረ ትውስታ ያለው ስልክ ያስፈልጋል።', eBestNo: 'ኮምፒውተር ወይም 8 GB ማህደረ ትውስታ ያለው ስልክ ያስፈልጋል።', bestBadge: 'በጣም ትክክለኛ',
+    eBest: 'ምርጥ ትክክለኛነት (በዚህ ኮምፒውተር)', eBestDesc: 'በጣም ትክክለኛው የአማርኛ ሞዴላችን (22% ገደማ ስህተት)። አንድ ጊዜ ~430 MB ከወረደ በኋላ ግላዊና ከመስመር ውጭ ይሰራል። ኮምፒውተር ወይም 8 GB ማህደረ ትውስታ ያለው ስልክ ያስፈልጋል።', eBestNo: 'ኮምፒውተር ወይም 8 GB ማህደረ ትውስታ ያለው ስልክ ያስፈልጋል።', bestBadge: 'በጣም ትክክለኛ',
   },
 };
 let L = S.en;
