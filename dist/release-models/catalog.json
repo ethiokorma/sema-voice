@@ -6,10 +6,10 @@
     "languages": [
       "am"
     ],
-    "requiredRamMb": 1800,
+    "requiredRamMb": 1400,
     "minTier": "HIGH",
     "qualityRank": 10,
-    "measuredWer": 0.235,
+    "measuredWer": 0.222,
     "license": "CC-BY-4.0",
     "sourceRepo": "badrex/Ethio-ASR-amharic",
     "displayName": "Amharic high accuracy (w2v-BERT CTC, int8)",
@@ -17,9 +17,9 @@
     "files": [
       {
         "file": "model_int8.onnx",
-        "sizeBytes": 876500358,
-        "sha256": "f939343b809390aadcce15a75d1b2543c9b0f81026e56d5249c4a99e944a44e0",
-        "url": "https://github.com/ethiokorma/sema-voice/releases/download/models-2026.10/ethio-asr-ctc-model_int8.onnx"
+        "sizeBytes": 652228057,
+        "sha256": "1cfce4733c3a54b434dfb62ed1fbf3da17607d8422c2bbd814d0fedc57cb7644",
+        "url": "https://github.com/ethiokorma/sema-voice/releases/download/models-2026.10/ethio-asr-ctc-v2-model_int8.onnx"
       },
       {
         "file": "vocab.json",

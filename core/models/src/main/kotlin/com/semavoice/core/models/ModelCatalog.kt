@@ -148,27 +148,27 @@ object ModelCatalog {
      * badrex/Ethio-ASR-amharic: w2v-BERT 2.0 CTC (600M), CC-BY-4.0, trained on WAXAL Amharic
      * (documented data; Google lists the Amharic WAXAL split as CC-BY-SA-4.0, review before paid
      * release). Measured 2026-10-15 on 30 FLEURS am_et clips, through ONNX Runtime with the int8
-     * file the app downloads: WER 0.235 / CER 0.086, 26/30 clips under 0.5, no loops
-     * (fp32: 0.219 / 0.072). RTF 1.25 on a 4-core Xeon E5-1607; phone speed not measured yet.
+     * file the app downloads (v2: pointwise convs rewritten as MatMul, int8 per-channel, 652 MB):
+     * WER 0.222 / CER 0.072, 26/30 clips under 0.5, no loops (fp32: 0.219 / 0.072; v1 876 MB: 0.235). RTF 1.25 on a 4-core Xeon E5-1607; phone speed not measured yet.
      * CTC cannot loop. Hosted as GitHub release assets (models-2026.10) of ethiokorma/sema-voice; built with tools/export_ctc_onnx.py. Int8 is MatMul-only (ORT has no ConvInteger kernel). Emits "።" and digits.
      * Alternative with equal accuracy: snapwre/hohe-asr-amharic (0.221 fp32, corpus undisclosed).
      */
     val ethioAsrAmharicCtc = ModelInfo(
         id = "ethio-asr-amharic-ctc-int8", kind = ModelKind.SPEECH,
         displayName = "Amharic high accuracy (w2v-BERT CTC, int8)",
-        description = "Best measured Amharic model: 23.5% word error on FLEURS vs 81% for the tiny Whisper model. 876 MB; needs a phone with 6 GB RAM.",
+        description = "Best measured Amharic model: 22% word error on FLEURS vs 81% for the tiny Whisper model. 652 MB; needs a phone with 6 GB RAM.",
         version = "2026.10",
         files = listOf(
-            ModelFile("model_int8.onnx", "$AMHARIC_MODEL_BASE_URL/ethio-asr-ctc-model_int8.onnx", 876_500_358, "f939343b809390aadcce15a75d1b2543c9b0f81026e56d5249c4a99e944a44e0"),
+            ModelFile("model_int8.onnx", "$AMHARIC_MODEL_BASE_URL/ethio-asr-ctc-v2-model_int8.onnx", 652_228_057, "1cfce4733c3a54b434dfb62ed1fbf3da17607d8422c2bbd814d0fedc57cb7644"),
             ModelFile("vocab.json", "$AMHARIC_MODEL_BASE_URL/ethio-asr-ctc-vocab.json", 4_700, "3f4a05c98277736556609871d76c8648b86fe04ac4c51e07f20dfbf7740c3acc"),
             ModelFile("ctc_config.json", "$AMHARIC_MODEL_BASE_URL/ethio-asr-ctc-ctc_config.json", 214, "0f41f52d4d95eab957ed0c7b5c1a22b6b83d8e7d79fa90a4c053090eeb8afa86"),
         ),
         languages = listOf(Language.AMHARIC),
-        requiredRamMb = 1800, minTier = PerformanceTier.HIGH,
+        requiredRamMb = 1400, minTier = PerformanceTier.HIGH,
         license = "CC-BY-4.0 (badrex/Ethio-ASR-amharic) - attribution required; data: WAXAL",
         attribution = "Ethio-ASR (Badr M. Abdullah et al., arXiv:2603.23654), w2v-BERT 2.0 fine-tuned on WAXAL Amharic",
         format = "onnx-ctc", recommended = true, experimental = true,
-        qualityRank = 10, measuredWer = 0.235,
+        qualityRank = 10, measuredWer = 0.222,
     )
 
     // ---- Translation --------------------------------------------------------------

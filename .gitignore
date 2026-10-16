@@ -20,3 +20,6 @@ core/speech/src/main/cpp/whisper.cpp/
 *.onnx
 *.gguf
 tests/ai-quality/dataset/clips/*.wav
+
+# chunked browser model: published only on gh-pages
+web/models/ethio-ctc/model.part*
