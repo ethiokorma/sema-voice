@@ -37,6 +37,7 @@ const S = {
     offlineReady: 'The on-device model is ready and works without internet.', offlineNot: 'Not downloaded yet. It downloads automatically the first time you use the on-device engine (about 56 MB, Wi-Fi recommended).',
     lowMem: 'This device reports {mem} GB memory. The on-device model may crash here; the Google engine is safer.',
     confirmClear: 'Tap again to delete all history', noVoice: 'No voice for this language in this browser.',
+    eBest: 'Best accuracy (on this computer)', eBestDesc: 'Our most accurate Amharic model (about 22% word error, vs 60–80% for the small model). Private and offline after a one-time ~400 MB download. Needs a computer or a phone with 8 GB memory.', eBestNo: 'Needs a computer or a phone with 8 GB memory.', bestBadge: 'Most accurate',
   },
   am: {
     speakTitle: 'ይናገሩ', historyTitle: 'ታሪክ', translateTitle: 'ተርጉም', settingsTitle: 'ቅንብሮች',
@@ -64,6 +65,7 @@ const S = {
     offlineReady: 'የስልኩ ሞዴል ዝግጁ ነው፤ ያለ ኢንተርኔት ይሰራል።', offlineNot: 'ገና አልወረደም። የስልኩን ሞተር መጀመሪያ ሲጠቀሙ በራሱ ይወርዳል (56 MB ገደማ፤ Wi-Fi ይመከራል)።',
     lowMem: 'ይህ መሣሪያ {mem} GB ማህደረ ትውስታ አለው። የስልኩ ሞዴል ሊቆም ይችላል፤ የGoogle ሞተር ይሻላል።',
     confirmClear: 'ሁሉንም ታሪክ ለመሰረዝ እንደገና ይንኩ', noVoice: 'በዚህ አሳሽ ለዚህ ቋንቋ ድምጽ የለም።',
+    eBest: 'ምርጥ ትክክለኛነት (በዚህ ኮምፒውተር)', eBestDesc: 'በጣም ትክክለኛው የአማርኛ ሞዴላችን (22% ገደማ ስህተት)። አንድ ጊዜ ~400 MB ከወረደ በኋላ ግላዊና ከመስመር ውጭ ይሰራል። ኮምፒውተር ወይም 8 GB ማህደረ ትውስታ ያለው ስልክ ያስፈልጋል።', eBestNo: 'ኮምፒውተር ወይም 8 GB ማህደረ ትውስታ ያለው ስልክ ያስፈልጋል።', bestBadge: 'በጣም ትክክለኛ',
   },
 };
 let L = S.en;
@@ -164,29 +166,31 @@ function showTab(name) {
 document.querySelectorAll('[data-tab]').forEach((b) => b.addEventListener('click', () => showTab(b.dataset.tab)));
 
 // ---------------------------------------------------------------- engines
-function engineAvailable(e) { return e === 'google' ? !!SR : true; }
+const BEST_MANIFEST = 'models/ethio-ctc/manifest.json';
+function engineAvailable(e) { return e === 'google' ? !!SR : e === 'best' ? (!isPhone || mem >= 8) : true; }
 function engine() { return state.engine && engineAvailable(state.engine) ? state.engine : (SR ? 'google' : 'local'); }
 function setEngine(e) {
   state.engine = e; store.set('engine', e); renderEngineOptions();
   if (e === 'local' && !isPhone) warmLocal(); // phones load the model only when the mic is used
+  if (e === 'best') warmBest();
 }
 function engineCard(e, host, onPick) {
   const avail = engineAvailable(e);
   const b = document.createElement('button');
   b.type = 'button'; b.className = 'opt'; b.setAttribute('role', 'radio');
   b.setAttribute('aria-checked', String(engine() === e && avail)); if (!avail) b.setAttribute('aria-disabled', 'true');
-  const title = e === 'google' ? t('eGoogle') : t('eLocal');
-  const desc = !avail ? t('unavailable') : e === 'google' ? t('eGoogleDesc') : t('eLocalDesc');
-  const badge = e === 'google' ? `<span class="badge">${t('recommended')}</span>` : `<span class="badge">${t('private')}</span>`;
+  const title = { google: t('eGoogle'), local: t('eLocal'), best: t('eBest') }[e];
+  const desc = !avail ? (e === 'best' ? t('eBestNo') : t('unavailable')) : { google: t('eGoogleDesc'), local: t('eLocalDesc'), best: t('eBestDesc') }[e];
+  const badge = e === 'google' ? `<span class="badge">${t('recommended')}</span>` : e === 'best' ? `<span class="badge">${t('bestBadge')}</span>` : `<span class="badge">${t('private')}</span>`;
   b.innerHTML = `<span class="radio"></span><span><span class="opt-title">${title} ${badge}</span><span class="opt-desc">${desc}</span></span>`;
   b.addEventListener('click', () => { if (avail) onPick(e); });
   host.append(b);
 }
 function renderEngineOptions() {
   const host = $('engineOptions'); host.innerHTML = '';
-  ['google', 'local'].forEach((e) => engineCard(e, host, setEngine));
+  ['google', 'best', 'local'].forEach((e) => engineCard(e, host, setEngine));
   const badge = $('engineBadge');
-  badge.textContent = engine() === 'google' ? 'Google' : (state.ui === 'am' ? 'በስልኩ' : 'On-device');
+  badge.textContent = engine() === 'google' ? 'Google' : engine() === 'best' ? (state.ui === 'am' ? 'ምርጥ' : 'Best') : (state.ui === 'am' ? 'በስልኩ' : 'On-device');
   badge.dataset.kind = engine() === 'google' ? 'cloud' : 'local';
 }
 $('engineBadge').addEventListener('click', () => showTab('settings'));
@@ -194,6 +198,10 @@ $('engineBadge').addEventListener('click', () => showTab('settings'));
 function warmLocal() {
   if (workerFailed) return;
   run({ type: 'warm', task: 'automatic-speech-recognition', model: LANGS[state.in].model }, [], true).then(() => { store.set('localReady', true); renderOffline(); }).catch(() => {});
+}
+function warmBest() {
+  if (workerFailed) return;
+  run({ type: 'warm-ctc', manifest: BEST_MANIFEST }, [], true).then(() => store.set('bestReady', true)).catch((err) => setChip(t('modelError'), 'err'));
 }
 function renderOffline() {
   $('offlineInfo').textContent = store.get('localReady', false) ? t('offlineReady') : t('offlineNot');
@@ -294,7 +302,8 @@ let media = null, chunks = [], stream = null, actx = null, levelTimer = 0, media
 async function startLocal() {
   if (workerFailed) { worker = null; workerFailed = false; }
   // Start loading the model now (in the worker) so it is ready by the time you stop talking.
-  run({ type: 'warm', task: 'automatic-speech-recognition', model: LANGS[state.in].model }, [], true).then(() => { store.set('localReady', true); }).catch(() => {});
+  if (engine() === 'best') warmBest();
+  else run({ type: 'warm', task: 'automatic-speech-recognition', model: LANGS[state.in].model }, [], true).then(() => { store.set('localReady', true); }).catch(() => {});
   try { stream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true } }); }
   catch { setStatus(t('micDenied')); return; }
   chunks = []; mediaCancelled = false;
@@ -308,7 +317,7 @@ async function startLocal() {
     levelTimer = setInterval(() => { an.getByteTimeDomainData(buf); let s = 0; for (const v of buf) { const d = (v - 128) / 128; s += d * d; } document.documentElement.style.setProperty('--lvl', Math.min(1, Math.sqrt(s / buf.length) * 4).toFixed(3)); }, 80);
   } catch {}
   resetResult(); showHero(); recordingUi(true, t('listening'));
-  const m = media; setTimeout(() => { if (m.state === 'recording') m.stop(); }, 30000); // one Whisper window
+  const m = media; setTimeout(() => { if (m.state === 'recording') m.stop(); }, engine() === 'best' ? 120000 : 30000); // Whisper: one 30 s window
 }
 function stopLocalStream() {
   clearInterval(levelTimer); document.documentElement.style.setProperty('--lvl', '0');
@@ -323,8 +332,14 @@ async function onLocalStop() {
   try {
     const pcm = await decode16k(blob);
     if (pcm.length < 16000 * 0.3) { setStatus(t('empty')); return; }
-    const samples = pcm.length > 480000 ? pcm.slice(0, 480000) : pcm;
+    const samples = pcm.slice(0, Math.min(pcm.length, 480000)); // always a copy: safe to transfer
     const audioMs = Math.round(samples.length / 16);
+    if (engine() === 'best' && state.in === 'am') {
+      const all = pcm.slice(0, Math.min(pcm.length, 16000 * 120));
+      const r = await run({ type: 'ctc', manifest: BEST_MANIFEST, samples: all }, [all.buffer]);
+      finishResult(r.text, `${(r.ms / 1000).toFixed(1)} s · on-device · Ethio-ASR (best)`, false, 'best');
+      return;
+    }
     const r = await run({ type: 'asr', model: LANGS[state.in].model, samples, language: LANGS[state.in].whisper }, [samples.buffer]);
     const g = guard(r.text.replace(/\s+/g, ' '), audioMs);
     finishResult(g.text, `${(r.ms / 1000).toFixed(1)} s · on-device · ${LANGS[state.in].model.split('/').pop()}`, g.needsReview, 'local');
@@ -471,7 +486,7 @@ $('bannerClose').addEventListener('click', () => ($('banner').hidden = true));
 // ---------------------------------------------------------------- first run
 function openWelcome() {
   const host = $('welcomeOptions');
-  const render = () => { host.innerHTML = ''; ['google', 'local'].forEach((e) => engineCard(e, host, (x) => { state.engine = x; render(); })); };
+  const render = () => { host.innerHTML = ''; ['google', 'best', 'local'].forEach((e) => engineCard(e, host, (x) => { state.engine = x; render(); })); };
   render();
   $('welcome').hidden = false;
 }

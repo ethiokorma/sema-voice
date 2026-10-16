@@ -42,8 +42,98 @@ async function load(task, model, id, slot) {
   return pipe;
 }
 
+// ---- "Best accuracy" engine: Ethio-ASR w2v-BERT CTC via onnxruntime-web (desktop / high-RAM) ----
+// The model is split into <100 MB chunks (GitHub Pages limit), downloaded once and kept in the
+// Cache API. Feature extraction and CTC decoding are the verified ports in ctc.js.
+import { extractFeatures, ctcDecode } from './ctc.js';
+const ORT_VER = '1.22.0';
+let ort = null, ortGpu = false, ctcSession = null, ctcMeta = null, ctcLoading = null;
+
+async function loadCtc(id, manifestUrl) {
+  if (ctcSession) return;
+  if (ctcLoading) return ctcLoading;
+  ctcLoading = (async () => {
+    postMessage({ id, type: 'status', stage: 'loading' });
+    if (!ort) {
+      // WebGPU is disabled: in testing (headless Chrome, 2026-10-15) the WebGPU path ran 2x faster but
+      // produced garbage output for this model. Re-enable only after verifying on real GPUs.
+      const gpu = false;
+      ort = await import(`https://cdn.jsdelivr.net/npm/onnxruntime-web@${ORT_VER}/dist/${gpu ? 'ort.webgpu.min.mjs' : 'ort.wasm.min.mjs'}`);
+      ortGpu = gpu;
+      ort.env.wasm.wasmPaths = `https://cdn.jsdelivr.net/npm/onnxruntime-web@${ORT_VER}/dist/`;
+      // Threads need cross-origin isolation (provided by sw.js); fall back to 1 thread otherwise.
+      ort.env.wasm.numThreads = self.crossOriginIsolated ? Math.min(8, navigator.hardwareConcurrency || 4) : 1;
+    }
+    const base = new URL(manifestUrl, self.location.href);
+    const manifest = await (await fetch(base)).json();
+    const cache = await caches.open('sema-ctc-' + manifest.version);
+    const total = manifest.chunks.reduce((a, c) => a + c.size, 0);
+    const model = new Uint8Array(total);
+    let done = 0, off = 0;
+    for (const c of manifest.chunks) {
+      const url = new URL(c.file, base).href;
+      let resp = await cache.match(url);
+      if (!resp) {
+        const r = await fetch(url);
+        if (!r.ok) throw new Error(`download failed: ${c.file} HTTP ${r.status}`);
+        const reader = r.body.getReader(); const parts = []; let got = 0;
+        for (;;) { const { done: d, value } = await reader.read(); if (d) break; parts.push(value); got += value.length;
+          postMessage({ id, type: 'progress', progress: ((done + got) / total) * 100, loaded: done + got, total }); }
+        const blob = new Blob(parts);
+        // Caching is best-effort (quota, private mode, duplicate entries must not break loading).
+        try { await cache.delete(url); await cache.put(url, new Response(blob)); } catch {}
+        resp = new Response(blob);
+      }
+      const buf = new Uint8Array(await resp.arrayBuffer());
+      if (buf.length !== c.size) { await cache.delete(url); throw new Error(`corrupt chunk ${c.file}`); }
+      model.set(buf, off); off += buf.length; done += c.size;
+      postMessage({ id, type: 'progress', progress: (done / total) * 100, loaded: done, total });
+    }
+    const vocab = manifest.vocab;
+    const idToToken = []; for (const [k, v] of Object.entries(vocab)) idToToken[v] = k;
+    ctcMeta = { idToToken, blank: manifest.blank_id, maskType: manifest.mask_type || 'int32', threads: ort.env.wasm.numThreads };
+    ctcSession = null;
+    if (ortGpu) {
+      try { ctcSession = await ort.InferenceSession.create(model, { executionProviders: ['webgpu'], graphOptimizationLevel: 'all' }); ctcMeta.ep = 'webgpu'; }
+      catch (e) { ctcSession = null; }
+    }
+    if (!ctcSession) { ctcSession = await ort.InferenceSession.create(model, { executionProviders: ['wasm'], graphOptimizationLevel: 'all' }); ctcMeta.ep = 'wasm'; }
+  })().finally(() => { ctcLoading = null; });
+  return ctcLoading;
+}
+
+async function runCtc(samples) {
+  const out = [];
+  const win = 16000 * 20; // 20 s windows bound attention memory
+  for (let s = 0; s < samples.length; s += win) {
+    const chunk = samples.subarray(s, Math.min(samples.length, s + win));
+    if (chunk.length < 8000) continue;
+    const { data, frames, dim } = extractFeatures(chunk);
+    if (!frames) continue;
+    const feeds = { input_features: new ort.Tensor('float32', data, [1, frames, dim]) };
+    if (ctcSession.inputNames.includes('attention_mask')) {
+      feeds.attention_mask = ctcMeta.maskType === 'int64'
+        ? new ort.Tensor('int64', new BigInt64Array(frames).fill(1n), [1, frames])
+        : new ort.Tensor('int32', new Int32Array(frames).fill(1), [1, frames]);
+    }
+    const res = await ctcSession.run(feeds);
+    const logits = res[ctcSession.outputNames[0]];
+    out.push(ctcDecode(logits.data, logits.dims[1], logits.dims[2], ctcMeta.idToToken, ctcMeta.blank));
+  }
+  return out.join(' ').trim();
+}
+
 self.onmessage = async ({ data: m }) => {
   try {
+    if (m.type === 'ctc') {
+      await loadCtc(m.id, m.manifest);
+      postMessage({ id: m.id, type: 'status', stage: 'transcribing' });
+      const t0 = performance.now();
+      const text = await runCtc(m.samples);
+      postMessage({ id: m.id, type: 'result', text, ms: Math.round(performance.now() - t0), ep: ctcMeta.ep, threads: ctcMeta.threads });
+      return;
+    }
+    if (m.type === 'warm-ctc') { await loadCtc(m.id, m.manifest); postMessage({ id: m.id, type: 'result', text: '', ms: 0 }); return; }
     if (m.type === 'asr') {
       const asr = await get('automatic-speech-recognition', m.model, m.id);
       postMessage({ id: m.id, type: 'status', stage: 'transcribing' });
