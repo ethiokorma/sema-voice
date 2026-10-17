@@ -220,3 +220,10 @@ body.busy .mic::after { content: ""; position: absolute; inset: -7px; border-rad
 .input { display: block; width: 100%; box-sizing: border-box; margin: 8px 0 0; padding: 11px 12px; border-radius: 12px; border: 1px solid var(--line);
   background: var(--surface-2); color: var(--text); font: inherit; font-size: 15px; }
 .input:focus { outline: 2px solid var(--brand); outline-offset: 1px; }
+
+/* last recording: play / try again */
+.clip-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.chip-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 999px; border: 1px solid var(--line);
+  background: var(--surface-2); color: var(--text); font: inherit; font-size: 14px; cursor: pointer; }
+.chip-btn .ico { width: 16px; height: 16px; }
+.chip-btn.attn { border-color: var(--brand); color: var(--brand); }
