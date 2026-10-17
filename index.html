@@ -132,6 +132,15 @@
       <h2 class="sec" data-i18n="engineSec">Recognition engine</h2>
       <div class="options" id="engineOptions"></div>
 
+      <h2 class="sec" data-i18n="serverSec">Sema server</h2>
+      <div class="card pad">
+        <p class="small" data-i18n="serverHelp">Use the most accurate model running on your own computer. Open the link shown by the server, or paste its address and key here.</p>
+        <input id="srvUrl" class="input" type="url" inputmode="url" autocomplete="off" placeholder="https://....trycloudflare.com">
+        <input id="srvKey" class="input" type="password" autocomplete="off" data-i18n-ph="serverKeyPh" placeholder="Access key">
+        <div class="row"><button class="btn" id="srvSave" type="button" data-i18n="serverTest">Save &amp; test</button><button class="btn ghost" id="srvForget" type="button" data-i18n="serverForget">Forget</button></div>
+        <p class="small" id="srvStatus"></p>
+      </div>
+
       <h2 class="sec" data-i18n="langSec">Languages</h2>
       <div class="card list-card">
         <label class="li"><span data-i18n="spokenLang">I speak</span><select id="inLang" class="select"></select></label>
@@ -151,7 +160,7 @@
         <button class="li" id="clearHistory" type="button"><span class="danger-t" data-i18n="clearHistory">Delete all history</span></button>
         <div class="li col"><span data-i18n="diagnostics">Diagnostics</span><code id="diag" class="diag"></code></div>
       </div>
-      <p class="note" data-i18n="privacy">On-device engines keep your audio in this browser. The Google engine sends audio to Google. History is saved only on this device.</p>
+      <p class="note" data-i18n="privacy">On-device engines keep your audio in this browser. The Google engine sends audio to Google. The Sema server engine sends audio only to the server address you set. History is saved only on this device.</p>
       <select id="mode" hidden aria-hidden="true"><option value="exact">exact</option><option value="clean" selected>clean</option><option value="translate">translate</option></select>
     </section>
   </main>

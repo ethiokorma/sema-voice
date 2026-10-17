@@ -215,3 +215,8 @@ body.busy .mic::after { content: ""; position: absolute; inset: -7px; border-rad
 .gk.form { background: var(--brand); color: #fff; border-color: var(--brand); font-size: 20px; }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+/* text inputs (Sema server settings) */
+.input { display: block; width: 100%; box-sizing: border-box; margin: 8px 0 0; padding: 11px 12px; border-radius: 12px; border: 1px solid var(--line);
+  background: var(--surface-2); color: var(--text); font: inherit; font-size: 15px; }
+.input:focus { outline: 2px solid var(--brand); outline-offset: 1px; }
