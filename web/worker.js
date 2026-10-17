@@ -102,11 +102,26 @@ async function loadCtc(id, manifestUrl) {
   return ctcLoading;
 }
 
+function splitAtSilence(x, maxS, searchS) {
+  const SR = 16000, out = [], hop = 800, maxN = maxS * SR, srch = searchS * SR;
+  let start = 0;
+  while (x.length - start > maxN) {
+    const lo = start + maxN - srch, k = Math.floor(srch / hop), e = new Float64Array(k);
+    for (let i = 0; i < k; i++) { let a = 0; for (let j = 0; j < hop; j++) { const v = x[lo + i * hop + j]; a += v * v; } e[i] = a; }
+    let best = 0, bv = Infinity;
+    for (let i = 0; i < k; i++) { let a = 0, c = 0; for (let d = -3; d <= 2; d++) { const q = i + d; if (q >= 0 && q < k) { a += e[q]; c++; } } a /= c; if (a < bv) { bv = a; best = i; } }
+    const cut = lo + best * hop + hop / 2;
+    out.push(x.subarray(start, cut)); start = cut;
+  }
+  out.push(x.subarray(start));
+  return out;
+}
+
 async function runCtc(samples) {
   const out = [];
-  const win = 16000 * 20; // 20 s windows bound attention memory
-  for (let s = 0; s < samples.length; s += win) {
-    const chunk = samples.subarray(s, Math.min(samples.length, s + win));
+  // Pieces of at most 20 s (bounds browser memory), cut at the quietest moment rather than at a fixed
+  // 20 s mark: fixed cuts split words and cost about 1 WER point on FLEURS.
+  for (const chunk of splitAtSilence(samples, 20, 6)) {
     if (chunk.length < 8000) continue;
     const { data, frames, dim } = extractFeatures(chunk);
     if (!frames) continue;

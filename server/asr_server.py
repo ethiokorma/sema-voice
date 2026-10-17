@@ -3,6 +3,7 @@ WER 0.222 on FLEURS) natively on this PC, so any browser (phone, iPhone, desktop
 
     python server/asr_server.py --model dist/release-models/ethio-asr-ctc-v2-model_int8.onnx \
         --vocab dist/models/ethio-asr-ctc/vocab.json --port 8765 [--token SECRET]
+        [--lm server/lm/amharic-wiki-3gram.npz <scratch>/amharic-web-3gram.npz]   # optional LM beam search
 
 API (CORS open; every request except /v1/health needs "Authorization: Bearer <token>"):
     GET  /v1/health                -> {"ok": true, "model": ..., "busy": bool}
@@ -28,6 +29,8 @@ import onnxruntime as ort
 SR = 16000
 MAX_SECONDS = 120
 FRAME, HOP, NFFT, MELS, STRIDE = 400, 160, 512, 80, 2
+# CTC + word 3-gram LM settings tuned on FLEURS am_et dev (docs/AMHARIC_LM.md); used only with --lm
+LM_DEFAULTS = {"alpha": 0.35, "beta": 2.0, "beam": 16, "char_weight": 0.3, "char_bonus": 1.5}
 
 
 def _mel_bank() -> np.ndarray:
@@ -64,8 +67,26 @@ def features(x: np.ndarray) -> np.ndarray:
     return lm[: f * STRIDE].reshape(f, MELS * STRIDE)[None].astype(np.float32)
 
 
+def split_at_silence(x: np.ndarray, max_s: float = 40.0, search_s: float = 10.0):
+    """Splits long audio into pieces of at most max_s seconds, cutting at the quietest 0.3 s inside
+    the last search_s seconds of each piece. Fixed 20 s cuts split words and cost about 1 WER point
+    on FLEURS (0.222 whole-clip vs 0.234 with 20 s windows, 2026-10-16)."""
+    out, start, n = [], 0, len(x)
+    maxn, srch, hop = int(max_s * SR), int(search_s * SR), int(0.05 * SR)
+    while n - start > maxn:
+        lo, hi = start + maxn - srch, start + maxn
+        seg = x[lo:hi]
+        k = len(seg) // hop
+        e = np.square(seg[: k * hop].reshape(k, hop)).mean(1)
+        e = np.convolve(e, np.ones(6) / 6, mode="same")  # 0.3 s smoothing
+        cut = lo + int(np.argmin(e)) * hop + hop // 2
+        out.append(x[start:cut]); start = cut
+    out.append(x[start:])
+    return out
+
+
 class Engine:
-    def __init__(self, model: str, vocab: str, threads: int):
+    def __init__(self, model: str, vocab: str, threads: int, lm_decoder=None):
         so = ort.SessionOptions()
         so.intra_op_num_threads = threads
         self.sess = ort.InferenceSession(model, so, providers=["CPUExecutionProvider"])
@@ -74,6 +95,7 @@ class Engine:
         self.blank = v["[PAD]"]
         self.inputs = {i.name: i.type for i in self.sess.get_inputs()}
         self.name = os.path.basename(model)
+        self.lm = lm_decoder  # optional lm.decoder.LmDecoder (word n-gram beam search); None = greedy
         self.lock = threading.Lock()  # one transcription at a time keeps memory and latency predictable
 
     def _decode(self, logits: np.ndarray) -> str:
@@ -89,10 +111,8 @@ class Engine:
 
     def transcribe(self, x: np.ndarray) -> str:
         parts = []
-        win = SR * 20  # 20 s windows bound attention memory
         with self.lock:
-            for s in range(0, len(x), win):
-                chunk = x[s : s + win]
+            for chunk in split_at_silence(x):
                 if len(chunk) < SR // 2:
                     continue
                 f = features(chunk)
@@ -100,7 +120,8 @@ class Engine:
                 if "attention_mask" in self.inputs:
                     dt = np.int64 if "int64" in self.inputs["attention_mask"] else np.int32
                     feeds["attention_mask"] = np.ones(f.shape[:2], dt)
-                parts.append(self._decode(self.sess.run(None, feeds)[0][0]))
+                logits = self.sess.run(None, feeds)[0][0]
+                parts.append(self.lm.decode(logits) if self.lm else self._decode(logits))
         return " ".join(p for p in parts if p).strip()
 
 
@@ -153,6 +174,7 @@ def make_handler(engine: Engine, token: str):
         def do_GET(self):
             if self.path.split("?")[0] == "/v1/health":
                 return self._send(200, {"ok": True, "model": engine.name, "busy": engine.lock.locked(),
+                                        "decoder": "ctc-lm-beam" if engine.lm else "ctc-greedy",
                                         "auth": self._authed()})
             self._send(404, {"error": "not found"})
 
@@ -184,6 +206,14 @@ def main():
     ap.add_argument("--port", type=int, default=8765)
     ap.add_argument("--threads", type=int, default=os.cpu_count() or 4)
     ap.add_argument("--token", default=os.environ.get("SEMA_TOKEN"))
+    ap.add_argument("--lm", nargs="+", help="word 3-gram LM .npz file(s) from tools/build_amharic_lm.py -> CTC beam "
+                    "search instead of greedy; tuned setup: server/lm/amharic-wiki-3gram.npz amharic-web-3gram.npz")
+    ap.add_argument("--lm-weights", type=float, nargs="*", help="log-linear weights per LM (default equal)")
+    ap.add_argument("--lm-alpha", type=float, default=LM_DEFAULTS["alpha"])
+    ap.add_argument("--lm-beta", type=float, default=LM_DEFAULTS["beta"])
+    ap.add_argument("--lm-beam", type=int, default=LM_DEFAULTS["beam"])
+    ap.add_argument("--lm-char-weight", type=float, default=LM_DEFAULTS["char_weight"])
+    ap.add_argument("--lm-char-bonus", type=float, default=LM_DEFAULTS["char_bonus"])
     a = ap.parse_args()
     token_file = os.path.join(root, "server", ".token")
     if not a.token:
@@ -192,7 +222,15 @@ def main():
         else:
             a.token = secrets.token_urlsafe(18)
             open(token_file, "w").write(a.token)
-    engine = Engine(a.model, a.vocab, a.threads)
+    dec = None
+    if a.lm:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from lm.decoder import LmDecoder
+        dec = LmDecoder(a.lm, a.vocab, alpha=a.lm_alpha, beta=a.lm_beta, beam=a.lm_beam, char_weight=a.lm_char_weight,
+                        char_bonus=a.lm_char_bonus, lm_weights=a.lm_weights)
+        print(f"LM beam search: {[os.path.basename(p) for p in a.lm]} alpha={a.lm_alpha} beta={a.lm_beta} "
+              f"beam={a.lm_beam}", flush=True)
+    engine = Engine(a.model, a.vocab, a.threads, dec)
     print(f"Sema Voice ASR server on http://{a.host}:{a.port}  model={engine.name}", flush=True)
     print(f"Access key: {a.token}", flush=True)
     ThreadingHTTPServer((a.host, a.port), make_handler(engine, a.token)).serve_forever()

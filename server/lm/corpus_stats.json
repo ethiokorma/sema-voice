@@ -1,0 +1,23 @@
+{
+ "wikipedia": {
+  "documents": 13906,
+  "sentences_raw": 217957,
+  "dropped_non_ethiopic": 22642,
+  "dropped_charset_or_short": 41944,
+  "sentences_kept": 121218,
+  "words_kept": 1361045,
+  "dropped_duplicate": 32153
+ },
+ "fineweb2": {
+  "documents": 428373,
+  "sentences_raw": 21837174,
+  "dropped_charset_or_short": 1879682,
+  "dropped_duplicate": 3234925,
+  "sentences_kept": 10005898,
+  "words_kept": 148597375,
+  "dropped_non_ethiopic": 6716654,
+  "leak_removed_near": 15
+ },
+ "fleurs_reference_texts": 420,
+ "fleurs_references_hit_by_removed_sentences": 12
+}

@@ -25,3 +25,6 @@ tests/ai-quality/dataset/clips/*.wav
 web/models/ethio-ctc/model.part*
 server/.token
 server/connect.html
+server/lm/*.npz
+server/lm/__pycache__/
+__pycache__/

@@ -61,3 +61,13 @@ verified before a file is ever loaded.
 
 `msrbuilds/voice-studio` is MIT and is supported as an optional remote server through its
 documented `POST /api/synthesize` endpoint; none of its code is included.
+
+## Language-model text (server only, `server/lm/*.npz`)
+
+* Amharic Wikipedia (`wikimedia/wikipedia` 20231101.am): CC BY-SA 3.0 / 4.0 and GFDL. The wiki
+  3-gram LM is treated as CC BY-SA. Attribution: Wikipedia contributors, https://am.wikipedia.org
+* FineWeb-2 `amh_Ethi` (HuggingFaceFW/fineweb-2): ODC-By 1.0, plus the Common Crawl Terms of Use.
+  ODC-By covers the compilation, not the copyright of each web page. The n-gram model stores counts
+  and does not reproduce text verbatim.
+* FLoRes-derived sets (FLEURS test text) were excluded and filtered out to prevent leakage. So were
+  non-commercial and unknown-licence corpora. See `docs/AMHARIC_LM.md`.

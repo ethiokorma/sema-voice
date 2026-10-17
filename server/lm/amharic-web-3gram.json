@@ -1,0 +1,26 @@
+{
+ "order": 3,
+ "smoothing": "interpolated modified Kneser-Ney, count-pruned, backoff form",
+ "vocab": 500003,
+ "corpus_tokens": 149958420,
+ "corpus_oov_rate": 0.03160882196544882,
+ "trigram_types": 102370129,
+ "stored_trigrams": 5095477,
+ "bigram_types": 42917824,
+ "stored_bigrams": 10317198,
+ "min_count2": 2,
+ "min_count3": 3,
+ "D2": [
+  0.0,
+  0.7776977229886853,
+  1.1162913038752222,
+  1.3711753812129122
+ ],
+ "D3": [
+  0.0,
+  0.858328530524729,
+  1.2882203644547778,
+  1.4492521728894594
+ ],
+ "file_bytes": 229994900
+}

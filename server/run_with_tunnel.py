@@ -21,6 +21,36 @@ import webbrowser
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 APP_URL = "https://ethiokorma.github.io/sema-voice/"
 PORT = 8765
+# Amharic word LMs for CTC beam search (docs/AMHARIC_LM.md): about 7 % fewer word errors on FLEURS test.
+LM_BASE = "https://github.com/ethiokorma/sema-voice/releases/download/models-2026.10/"
+LMS = {"amharic-wiki-3gram.npz": "2d55f337473a138a6f669f17112f00a8cb71f7350e9d535c5bf3398c28690a16",
+       "amharic-web-3gram.npz": "357ba1378bcbb5ce1479672c6899d690ef52f4c5111bfe5e2805f8dbef5648d3"}
+
+
+def ensure_lms() -> list:
+    """Downloads the LM files once (about 270 MB) and checks their SHA-256. Returns [] on failure,
+    in which case the server runs without an LM (plain decoding) rather than not at all."""
+    import hashlib
+    paths = []
+    for name, sha in LMS.items():
+        path = os.path.join(ROOT, "server", "lm", name)
+        if not os.path.exists(path):
+            print(f"Downloading {name} (one time)...", flush=True)
+            try:
+                urllib.request.urlretrieve(LM_BASE + name, path + ".part")
+                os.replace(path + ".part", path)
+            except Exception as e:
+                print(f"  download failed: {e}; continuing without the language model", flush=True)
+                return []
+        h = hashlib.sha256()
+        with open(path, "rb") as f:
+            for b in iter(lambda: f.read(1 << 20), b""):
+                h.update(b)
+        if h.hexdigest() != sha:
+            print(f"  {name} is corrupt (checksum mismatch); delete it and restart. Continuing without the LM.", flush=True)
+            return []
+        paths.append(path)
+    return paths
 
 
 def find_cloudflared() -> str:
@@ -67,7 +97,8 @@ code{{word-break:break-all;font-size:12px;color:#667085}} a{{color:#4F46E5}}</st
 
 def main():
     py = sys.executable
-    srv = subprocess.Popen([py, os.path.join(ROOT, "server", "asr_server.py"), "--port", str(PORT)],
+    lms = ensure_lms()
+    srv = subprocess.Popen([py, os.path.join(ROOT, "server", "asr_server.py"), "--port", str(PORT)] + (["--lm", *lms] if lms else []),
                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, encoding="utf-8")
     key = None
     for line in srv.stdout:
