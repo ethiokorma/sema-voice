@@ -12,6 +12,9 @@ const store = {
 // ---------------------------------------------------------------- strings (en / am)
 const S = {
   en: {
+    eServer: 'Sema server (most accurate)', eServerDesc: 'Our best Amharic model (about 22% word error) running on your own computer. Works in any browser, including iPhone. Audio goes only to your server.', eServerNo: 'Not connected. Open the link from your Sema server, or add it under Sema server below.', serverBadge: 'Best',
+    serverSec: 'Sema server', serverHelp: 'Use the most accurate model running on your own computer. Open the link shown by the server, or paste its address and key here.', serverKeyPh: 'Access key', serverTest: 'Save & test', serverForget: 'Forget',
+    srvOk: 'Connected: {model}', srvBadKey: 'The server is reachable but the access key is wrong.', srvDown: 'Cannot reach the server. Is it running, and is the address right?', srvBusy: 'Sending audio to your Sema server…', srvLinked: 'Sema server connected. It is now your recognition engine.',
     speakTitle: 'Speak', historyTitle: 'History', translateTitle: 'Translate', settingsTitle: 'Settings',
     tabSpeak: 'Speak', tabHistory: 'History', tabTranslate: 'Translate', tabSettings: 'Settings',
     modeExact: 'Exact', modeClean: 'Clean', modeTranslate: '+ English',
@@ -40,6 +43,9 @@ const S = {
     eBest: 'Best accuracy (on this computer)', eBestDesc: 'Our most accurate Amharic model (about 22% word error, vs 60–80% for the small model). Private and offline after a one-time ~430 MB download. Needs a computer or a phone with 8 GB memory.', eBestNo: 'Needs a computer or a phone with 8 GB memory.', bestBadge: 'Most accurate',
   },
   am: {
+    eServer: 'ሰማ ሰርቨር (በጣም ትክክለኛ)', eServerDesc: 'ምርጡ የአማርኛ ሞዴላችን (~22% የቃል ስህተት) በራስዎ ኮምፒውተር ላይ ይሰራል። በማንኛውም አሳሽ፣ iPhone ጨምሮ ይሰራል። ድምጽ ወደ ሰርቨርዎ ብቻ ይሄዳል።', eServerNo: 'አልተገናኘም። ከሰማ ሰርቨርዎ የሚመጣውን ሊንክ ይክፈቱ ወይም ከታች ያክሉት።', serverBadge: 'ምርጥ',
+    serverSec: 'ሰማ ሰርቨር', serverHelp: 'በራስዎ ኮምፒውተር ላይ የሚሰራውን በጣም ትክክለኛ ሞዴል ይጠቀሙ። ሰርቨሩ የሚያሳየውን ሊንክ ይክፈቱ ወይም አድራሻውንና ቁልፉን እዚህ ይለጥፉ።', serverKeyPh: 'የመግቢያ ቁልፍ', serverTest: 'አስቀምጥና ሞክር', serverForget: 'እርሳ',
+    srvOk: 'ተገናኝቷል፦ {model}', srvBadKey: 'ሰርቨሩ ይገኛል ግን ቁልፉ ትክክል አይደለም።', srvDown: 'ሰርቨሩን ማግኘት አልተቻለም። እየሰራ ነው? አድራሻው ትክክል ነው?', srvBusy: 'ድምጽ ወደ ሰማ ሰርቨርዎ እየተላከ ነው…', srvLinked: 'ሰማ ሰርቨር ተገናኝቷል። አሁን የማወቂያ ሞተርዎ ነው።',
     speakTitle: 'ይናገሩ', historyTitle: 'ታሪክ', translateTitle: 'ተርጉም', settingsTitle: 'ቅንብሮች',
     tabSpeak: 'ይናገሩ', tabHistory: 'ታሪክ', tabTranslate: 'ተርጉም', tabSettings: 'ቅንብሮች',
     modeExact: 'ልክ', modeClean: 'ንጹህ', modeTranslate: '+ እንግሊዝኛ',
@@ -94,6 +100,19 @@ const state = {
   ui: store.get('ui', navigator.language.startsWith('am') ? 'am' : 'en'),
 };
 if (!LANGS[state.in]) state.in = 'am';
+// Sema server (self-hosted best model). A link like  .../#server=<url>&key=<key>  configures it in one tap.
+// The key travels in the #fragment, which browsers never send to GitHub Pages.
+let server = store.get('server', null);
+let serverLinked = false;
+(() => {
+  const h = new URLSearchParams(location.hash.slice(1));
+  const u = h.get('server'), k = h.get('key');
+  if (u && k) {
+    server = { url: u.replace(/\/+$/, ''), key: k }; store.set('server', server);
+    state.engine = 'server'; store.set('engine', 'server'); serverLinked = true;
+    history.replaceState(null, '', location.pathname + location.search);
+  }
+})();
 
 // ---------------------------------------------------------------- crash detection
 // A "stage" marker is written before heavy work and cleared after. If it is still present on
@@ -160,14 +179,14 @@ function showTab(name) {
   document.querySelectorAll('[data-tab]').forEach((b) => b.classList.toggle('on', b.dataset.tab === name));
   $('screenTitle').textContent = t($('screen-' + name).dataset.title);
   if (name === 'history') renderHistory();
-  if (name === 'settings') renderDiag();
+  if (name === 'settings') { renderDiag(); renderServer(); }
   scrollTo({ top: 0 });
 }
 document.querySelectorAll('[data-tab]').forEach((b) => b.addEventListener('click', () => showTab(b.dataset.tab)));
 
 // ---------------------------------------------------------------- engines
 const BEST_MANIFEST = 'models/ethio-ctc/manifest.json';
-function engineAvailable(e) { return e === 'google' ? !!SR : e === 'best' ? (!isPhone || mem >= 8) : true; }
+function engineAvailable(e) { return e === 'google' ? !!SR : e === 'best' ? (!isPhone || mem >= 8) : e === 'server' ? !!server : true; }
 function engine() { return state.engine && engineAvailable(state.engine) ? state.engine : (SR ? 'google' : 'local'); }
 function setEngine(e) {
   state.engine = e; store.set('engine', e); renderEngineOptions();
@@ -179,19 +198,19 @@ function engineCard(e, host, onPick) {
   const b = document.createElement('button');
   b.type = 'button'; b.className = 'opt'; b.setAttribute('role', 'radio');
   b.setAttribute('aria-checked', String(engine() === e && avail)); if (!avail) b.setAttribute('aria-disabled', 'true');
-  const title = { google: t('eGoogle'), local: t('eLocal'), best: t('eBest') }[e];
-  const desc = !avail ? (e === 'best' ? t('eBestNo') : t('unavailable')) : { google: t('eGoogleDesc'), local: t('eLocalDesc'), best: t('eBestDesc') }[e];
-  const badge = e === 'google' ? `<span class="badge">${t('recommended')}</span>` : e === 'best' ? `<span class="badge">${t('bestBadge')}</span>` : `<span class="badge">${t('private')}</span>`;
+  const title = { google: t('eGoogle'), local: t('eLocal'), best: t('eBest'), server: t('eServer') }[e];
+  const desc = !avail ? (e === 'best' ? t('eBestNo') : e === 'server' ? t('eServerNo') : t('unavailable')) : { google: t('eGoogleDesc'), local: t('eLocalDesc'), best: t('eBestDesc'), server: t('eServerDesc') }[e];
+  const badge = e === 'google' ? `<span class="badge">${t('recommended')}</span>` : e === 'best' ? `<span class="badge">${t('bestBadge')}</span>` : e === 'server' ? `<span class="badge">${t('serverBadge')}</span>` : `<span class="badge">${t('private')}</span>`;
   b.innerHTML = `<span class="radio"></span><span><span class="opt-title">${title} ${badge}</span><span class="opt-desc">${desc}</span></span>`;
   b.addEventListener('click', () => { if (avail) onPick(e); });
   host.append(b);
 }
 function renderEngineOptions() {
   const host = $('engineOptions'); host.innerHTML = '';
-  ['google', 'best', 'local'].forEach((e) => engineCard(e, host, setEngine));
+  ['server', 'google', 'best', 'local'].forEach((e) => engineCard(e, host, setEngine));
   const badge = $('engineBadge');
-  badge.textContent = engine() === 'google' ? 'Google' : engine() === 'best' ? (state.ui === 'am' ? 'ምርጥ' : 'Best') : (state.ui === 'am' ? 'በስልኩ' : 'On-device');
-  badge.dataset.kind = engine() === 'google' ? 'cloud' : 'local';
+  badge.textContent = engine() === 'google' ? 'Google' : engine() === 'server' ? (state.ui === 'am' ? 'ሰርቨር' : 'Server') : engine() === 'best' ? (state.ui === 'am' ? 'ምርጥ' : 'Best') : (state.ui === 'am' ? 'በስልኩ' : 'On-device');
+  badge.dataset.kind = engine() === 'google' || engine() === 'server' ? 'cloud' : 'local';
 }
 $('engineBadge').addEventListener('click', () => showTab('settings'));
 
@@ -208,6 +227,42 @@ function renderOffline() {
   if (mem && mem <= 4) $('offlineInfo').textContent += ' ' + t('lowMem', { mem });
 }
 $('warm').addEventListener('click', warmLocal);
+
+async function serverHealth(cfg) {
+  const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 10000);
+  try {
+    const r = await fetch(cfg.url + '/v1/health', { headers: { Authorization: 'Bearer ' + cfg.key }, signal: ctl.signal, cache: 'no-store' });
+    const j = await r.json();
+    return j.auth ? { ok: true, msg: t('srvOk', { model: j.model }) } : { ok: false, msg: t('srvBadKey') };
+  } catch { return { ok: false, msg: t('srvDown') }; } finally { clearTimeout(tm); }
+}
+async function serverTranscribe(samples) {
+  const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 180000);
+  try {
+    const r = await fetch(server.url + '/v1/transcribe', { method: 'POST', body: samples, signal: ctl.signal,
+      headers: { Authorization: 'Bearer ' + server.key, 'Content-Type': 'application/octet-stream' } });
+    const j = await r.json().catch(() => ({}));
+    if (r.status === 401) throw new Error(t('srvBadKey'));
+    if (!r.ok) throw new Error(j.error || 'HTTP ' + r.status);
+    return j;
+  } catch (err) { if (err.name === 'AbortError' || err instanceof TypeError) throw new Error(t('srvDown')); throw err; }
+  finally { clearTimeout(tm); }
+}
+function renderServer() {
+  $('srvUrl').value = server?.url || ''; $('srvKey').value = server?.key || ''; $('srvStatus').textContent = '';
+}
+$('srvSave').addEventListener('click', async () => {
+  const url = $('srvUrl').value.trim().replace(/\/+$/, ''), key = $('srvKey').value.trim();
+  if (!/^https?:\/\//.test(url) || !key) { $('srvStatus').textContent = t('srvDown'); return; }
+  $('srvStatus').textContent = '…';
+  const h = await serverHealth({ url, key });
+  $('srvStatus').textContent = h.msg;
+  if (h.ok) { server = { url, key }; store.set('server', server); setEngine('server'); }
+});
+$('srvForget').addEventListener('click', () => {
+  server = null; store.del('server'); if (state.engine === 'server') { state.engine = null; store.del('engine'); }
+  renderServer(); renderEngineOptions();
+});
 
 // ---------------------------------------------------------------- languages
 function renderLangPair() {
@@ -302,7 +357,8 @@ let media = null, chunks = [], stream = null, actx = null, levelTimer = 0, media
 async function startLocal() {
   if (workerFailed) { worker = null; workerFailed = false; }
   // Start loading the model now (in the worker) so it is ready by the time you stop talking.
-  if (engine() === 'best') warmBest();
+  if (engine() === 'server') { /* nothing to load: the model runs on your server */ }
+  else if (engine() === 'best') warmBest();
   else run({ type: 'warm', task: 'automatic-speech-recognition', model: LANGS[state.in].model }, [], true).then(() => { store.set('localReady', true); }).catch(() => {});
   try { stream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true } }); }
   catch { setStatus(t('micDenied')); return; }
@@ -317,7 +373,7 @@ async function startLocal() {
     levelTimer = setInterval(() => { an.getByteTimeDomainData(buf); let s = 0; for (const v of buf) { const d = (v - 128) / 128; s += d * d; } document.documentElement.style.setProperty('--lvl', Math.min(1, Math.sqrt(s / buf.length) * 4).toFixed(3)); }, 80);
   } catch {}
   resetResult(); showHero(); recordingUi(true, t('listening'));
-  const m = media; setTimeout(() => { if (m.state === 'recording') m.stop(); }, engine() === 'best' ? 120000 : 30000); // Whisper: one 30 s window
+  const m = media; setTimeout(() => { if (m.state === 'recording') m.stop(); }, engine() === 'best' || engine() === 'server' ? 120000 : 30000); // Whisper: one 30 s window
 }
 function stopLocalStream() {
   clearInterval(levelTimer); document.documentElement.style.setProperty('--lvl', '0');
@@ -334,6 +390,13 @@ async function onLocalStop() {
     if (pcm.length < 16000 * 0.3) { setStatus(t('empty')); return; }
     const samples = pcm.slice(0, Math.min(pcm.length, 480000)); // always a copy: safe to transfer
     const audioMs = Math.round(samples.length / 16);
+    if (engine() === 'server' && state.in === 'am') {
+      setStatus(t('srvBusy'));
+      const all = pcm.slice(0, Math.min(pcm.length, 16000 * 120));
+      const r = await serverTranscribe(all);
+      finishResult(r.text, `${(r.ms / 1000).toFixed(1)} s · Sema server · Ethio-ASR`, false, 'server');
+      return;
+    }
     if (engine() === 'best' && state.in === 'am') {
       const all = pcm.slice(0, Math.min(pcm.length, 16000 * 120));
       const r = await run({ type: 'ctc', manifest: BEST_MANIFEST, samples: all }, [all.buffer]);
@@ -486,7 +549,7 @@ $('bannerClose').addEventListener('click', () => ($('banner').hidden = true));
 // ---------------------------------------------------------------- first run
 function openWelcome() {
   const host = $('welcomeOptions');
-  const render = () => { host.innerHTML = ''; ['google', 'best', 'local'].forEach((e) => engineCard(e, host, (x) => { state.engine = x; render(); })); };
+  const render = () => { host.innerHTML = ''; ['server', 'google', 'best', 'local'].forEach((e) => engineCard(e, host, (x) => { state.engine = x; render(); })); };
   render();
   $('welcome').hidden = false;
 }
@@ -496,7 +559,8 @@ $('welcomeGo').addEventListener('click', () => { setEngine(engine()); store.set(
 applyLang();
 showTab('speak');
 showHero();
-if (!store.get('welcomed', false)) openWelcome();
+if (serverLinked) { store.set('welcomed', true); toast(t('srvLinked')); serverHealth(server).then((h) => { if (!h.ok) banner(h.msg, t('dismiss'), () => {}); }); }
+else if (!store.get('welcomed', false)) openWelcome();
 if (crashed && ['loading', 'transcribing'].includes(crashed.s)) {
   banner(t('crashed', { stage: t('stage_' + crashed.s) }), SR ? t('useGoogle') : t('dismiss'), () => { if (SR) setEngine('google'); });
 }

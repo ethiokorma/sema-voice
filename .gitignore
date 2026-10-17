@@ -23,3 +23,5 @@ tests/ai-quality/dataset/clips/*.wav
 
 # chunked browser model: published only on gh-pages
 web/models/ethio-ctc/model.part*
+server/.token
+server/connect.html
