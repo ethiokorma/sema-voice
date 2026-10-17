@@ -12,6 +12,8 @@ const store = {
 // ---------------------------------------------------------------- strings (en / am)
 const S = {
   en: {
+    playRec: 'Play recording', retry: 'Try again', newNote: 'New note', recSaved: 'Your recording is saved. Tap “Try again” to transcribe it again.', stopPlay: 'Stop',
+    restored: 'Your last note was restored.',
     eServer: 'Sema server (most accurate)', eServerDesc: 'Our best Amharic model (about 22% word error) running on your own computer. Works in any browser, including iPhone. Audio goes only to your server.', eServerNo: 'Not connected. Open the link from your Sema server, or add it under Sema server below.', serverBadge: 'Best',
     serverSec: 'Sema server', serverHelp: 'Use the most accurate model running on your own computer. Open the link shown by the server, or paste its address and key here.', serverKeyPh: 'Access key', serverTest: 'Save & test', serverForget: 'Forget',
     srvOk: 'Connected: {model}', srvBadKey: 'The server is reachable but the access key is wrong.', srvDown: 'Cannot reach the server. Is it running, and is the address right?', srvBusy: 'Sending audio to your Sema server…', srvLinked: 'Sema server connected. It is now your recognition engine.',
@@ -43,6 +45,8 @@ const S = {
     eBest: 'Best accuracy (on this computer)', eBestDesc: 'Our most accurate Amharic model (about 22% word error, vs 60–80% for the small model). Private and offline after a one-time ~430 MB download. Needs a computer or a phone with 8 GB memory.', eBestNo: 'Needs a computer or a phone with 8 GB memory.', bestBadge: 'Most accurate',
   },
   am: {
+    playRec: 'ቅጂውን አጫውት', retry: 'እንደገና ሞክር', newNote: 'አዲስ ማስታወሻ', recSaved: 'ቅጂዎ ተቀምጧል። እንደገና ለመጻፍ “እንደገና ሞክር” ይንኩ።', stopPlay: 'አቁም',
+    restored: 'የመጨረሻው ማስታወሻዎ ተመልሷል።',
     eServer: 'ሰማ ሰርቨር (በጣም ትክክለኛ)', eServerDesc: 'ምርጡ የአማርኛ ሞዴላችን (~22% የቃል ስህተት) በራስዎ ኮምፒውተር ላይ ይሰራል። በማንኛውም አሳሽ፣ iPhone ጨምሮ ይሰራል። ድምጽ ወደ ሰርቨርዎ ብቻ ይሄዳል።', eServerNo: 'አልተገናኘም። ከሰማ ሰርቨርዎ የሚመጣውን ሊንክ ይክፈቱ ወይም ከታች ያክሉት።', serverBadge: 'ምርጥ',
     serverSec: 'ሰማ ሰርቨር', serverHelp: 'በራስዎ ኮምፒውተር ላይ የሚሰራውን በጣም ትክክለኛ ሞዴል ይጠቀሙ። ሰርቨሩ የሚያሳየውን ሊንክ ይክፈቱ ወይም አድራሻውንና ቁልፉን እዚህ ይለጥፉ።', serverKeyPh: 'የመግቢያ ቁልፍ', serverTest: 'አስቀምጥና ሞክር', serverForget: 'እርሳ',
     srvOk: 'ተገናኝቷል፦ {model}', srvBadKey: 'ሰርቨሩ ይገኛል ግን ቁልፉ ትክክል አይደለም።', srvDown: 'ሰርቨሩን ማግኘት አልተቻለም። እየሰራ ነው? አድራሻው ትክክል ነው?', srvBusy: 'ድምጽ ወደ ሰማ ሰርቨርዎ እየተላከ ነው…', srvLinked: 'ሰማ ሰርቨር ተገናኝቷል። አሁን የማወቂያ ሞተርዎ ነው።',
@@ -300,15 +304,63 @@ function autosize() { const el = $('text'); el.style.height = 'auto'; el.style.h
 $('text').addEventListener('input', autosize);
 
 let current = null; // {id, text, translation, lang, engine, at}
-function finishResult(text, meta, needsReview, eng) {
+
+// ---------------------------------------------------------------- recordings (IndexedDB, this device only)
+// Every recording is saved BEFORE it is transcribed, so a failed upload, a crash or a reload never
+// loses your voice. The newest 40 recordings are kept.
+const clips = (() => {
+  let dbp = null;
+  const db = () => dbp || (dbp = new Promise((res, rej) => {
+    const r = indexedDB.open('sema-audio', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('clips', { keyPath: 'id' });
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  }));
+  const tx = async (mode, fn) => { const d = await db(); return new Promise((res, rej) => { const t = d.transaction('clips', mode); const st = t.objectStore('clips'); const out = fn(st); t.oncomplete = () => res(out?.result ?? out); t.onerror = () => rej(t.error); }); };
+  return {
+    async put(c) { try { await tx('readwrite', (st) => st.put(c)); await this.prune(); } catch {} },
+    async get(id) { try { return await tx('readonly', (st) => st.get(id)); } catch { return null; } },
+    async prune() {
+      try {
+        const all = await tx('readonly', (st) => st.getAll());
+        all.sort((a, b) => b.at - a.at);
+        const old = all.slice(40); if (old.length) await tx('readwrite', (st) => old.forEach((c) => st.delete(c.id)));
+      } catch {}
+    },
+  };
+})();
+let lastClip = null; // {id, blob, type, noteId, at}
+let player = null;
+function showClipRow(failed) {
+  $('clipRow').hidden = !lastClip;
+  $('clipRetry').classList.toggle('attn', !!failed);
+}
+$('clipPlay').addEventListener('click', () => {
+  if (!lastClip) return;
+  if (player) { player.pause(); URL.revokeObjectURL(player.src); player = null; $('clipPlay').lastChild.textContent = t('playRec'); return; }
+  player = new Audio(URL.createObjectURL(lastClip.blob));
+  player.onended = () => { URL.revokeObjectURL(player.src); player = null; $('clipPlay').lastChild.textContent = t('playRec'); };
+  player.play().catch(() => {}); $('clipPlay').lastChild.textContent = t('stopPlay');
+});
+$('clipRetry').addEventListener('click', () => { if (lastClip && !document.body.classList.contains('busy')) transcribeBlob(lastClip.blob, true); });
+
+// The note being dictated: each recording is ADDED to it (it is never wiped by a new recording).
+let noteBase = '';
+function joinText(a, b) { a = (a || '').trim(); b = (b || '').trim(); return !a ? b : !b ? a : a + (/\n$/.test(a) ? '' : ' ') + b; }
+function saveDraft() { store.set('draft', { text: $('text').value, id: current?.id || null }); }
+function finishResult(text, meta, needsReview, eng, replaceLast) {
   text = text.trim();
-  if (!text) { showHero(); setStatus(t('empty')); return; }
+  if (!text) { if (!$('text').value.trim()) showHero(); setStatus(t('empty')); return; }
   if (state.mode !== 'exact') text = clean(text, state.in);
+  if (replaceLast && lastClip?.piece && $('text').value.endsWith(lastClip.piece)) noteBase = $('text').value.slice(0, -lastClip.piece.length);
+  if (lastClip) lastClip.piece = text;
+  text = joinText(noteBase, text);
   $('text').value = text; showLive(); autosize();
   $('stats').textContent = meta + (needsReview ? ' · ' + t('review') : ''); $('stats').classList.toggle('warn', !!needsReview);
   $('resultActions').hidden = false; setStatus(t('tapToSpeak'));
-  current = { id: Date.now().toString(36), text, translation: null, lang: state.in, engine: eng, at: Date.now() };
-  saveHistory(current);
+  if (current) { current.text = text; current.engine = eng; current.at = Date.now(); }
+  else current = { id: Date.now().toString(36), text, translation: null, lang: state.in, engine: eng, at: Date.now() };
+  if (lastClip) { current.clips = [...new Set([...(current.clips || []), lastClip.id])]; }
+  saveHistory(current); saveDraft(); showClipRow(false);
   if (state.mode === 'translate') doTranslate();
 }
 
@@ -330,11 +382,12 @@ let rec = null, recFinal = '', recCancelled = false, recError = '';
 function startGoogle() {
   rec = new SR(); rec.lang = LANGS[state.in].bcp; rec.continuous = true; rec.interimResults = true; rec.maxAlternatives = 1;
   recFinal = ''; recCancelled = false; recError = '';
-  resetResult(); showLive(); $('resultActions').hidden = true;
+  noteBase = $('text').value; lastClip = null; showClipRow(false);
+  showLive(); $('resultActions').hidden = true;
   rec.onresult = (e) => {
     let interim = '';
     for (let i = e.resultIndex; i < e.results.length; i++) { const tx = e.results[i][0].transcript; if (e.results[i].isFinal) recFinal += tx + ' '; else interim += tx; }
-    $('text').value = (recFinal + interim).replace(/\s+/g, ' ').trim(); autosize();
+    $('text').value = joinText(noteBase, (recFinal + interim).replace(/\s+/g, ' ')); autosize();
   };
   rec.onerror = (e) => {
     recError = e.error;
@@ -343,9 +396,10 @@ function startGoogle() {
   };
   rec.onend = () => {
     const wasCancelled = recCancelled; rec = null; recordingUi(false);
-    if (wasCancelled) { resetResult(); showHero(); setStatus(t('tapToSpeak')); return; }
-    const text = $('text').value;
-    if (!text.trim()) { showHero(); if (!recError) setStatus(t('empty')); return; }
+    if (wasCancelled) { $('text').value = noteBase; if (!noteBase.trim()) showHero(); else { $('resultActions').hidden = false; autosize(); } setStatus(t('tapToSpeak')); return; }
+    const text = recFinal.replace(/\s+/g, ' ').trim() || $('text').value.slice(noteBase.length);
+    $('text').value = noteBase;
+    if (!text.trim()) { if (!noteBase.trim()) showHero(); else $('resultActions').hidden = false; if (!recError) setStatus(t('empty')); return; }
     finishResult(text, `Google · ${LANGS[state.in].bcp} · online`, false, 'google');
   };
   try { rec.start(); } catch (err) { setStatus(describe(err)); rec = null; return; }
@@ -372,7 +426,9 @@ async function startLocal() {
     const buf = new Uint8Array(an.fftSize);
     levelTimer = setInterval(() => { an.getByteTimeDomainData(buf); let s = 0; for (const v of buf) { const d = (v - 128) / 128; s += d * d; } document.documentElement.style.setProperty('--lvl', Math.min(1, Math.sqrt(s / buf.length) * 4).toFixed(3)); }, 80);
   } catch {}
-  resetResult(); showHero(); recordingUi(true, t('listening'));
+  noteBase = $('text').value;
+  if (!noteBase.trim()) { resetResult(); showHero(); }
+  recordingUi(true, t('listening'));
   const m = media; setTimeout(() => { if (m.state === 'recording') m.stop(); }, engine() === 'best' || engine() === 'server' ? 120000 : 30000); // Whisper: one 30 s window
 }
 function stopLocalStream() {
@@ -384,7 +440,13 @@ async function onLocalStop() {
   if (mediaCancelled) { setStatus(t('tapToSpeak')); return; }
   const blob = new Blob(chunks, { type: media.mimeType }); chunks = [];
   if (blob.size < 2000) { setStatus(t('empty')); return; }
+  lastClip = { id: 'c' + Date.now().toString(36), blob, type: blob.type, noteId: current?.id || null, at: Date.now() };
+  await clips.put({ ...lastClip });
+  await transcribeBlob(blob, false);
+}
+async function transcribeBlob(blob, retry) {
   document.body.classList.add('busy'); setStatus(t('transcribing'));
+  if (!$('text').value.trim()) { showLive(); $('resultActions').hidden = true; }
   try {
     const pcm = await decode16k(blob);
     if (pcm.length < 16000 * 0.3) { setStatus(t('empty')); return; }
@@ -394,19 +456,23 @@ async function onLocalStop() {
       setStatus(t('srvBusy'));
       const all = pcm.slice(0, Math.min(pcm.length, 16000 * 120));
       const r = await serverTranscribe(all);
-      finishResult(r.text, `${(r.ms / 1000).toFixed(1)} s · Sema server · Ethio-ASR`, false, 'server');
+      finishResult(r.text, `${(r.ms / 1000).toFixed(1)} s · Sema server · ${r.model || 'Ethio-ASR'}`, false, 'server', retry);
       return;
     }
     if (engine() === 'best' && state.in === 'am') {
       const all = pcm.slice(0, Math.min(pcm.length, 16000 * 120));
       const r = await run({ type: 'ctc', manifest: BEST_MANIFEST, samples: all }, [all.buffer]);
-      finishResult(r.text, `${(r.ms / 1000).toFixed(1)} s · on-device · Ethio-ASR (best)`, false, 'best');
+      finishResult(r.text, `${(r.ms / 1000).toFixed(1)} s · on-device · Ethio-ASR (best)`, false, 'best', retry);
       return;
     }
     const r = await run({ type: 'asr', model: LANGS[state.in].model, samples, language: LANGS[state.in].whisper }, [samples.buffer]);
     const g = guard(r.text.replace(/\s+/g, ' '), audioMs);
-    finishResult(g.text, `${(r.ms / 1000).toFixed(1)} s · on-device · ${LANGS[state.in].model.split('/').pop()}`, g.needsReview, 'local');
-  } catch (err) { setStatus(describe(err)); }
+    finishResult(g.text, `${(r.ms / 1000).toFixed(1)} s · on-device · ${LANGS[state.in].model.split('/').pop()}`, g.needsReview, 'local', retry);
+  } catch (err) {
+    setStatus(describe(err) + ' ' + t('recSaved'));
+    showLive(); if ($('text').value.trim()) $('resultActions').hidden = false;
+    showClipRow(true);
+  }
   finally { document.body.classList.remove('busy'); }
 }
 async function decode16k(blob) {
@@ -447,9 +513,10 @@ $('share').addEventListener('click', async () => {
   if (navigator.share) { try { await navigator.share({ text: s }); } catch {} } else { await navigator.clipboard.writeText(s).catch(() => {}); toast(t('copied')); }
 });
 $('translate').addEventListener('click', () => doTranslate());
-$('discard').addEventListener('click', () => { resetResult(); showHero(); current = null; });
+$('discard').addEventListener('click', () => { if (current) { current.text = $('text').value; saveHistory(current); } resetResult(); showHero(); current = null; lastClip = null; noteBase = ''; showClipRow(false); store.del('draft'); setStatus(t('tapToSpeak')); });
 $('speak').addEventListener('click', () => speakText($('trBlock').hidden ? $('text').value : $('translation').textContent, $('trBlock').hidden ? state.in : state.out));
-$('text').addEventListener('change', () => { if (current) { current.text = $('text').value; saveHistory(current); } });
+$('text').addEventListener('change', () => { if (current) { current.text = $('text').value; saveHistory(current); } saveDraft(); });
+$('text').addEventListener('input', () => saveDraft());
 
 async function doTranslate() {
   const text = $('text').value.trim(); if (!text) return;
@@ -501,6 +568,10 @@ function renderHistory() {
     mk(t('copy'), async () => { await navigator.clipboard.writeText(x.text + (x.translation ? '\n' + x.translation : '')).catch(() => {}); toast(t('copied')); });
     mk(t('share'), async () => { if (navigator.share) navigator.share({ text: x.text }).catch(() => {}); });
     mk(t('listen'), () => speakText(x.text, x.lang));
+    if (x.clips?.length) mk(t('playRec'), async () => {
+      const c = await clips.get(x.clips[x.clips.length - 1]); if (!c) { toast('—'); return; }
+      const a = new Audio(URL.createObjectURL(c.blob)); a.onended = () => URL.revokeObjectURL(a.src); a.play().catch(() => {});
+    });
     mk(t('clear'), () => { store.set('history', loadHistory().filter((y) => y.id !== x.id)); renderHistory(); toast(t('deleted')); });
     card.append(acts); host.append(card);
   }
@@ -559,6 +630,14 @@ $('welcomeGo').addEventListener('click', () => { setEngine(engine()); store.set(
 applyLang();
 showTab('speak');
 showHero();
+(() => { // restore the note you were working on (after a reload or a crash)
+  const d = store.get('draft', null);
+  if (!d || !d.text || !d.text.trim()) return;
+  $('text').value = d.text; current = loadHistory().find((x) => x.id === d.id) || null;
+  showLive(); $('resultActions').hidden = false; requestAnimationFrame(autosize);
+  if (current?.clips?.length) clips.get(current.clips[current.clips.length - 1]).then((c) => { if (c) { lastClip = c; showClipRow(false); } });
+  toast(t('restored'));
+})();
 if (serverLinked) { store.set('welcomed', true); toast(t('srvLinked')); serverHealth(server).then((h) => { if (!h.ok) banner(h.msg, t('dismiss'), () => {}); }); }
 else if (!store.get('welcomed', false)) openWelcome();
 if (crashed && ['loading', 'transcribing'].includes(crashed.s)) {
