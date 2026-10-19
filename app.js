@@ -28,7 +28,7 @@ const S = {
     offlineSec: 'Offline model', prepare: 'Download & prepare now', appSec: 'App', install: 'Install app', clearHistory: 'Delete all history', diagnostics: 'Diagnostics',
     privacy: 'On-device engines keep your audio in this browser. The Google engine sends audio to Google. History is saved only on this device.',
     welcomeTitle: 'Welcome to Sema Voice', welcomeSub: 'Choose how your voice is turned into text. You can change this any time in Settings.', start: 'Start', done: 'Done', dismiss: 'Dismiss',
-    eGoogle: 'Google (online)', eGoogleDesc: 'Most accurate for Amharic in the browser. Words appear live as you speak. Audio is sent to Google. Needs internet and Chrome.',
+    eApple: 'Apple speech (online)', eAppleDesc: 'iPhone has no Google speech: browsers there use Apple speech. Works for English and Arabic. Needs internet; audio goes to Apple.', eAppleNoAm: 'Apple speech does not support Amharic. On iPhone use Sema server (most accurate) or On-device.', eGoogle: 'Google (online)', eGoogleDesc: 'Most accurate for Amharic in the browser. Words appear live as you speak. Audio is sent to Google. Needs internet and Chrome.',
     eLocal: 'On-device (private)', eLocalDesc: 'Works offline, audio never leaves this phone. Uses a small 56 MB model: fast, but makes more mistakes.',
     recommended: 'Recommended', private: 'Private', unavailable: 'Not available in this browser',
     tapToSpeak: 'Tap to speak', listening: 'Listening…', liveListening: 'Listening… words appear as you speak', transcribing: 'Writing it down…', translating: 'Translating…',
@@ -61,7 +61,7 @@ const S = {
     offlineSec: 'ከመስመር ውጭ ሞዴል', prepare: 'አሁን አውርድና አዘጋጅ', appSec: 'መተግበሪያ', install: 'መተግበሪያውን ጫን', clearHistory: 'ሁሉንም ታሪክ ሰርዝ', diagnostics: 'ምርመራ',
     privacy: 'በስልኩ ላይ የሚሰሩ ሞተሮች ድምጽዎን በዚህ አሳሽ ውስጥ ያቆያሉ። የGoogle ሞተር ድምጽን ወደ Google ይልካል። ታሪክ በዚህ መሣሪያ ላይ ብቻ ይቀመጣል።',
     welcomeTitle: 'ወደ ሰማ ቮይስ እንኳን በደህና መጡ', welcomeSub: 'ድምጽዎ ወደ ጽሑፍ የሚቀየርበትን መንገድ ይምረጡ። በኋላ በቅንብሮች መቀየር ይችላሉ።', start: 'ጀምር', done: 'ተጠናቀቀ', dismiss: 'ዝጋ',
-    eGoogle: 'Google (በመስመር ላይ)', eGoogleDesc: 'በአሳሽ ውስጥ ለአማርኛ በጣም ትክክለኛ። ቃላት ሲናገሩ ወዲያው ይታያሉ። ድምጽ ወደ Google ይላካል። ኢንተርኔትና Chrome ያስፈልጋል።',
+    eApple: 'Apple ንግግር (በመስመር ላይ)', eAppleDesc: 'iPhone ላይ የGoogle ንግግር የለም፤ አሳሾቹ የApple ንግግር ይጠቀማሉ። ለእንግሊዝኛና ለዓረብኛ ይሰራል። ኢንተርኔት ያስፈልጋል፤ ድምጽ ወደ Apple ይላካል።', eAppleNoAm: 'የApple ንግግር አማርኛን አይደግፍም። በiPhone ላይ ሰማ ሰርቨርን (በጣም ትክክለኛ) ወይም በስልኩ ላይን ይጠቀሙ።', eGoogle: 'Google (በመስመር ላይ)', eGoogleDesc: 'በአሳሽ ውስጥ ለአማርኛ በጣም ትክክለኛ። ቃላት ሲናገሩ ወዲያው ይታያሉ። ድምጽ ወደ Google ይላካል። ኢንተርኔትና Chrome ያስፈልጋል።',
     eLocal: 'በስልኩ ላይ (ግላዊ)', eLocalDesc: 'ያለ ኢንተርኔት ይሰራል፤ ድምጽ ከስልኩ አይወጣም። ትንሽ 56 MB ሞዴል ነው፤ ፈጣን ነው ግን ብዙ ስህተት ይሰራል።',
     recommended: 'የሚመከር', private: 'ግላዊ', unavailable: 'በዚህ አሳሽ አይገኝም',
     tapToSpeak: 'ለመናገር ይንኩ', listening: 'እያዳመጠ ነው…', liveListening: 'እያዳመጠ ነው… ቃላት ሲናገሩ ይታያሉ', transcribing: 'እየጻፈ ነው…', translating: 'እየተረጎመ ነው…',
@@ -98,6 +98,9 @@ function trModel(from, to) {
 
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 const isPhone = /Android|iPhone|iPad|Mobile/i.test(navigator.userAgent);
+// Every iPhone/iPad browser (Safari, Chrome, Edge) is WebKit: its SpeechRecognition is Apple's, not Google's,
+// and Apple speech has no Amharic. iPadOS reports a Mac user agent, hence the touch check.
+const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
 const mem = navigator.deviceMemory || 0; // Chrome-only hint, GB, capped at 8
 const state = {
   engine: store.get('engine', null), in: store.get('in', 'am'), out: store.get('out', 'en'), mode: store.get('mode', 'clean'),
@@ -190,8 +193,11 @@ document.querySelectorAll('[data-tab]').forEach((b) => b.addEventListener('click
 
 // ---------------------------------------------------------------- engines
 const BEST_MANIFEST = 'models/ethio-ctc/manifest.json';
-function engineAvailable(e) { return e === 'google' ? !!SR : e === 'best' ? (!isPhone || mem >= 8) : e === 'server' ? !!server : true; }
-function engine() { return state.engine && engineAvailable(state.engine) ? state.engine : (SR ? 'google' : 'local'); }
+function engineAvailable(e) { return e === 'google' ? !!SR && !(isIOS && state.in === 'am') : e === 'best' ? (!isPhone || mem >= 8) : e === 'server' ? !!server : true; }
+function engine() {
+  if (state.engine && engineAvailable(state.engine)) return state.engine;
+  return engineAvailable('google') ? 'google' : server ? 'server' : 'local';
+}
 function setEngine(e) {
   state.engine = e; store.set('engine', e); renderEngineOptions();
   if (e === 'local' && !isPhone) warmLocal(); // phones load the model only when the mic is used
@@ -202,9 +208,9 @@ function engineCard(e, host, onPick) {
   const b = document.createElement('button');
   b.type = 'button'; b.className = 'opt'; b.setAttribute('role', 'radio');
   b.setAttribute('aria-checked', String(engine() === e && avail)); if (!avail) b.setAttribute('aria-disabled', 'true');
-  const title = { google: t('eGoogle'), local: t('eLocal'), best: t('eBest'), server: t('eServer') }[e];
-  const desc = !avail ? (e === 'best' ? t('eBestNo') : e === 'server' ? t('eServerNo') : t('unavailable')) : { google: t('eGoogleDesc'), local: t('eLocalDesc'), best: t('eBestDesc'), server: t('eServerDesc') }[e];
-  const badge = e === 'google' ? `<span class="badge">${t('recommended')}</span>` : e === 'best' ? `<span class="badge">${t('bestBadge')}</span>` : e === 'server' ? `<span class="badge">${t('serverBadge')}</span>` : `<span class="badge">${t('private')}</span>`;
+  const title = { google: t(isIOS ? 'eApple' : 'eGoogle'), local: t('eLocal'), best: t('eBest'), server: t('eServer') }[e];
+  const desc = !avail ? (e === 'best' ? t('eBestNo') : e === 'server' ? t('eServerNo') : e === 'google' && isIOS && SR ? t('eAppleNoAm') : t('unavailable')) : { google: t(isIOS ? 'eAppleDesc' : 'eGoogleDesc'), local: t('eLocalDesc'), best: t('eBestDesc'), server: t('eServerDesc') }[e];
+  const badge = e === 'google' ? (isIOS ? '' : `<span class="badge">${t('recommended')}</span>`) : e === 'best' ? `<span class="badge">${t('bestBadge')}</span>` : e === 'server' ? `<span class="badge">${t('serverBadge')}</span>` : `<span class="badge">${t('private')}</span>`;
   b.innerHTML = `<span class="radio"></span><span><span class="opt-title">${title} ${badge}</span><span class="opt-desc">${desc}</span></span>`;
   b.addEventListener('click', () => { if (avail) onPick(e); });
   host.append(b);
@@ -213,7 +219,7 @@ function renderEngineOptions() {
   const host = $('engineOptions'); host.innerHTML = '';
   ['server', 'google', 'best', 'local'].forEach((e) => engineCard(e, host, setEngine));
   const badge = $('engineBadge');
-  badge.textContent = engine() === 'google' ? 'Google' : engine() === 'server' ? (state.ui === 'am' ? 'ሰርቨር' : 'Server') : engine() === 'best' ? (state.ui === 'am' ? 'ምርጥ' : 'Best') : (state.ui === 'am' ? 'በስልኩ' : 'On-device');
+  badge.textContent = engine() === 'google' ? (isIOS ? 'Apple' : 'Google') : engine() === 'server' ? (state.ui === 'am' ? 'ሰርቨር' : 'Server') : engine() === 'best' ? (state.ui === 'am' ? 'ምርጥ' : 'Best') : (state.ui === 'am' ? 'በስልኩ' : 'On-device');
   badge.dataset.kind = engine() === 'google' || engine() === 'server' ? 'cloud' : 'local';
 }
 $('engineBadge').addEventListener('click', () => showTab('settings'));
@@ -279,7 +285,7 @@ function renderLangPair() {
   document.querySelectorAll('[data-mode]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mode === state.mode)));
 }
 function fillSelect(sel, map, val) { sel.innerHTML = Object.entries(map).map(([k, v]) => `<option value="${k}">${v}</option>`).join(''); sel.value = val; }
-function setIn(v) { state.in = v; store.set('in', v); renderLangPair(); }
+function setIn(v) { state.in = v; store.set('in', v); renderLangPair(); renderEngineOptions(); } // engine availability depends on language
 function setOut(v) { state.out = v; store.set('out', v); renderLangPair(); }
 $('inLang').addEventListener('change', (e) => setIn(e.target.value));
 $('outLang').addEventListener('change', (e) => setOut(e.target.value));
@@ -395,7 +401,7 @@ function stopGoogle(cancel) {
   if (rec) { try { cancel ? rec.abort() : rec.stop(); } catch { googleDone(); } } else googleDone();
 }
 function googleSession() {
-  const r = new SR(); r.lang = LANGS[state.in].bcp; r.continuous = !isAndroid; r.interimResults = true; r.maxAlternatives = 1;
+  const r = new SR(); r.lang = LANGS[state.in].bcp; r.continuous = !(isAndroid || isIOS); r.interimResults = true; r.maxAlternatives = 1;
   recSession = '';
   r.onresult = (e) => {
     let txt = '';
@@ -430,7 +436,7 @@ function googleDone() {
   const text = (recFinal + ' ' + recSession).replace(/\s+/g, ' ').trim(); recSession = '';
   $('text').value = noteBase;
   if (!text) { if (!noteBase.trim()) showHero(); else $('resultActions').hidden = false; if (!recError) setStatus(t('empty')); return; }
-  finishResult(text, `Google · ${LANGS[state.in].bcp} · online`, false, 'google');
+  finishResult(text, `${isIOS ? 'Apple' : 'Google'} · ${LANGS[state.in].bcp} · online`, false, 'google');
 }
 
 // ---------------------------------------------------------------- recording: on-device engine
