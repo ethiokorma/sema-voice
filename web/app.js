@@ -33,7 +33,7 @@ const S = {
     recommended: 'Recommended', private: 'Private', unavailable: 'Not available in this browser',
     tapToSpeak: 'Tap to speak', listening: 'Listening…', liveListening: 'Listening… words appear as you speak', transcribing: 'Writing it down…', translating: 'Translating…',
     preparing: 'Preparing model', ready: 'Model ready', modelError: 'Model error',
-    empty: "I didn't catch anything. Try again a bit closer.", micDenied: 'Microphone permission is needed. Allow it in the browser settings.',
+    empty: "I didn't catch anything. Try again a bit closer.", micDenied: 'Microphone permission is needed. Allow it in the browser settings.', googleUnavail: 'Google speech is not available in this browser. Use Chrome with the Google app installed and up to date, or pick another engine.', micBusy: 'Another app is using the microphone. Close it and try again.', switchEngine: 'Choose engine',
     googleOffline: 'Google speech needs internet. Switch to On-device in Settings.', googleLang: 'Google speech does not support this language here.',
     copied: 'Copied', saved: 'Saved to History', deleted: 'Deleted', review: 'check this text: the model repeated itself',
     noTr: 'No translation model for this language pair.', workerCrash: 'The on-device model stopped (probably not enough memory). Try the Google engine, or close other tabs.',
@@ -66,7 +66,7 @@ const S = {
     recommended: 'የሚመከር', private: 'ግላዊ', unavailable: 'በዚህ አሳሽ አይገኝም',
     tapToSpeak: 'ለመናገር ይንኩ', listening: 'እያዳመጠ ነው…', liveListening: 'እያዳመጠ ነው… ቃላት ሲናገሩ ይታያሉ', transcribing: 'እየጻፈ ነው…', translating: 'እየተረጎመ ነው…',
     preparing: 'ሞዴል እየተዘጋጀ', ready: 'ሞዴሉ ዝግጁ ነው', modelError: 'የሞዴል ስህተት',
-    empty: 'ምንም አልሰማሁም። ቀረብ ብለው እንደገና ይሞክሩ።', micDenied: 'የማይክሮፎን ፈቃድ ያስፈልጋል። በአሳሹ ቅንብሮች ውስጥ ይፍቀዱ።',
+    empty: 'ምንም አልሰማሁም። ቀረብ ብለው እንደገና ይሞክሩ።', micDenied: 'የማይክሮፎን ፈቃድ ያስፈልጋል። በአሳሹ ቅንብሮች ውስጥ ይፍቀዱ።', googleUnavail: 'የGoogle ንግግር በዚህ አሳሽ አይገኝም። Chrome ከተዘመነ የGoogle መተግበሪያ ጋር ይጠቀሙ ወይም ሌላ ሞተር ይምረጡ።', micBusy: 'ሌላ መተግበሪያ ማይክሮፎኑን እየተጠቀመ ነው። ዘግተው እንደገና ይሞክሩ።', switchEngine: 'ሞተር ይምረጡ',
     googleOffline: 'የGoogle ንግግር ኢንተርኔት ያስፈልገዋል። በቅንብሮች ወደ በስልኩ ላይ ይቀይሩ።', googleLang: 'የGoogle ንግግር ይህን ቋንቋ እዚህ አይደግፍም።',
     copied: 'ተቀድቷል', saved: 'በታሪክ ተቀምጧል', deleted: 'ተሰርዟል', review: 'ይህን ጽሑፍ ያረጋግጡ፤ ሞዴሉ ደግሟል',
     noTr: 'ለዚህ ቋንቋ ጥንድ የትርጉም ሞዴል የለም።', workerCrash: 'የስልኩ ሞዴል ቆሟል (ማህደረ ትውስታ አልበቃም)። የGoogle ሞተርን ይሞክሩ ወይም ሌሎች ትሮችን ይዝጉ።',
@@ -378,32 +378,59 @@ function clean(text, lang) {
 }
 
 // ---------------------------------------------------------------- recording: Google engine
-let rec = null, recFinal = '', recCancelled = false, recError = '';
+// Android Chrome: continuous mode repeats earlier phrases inside later results (garbled, duplicated text)
+// and a session ends by itself after a short pause. There we run one short session per phrase and
+// restart it until the user taps stop, keeping the text of each finished phrase.
+const isAndroid = /Android/i.test(navigator.userAgent);
+let rec = null, recFinal = '', recSession = '', recCancelled = false, recError = '', recWanted = false, recQuiet = 0;
 function startGoogle() {
-  rec = new SR(); rec.lang = LANGS[state.in].bcp; rec.continuous = true; rec.interimResults = true; rec.maxAlternatives = 1;
-  recFinal = ''; recCancelled = false; recError = '';
+  recFinal = ''; recSession = ''; recCancelled = false; recError = ''; recWanted = true; recQuiet = 0;
   noteBase = $('text').value; lastClip = null; showClipRow(false);
   showLive(); $('resultActions').hidden = true;
-  rec.onresult = (e) => {
-    let interim = '';
-    for (let i = e.resultIndex; i < e.results.length; i++) { const tx = e.results[i][0].transcript; if (e.results[i].isFinal) recFinal += tx + ' '; else interim += tx; }
-    $('text').value = joinText(noteBase, (recFinal + interim).replace(/\s+/g, ' ')); autosize();
-  };
-  rec.onerror = (e) => {
-    recError = e.error;
-    const map = { 'not-allowed': t('micDenied'), 'service-not-allowed': t('micDenied'), 'language-not-supported': t('googleLang'), network: t('googleOffline'), 'no-speech': t('empty') };
-    setStatus(map[e.error] || `Error: ${e.error}`);
-  };
-  rec.onend = () => {
-    const wasCancelled = recCancelled; rec = null; recordingUi(false);
-    if (wasCancelled) { $('text').value = noteBase; if (!noteBase.trim()) showHero(); else { $('resultActions').hidden = false; autosize(); } setStatus(t('tapToSpeak')); return; }
-    const text = recFinal.replace(/\s+/g, ' ').trim() || $('text').value.slice(noteBase.length);
-    $('text').value = noteBase;
-    if (!text.trim()) { if (!noteBase.trim()) showHero(); else $('resultActions').hidden = false; if (!recError) setStatus(t('empty')); return; }
-    finishResult(text, `Google · ${LANGS[state.in].bcp} · online`, false, 'google');
-  };
-  try { rec.start(); } catch (err) { setStatus(describe(err)); rec = null; return; }
+  if (!googleSession()) { recWanted = false; return; }
   recordingUi(true, t('liveListening'));
+}
+function stopGoogle(cancel) {
+  recWanted = false; if (cancel) recCancelled = true;
+  if (rec) { try { cancel ? rec.abort() : rec.stop(); } catch { googleDone(); } } else googleDone();
+}
+function googleSession() {
+  const r = new SR(); r.lang = LANGS[state.in].bcp; r.continuous = !isAndroid; r.interimResults = true; r.maxAlternatives = 1;
+  recSession = '';
+  r.onresult = (e) => {
+    let txt = '';
+    if (r.continuous) { for (let i = 0; i < e.results.length; i++) txt += e.results[i][0].transcript + ' '; }
+    else txt = e.results[e.results.length - 1][0].transcript; // one phrase per session: the last result is the whole phrase
+    recSession = txt.replace(/\s+/g, ' ').trim();
+    $('text').value = joinText(noteBase, (recFinal + ' ' + recSession).trim()); autosize();
+  };
+  r.onerror = (e) => {
+    if (e.error === 'aborted') return;
+    if (e.error === 'no-speech' && recWanted) return; // a pause: the next session keeps listening
+    recError = e.error; recWanted = false;
+    const map = { 'not-allowed': t('micDenied'), 'service-not-allowed': t('googleUnavail'), 'language-not-supported': t('googleLang'),
+      network: t('googleOffline'), 'audio-capture': t('micBusy'), 'no-speech': t('empty') };
+    setStatus(map[e.error] || `Error: ${e.error}`);
+    if (['service-not-allowed', 'language-not-supported', 'network'].includes(e.error)) banner(map[e.error], t('switchEngine'), () => showTab('settings'));
+  };
+  r.onend = () => {
+    if (rec !== r) return;
+    rec = null;
+    if (recSession) { recFinal = (recFinal + ' ' + recSession).trim(); recSession = ''; recQuiet = 0; } else recQuiet++;
+    // keep listening across pauses; give up after about 3 silent sessions so it never runs forever
+    if (recWanted && !recCancelled && !recError && recQuiet < 3 && googleSession()) return;
+    googleDone();
+  };
+  try { r.start(); } catch (err) { setStatus(describe(err)); return null; }
+  rec = r; return r;
+}
+function googleDone() {
+  recWanted = false; rec = null; recordingUi(false);
+  if (recCancelled) { $('text').value = noteBase; if (!noteBase.trim()) showHero(); else { $('resultActions').hidden = false; autosize(); } setStatus(t('tapToSpeak')); return; }
+  const text = (recFinal + ' ' + recSession).replace(/\s+/g, ' ').trim(); recSession = '';
+  $('text').value = noteBase;
+  if (!text) { if (!noteBase.trim()) showHero(); else $('resultActions').hidden = false; if (!recError) setStatus(t('empty')); return; }
+  finishResult(text, `Google · ${LANGS[state.in].bcp} · online`, false, 'google');
 }
 
 // ---------------------------------------------------------------- recording: on-device engine
@@ -495,11 +522,11 @@ function recordingUi(on, msg) {
   if (on) { recStart = Date.now(); $('timer').textContent = '0:00'; timerInt = setInterval(() => { const s = Math.floor((Date.now() - recStart) / 1000); $('timer').textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; }, 500); setStatus(msg); }
 }
 $('mic').addEventListener('click', () => {
-  if (engine() === 'google') { if (rec) rec.stop(); else startGoogle(); return; }
+  if (engine() === 'google') { if (recWanted || rec) stopGoogle(false); else startGoogle(); return; }
   if (media?.state === 'recording') media.stop(); else startLocal();
 });
 $('cancel').addEventListener('click', () => {
-  if (rec) { recCancelled = true; rec.abort(); return; }
+  if (recWanted || rec) { stopGoogle(true); return; }
   if (media?.state === 'recording') { mediaCancelled = true; media.stop(); }
 });
 
